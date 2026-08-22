@@ -195,6 +195,7 @@ export const siteSettings = mysqlTable("site_settings", {
     youtube?: string;
     facebook?: string;
     tiktok?: string;
+    dribbble?: string;
   }>(),
   metaTitle: varchar("meta_title", { length: 255 }),
   metaDescription: varchar("meta_description", { length: 500 }),
