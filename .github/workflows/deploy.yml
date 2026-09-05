@@ -8,7 +8,7 @@ on:
 
 jobs:
   build-and-deploy:
-    name: Build & Deploy via FTP
+    name: Build & Deploy via FTPS
     runs-on: ubuntu-latest
 
     steps:
@@ -27,8 +27,10 @@ jobs:
       - name: 🏗️ Build Next.js Application
         run: npm run build
 
-      - name: 🧹 Clean Build Cache
-        run: rm -rf .next/cache
+      - name: 🧹 Clean Build & Source Maps
+        run: |
+          rm -rf .next/cache
+          find .next -name "*.map" -type f -delete
 
       - name: 🔄 Trigger Phusion Passenger Restart
         run: |
@@ -42,14 +44,17 @@ jobs:
           username: ${{ secrets.CPANEL_USERNAME }}
           password: ${{ secrets.CPANEL_PASSWORD }}
           server-dir: ${{ secrets.CPANEL_APP_PATH }}/
-          protocol: ftp
+          protocol: ftps
           port: 21
+          security: explicit
+          passive: true
           exclude: |
             **/.git*
             **/.git*/**
             **/.github/**
             **/node_modules/**
             **/.next/cache/**
+            **/*.map
             **/*.sql
             **/*.md
             **/*.zip
