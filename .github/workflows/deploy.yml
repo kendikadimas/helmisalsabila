@@ -46,8 +46,8 @@ jobs:
           server-dir: ${{ secrets.CPANEL_APP_PATH }}/
           protocol: ftps
           port: 21
-          security: explicit
-          passive: true
+          security: loose
+          dangerous-clean-slate: false
           exclude: |
             **/.git*
             **/.git*/**
