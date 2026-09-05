@@ -1,0 +1,58 @@
+name: Deploy Next.js to cPanel Shared Hosting
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    name: Build & Deploy via FTP
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: ⬇️ Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: 📦 Install Dependencies
+        run: npm ci
+
+      - name: 🏗️ Build Next.js Application
+        run: npm run build
+
+      - name: 🧹 Clean Build Cache
+        run: rm -rf .next/cache
+
+      - name: 🔄 Trigger Phusion Passenger Restart
+        run: |
+          mkdir -p tmp
+          echo "$(date)" > tmp/restart.txt
+
+      - name: 🚀 Sync Files to cPanel via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.CPANEL_SERVER }}
+          username: ${{ secrets.CPANEL_USERNAME }}
+          password: ${{ secrets.CPANEL_PASSWORD }}
+          server-dir: ${{ secrets.CPANEL_APP_PATH }}/
+          protocol: ftp
+          port: 21
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/.github/**
+            **/node_modules/**
+            **/.next/cache/**
+            **/*.sql
+            **/*.md
+            **/*.zip
+            .env
+            .env.local
+            .env.*.local
