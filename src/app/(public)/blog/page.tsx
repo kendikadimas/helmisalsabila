@@ -38,7 +38,7 @@ export default async function BlogPage({
         defaultValue={params.q || ""}
       />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+      <div className="max-w-[1440px] mx-auto px-6 sm:px-12 lg:px-[96px] space-y-12">
         {/* 1. Artikel Populer (Top 2 Featured Large Cards from DB) */}
         {popularArticles.length > 0 && (
           <section className="space-y-6">

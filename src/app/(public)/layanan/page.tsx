@@ -41,7 +41,7 @@ export default async function LayananPage({
         defaultValue={params.q || ""}
       />
 
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[1440px] mx-auto px-6 sm:px-12 lg:px-[96px]">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Left Sidebar Filter */}
           <div className="lg:col-span-1">

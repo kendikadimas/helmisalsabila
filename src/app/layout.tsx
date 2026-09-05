@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import { Quicksand } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 
-const quicksand = Quicksand({
+const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["300", "400", "500", "600", "700", "800"],
   variable: "--font-sans",
 });
 
@@ -20,7 +20,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="id" className={`${quicksand.variable}`}>
+    <html lang="id" className={`${plusJakartaSans.variable}`}>
       <body className="font-sans antialiased bg-white text-slate-900 min-h-screen">
         {children}
       </body>

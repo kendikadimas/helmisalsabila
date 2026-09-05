@@ -57,7 +57,7 @@ export default async function DetailLayananPage({
     <div className="space-y-12 pb-20">
       {/* Breadcrumb Header */}
       <div className="bg-slate-50 border-b border-slate-100 py-4">
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 text-xs text-slate-500 flex items-center gap-2">
+        <div className="max-w-[1440px] mx-auto px-6 sm:px-12 lg:px-[96px] text-xs text-slate-500 flex items-center gap-2">
           <Link href="/" className="hover:text-slate-800">
             Beranda
           </Link>
@@ -70,7 +70,7 @@ export default async function DetailLayananPage({
         </div>
       </div>
 
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+      <div className="max-w-[1440px] mx-auto px-6 sm:px-12 lg:px-[96px] space-y-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
           {/* Left Main Content (65% / col-span-8) */}
           <div className="lg:col-span-8 space-y-8">

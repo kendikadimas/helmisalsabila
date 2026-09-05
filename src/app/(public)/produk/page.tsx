@@ -41,19 +41,21 @@ export default async function ProdukPage({
         defaultValue={params.q || ""}
       />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col lg:flex-row gap-8 items-start">
+      <div className="max-w-[1440px] mx-auto px-6 sm:px-12 lg:px-[96px]">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Sidebar Filter (Categories from DB) */}
-          <FilterSidebar
-            categories={categories}
-            currentCategory={params.kategori}
-            currentSort={params.sort}
-            currentPriceType={params.harga}
-            basePath="/produk"
-          />
+          <div className="lg:col-span-1">
+            <FilterSidebar
+              categories={categories}
+              currentCategory={params.kategori}
+              currentSort={params.sort}
+              currentPriceType={params.harga}
+              basePath="/produk"
+            />
+          </div>
 
           {/* Product Cards Grid (3 Columns) */}
-          <div className="flex-1 space-y-8 w-full">
+          <div className="lg:col-span-3 space-y-8">
             {products.length === 0 ? (
               <div className="text-center py-16 bg-white rounded-2xl border border-slate-200 text-slate-500 text-xs">
                 Tidak ada produk digital yang sesuai dengan filter atau pencarian Anda.
