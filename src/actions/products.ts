@@ -144,14 +144,25 @@ export async function createProduct(formData: FormData) {
     if (!session) return { success: false, error: "Unauthorized" };
 
     const title = formData.get("title") as string;
-    const slug = (formData.get("slug") as string) || slugify(title);
+    let baseSlug = (formData.get("slug") as string) || slugify(title);
+    if (!baseSlug) baseSlug = `product-${Date.now()}`;
+
+    // Ensure slug uniqueness
+    const existing = await db
+      .select({ id: schema.products.id })
+      .from(schema.products)
+      .where(eq(schema.products.slug, baseSlug))
+      .limit(1);
+
+    const slug = existing.length > 0 ? `${baseSlug}-${Date.now().toString(36)}` : baseSlug;
+
     const levelBadge = (formData.get("levelBadge") as string) || "Semua Level";
     const originalPrice = (formData.get("originalPrice") as string) || "0";
     const discountPercent = parseInt((formData.get("discountPercent") as string) || "0", 10);
     const discountedPrice = (formData.get("discountedPrice") as string) || originalPrice;
     const totalSales = parseInt((formData.get("totalSales") as string) || "0", 10);
     const thumbnailUrl = (formData.get("thumbnailUrl") as string) || "/assets/placeholder.jpg";
-    const aboutProduct = formData.get("aboutProduct") as string;
+    const aboutProduct = (formData.get("aboutProduct") as string) || title;
     const isFeatured = formData.get("isFeatured") === "true";
     const isPublished = formData.get("isPublished") !== "false";
 
@@ -178,6 +189,7 @@ export async function createProduct(formData: FormData) {
     revalidatePath("/admin/products");
     return { success: true, id };
   } catch (error: any) {
+    console.error("Error creating product:", error);
     return { success: false, error: error.message };
   }
 }

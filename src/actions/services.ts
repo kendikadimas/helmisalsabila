@@ -132,9 +132,20 @@ export async function createService(formData: FormData) {
     if (!session) return { success: false, error: "Unauthorized" };
 
     const title = formData.get("title") as string;
-    const slug = (formData.get("slug") as string) || slugify(title);
-    const shortDescription = formData.get("shortDescription") as string;
-    const fullDescription = formData.get("fullDescription") as string;
+    let baseSlug = (formData.get("slug") as string) || slugify(title);
+    if (!baseSlug) baseSlug = `service-${Date.now()}`;
+    
+    // Ensure slug uniqueness
+    const existing = await db
+      .select({ id: schema.services.id })
+      .from(schema.services)
+      .where(eq(schema.services.slug, baseSlug))
+      .limit(1);
+
+    const slug = existing.length > 0 ? `${baseSlug}-${Date.now().toString(36)}` : baseSlug;
+
+    const shortDescription = (formData.get("shortDescription") as string) || "";
+    const fullDescription = (formData.get("fullDescription") as string) || shortDescription;
     const thumbnailUrl = (formData.get("thumbnailUrl") as string) || "/assets/placeholder.jpg";
     const categoryId = (formData.get("categoryId") as string) || null;
     const priceStartingAt = formData.get("priceStartingAt") as string;
@@ -163,6 +174,7 @@ export async function createService(formData: FormData) {
     revalidatePath("/admin/services");
     return { success: true, id };
   } catch (error: any) {
+    console.error("Error creating service:", error);
     return { success: false, error: error.message };
   }
 }

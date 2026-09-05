@@ -168,9 +168,20 @@ export async function createArticle(formData: FormData) {
     if (!session) return { success: false, error: "Unauthorized" };
 
     const title = formData.get("title") as string;
-    const slug = (formData.get("slug") as string) || slugify(title);
-    const excerpt = formData.get("excerpt") as string;
-    const content = formData.get("content") as string;
+    let baseSlug = (formData.get("slug") as string) || slugify(title);
+    if (!baseSlug) baseSlug = `article-${Date.now()}`;
+
+    // Ensure slug uniqueness
+    const existing = await db
+      .select({ id: schema.articles.id })
+      .from(schema.articles)
+      .where(eq(schema.articles.slug, baseSlug))
+      .limit(1);
+
+    const slug = existing.length > 0 ? `${baseSlug}-${Date.now().toString(36)}` : baseSlug;
+
+    const excerpt = (formData.get("excerpt") as string) || title;
+    const content = (formData.get("content") as string) || excerpt;
     const featuredImage = (formData.get("featuredImage") as string) || "/assets/placeholder.jpg";
     const categoryId = (formData.get("categoryId") as string) || null;
     const isPublished = formData.get("isPublished") === "true";
@@ -204,6 +215,7 @@ export async function createArticle(formData: FormData) {
     revalidatePath("/admin/articles");
     return { success: true, id };
   } catch (error: any) {
+    console.error("Error creating article:", error);
     return { success: false, error: error.message };
   }
 }
