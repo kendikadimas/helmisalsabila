@@ -8,7 +8,7 @@ on:
 
 jobs:
   build-and-deploy:
-    name: Build & Deploy via FTPS
+    name: Build & Deploy via FTP
     runs-on: ubuntu-latest
 
     steps:
@@ -32,32 +32,56 @@ jobs:
           rm -rf .next/cache
           find .next -name "*.map" -type f -delete
 
-      - name: 🔄 Trigger Phusion Passenger Restart
+      - name: 🔄 Trigger Phusion Passenger Restart Marker
         run: |
           mkdir -p tmp
           echo "$(date)" > tmp/restart.txt
 
+      - name: 🛠️ Install lftp
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq lftp
+
       - name: 🚀 Sync Files to cPanel via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.CPANEL_SERVER }}
-          username: ${{ secrets.CPANEL_USERNAME }}
-          password: ${{ secrets.CPANEL_PASSWORD }}
-          server-dir: ${{ secrets.CPANEL_APP_PATH }}/
-          protocol: ftps
-          port: 21
-          security: loose
-          dangerous-clean-slate: false
-          exclude: |
-            **/.git*
-            **/.git*/**
-            **/.github/**
-            **/node_modules/**
-            **/.next/cache/**
-            **/*.map
-            **/*.sql
-            **/*.md
-            **/*.zip
-            .env
-            .env.local
-            .env.*.local
+        env:
+          FTP_HOST: ${{ secrets.CPANEL_SERVER }}
+          FTP_USER: ${{ secrets.CPANEL_USERNAME }}
+          FTP_PASS: ${{ secrets.CPANEL_PASSWORD }}
+          FTP_DIR: ${{ secrets.CPANEL_APP_PATH }}
+        run: |
+          lftp -u "$FTP_USER","$FTP_PASS" "$FTP_HOST" <<'SCRIPT'
+            set ftp:ssl-allow no
+            set ftp:passive-mode on
+            set ftp:use-mdtm off
+            set ftp:use-site-utime off
+            set ftp:use-site-idle off
+            set ftp:use-pret off
+            set net:max-retries 10
+            set net:reconnect-interval-base 5
+            set net:reconnect-interval-max 60
+            set net:timeout 40
+            set mirror:use-utc off
+            mirror -R --no-perms --no-umask --continue --verbose=1 \
+              --exclude '^\.git' \
+              --exclude '^\.github/' \
+              --exclude '^node_modules/' \
+              --exclude '^\.next/cache/' \
+              --exclude '\.map$' \
+              --exclude '\.sql$' \
+              --exclude '\.zip$' \
+              --exclude '\.md$' \
+              --exclude '^\.env' \
+              --exclude '^tsconfig\.tsbuildinfo$' \
+              --exclude '^stderr\.log$' \
+              . helmisalsabila/
+            bye
+          SCRIPT
+
+      - name: ✅ Verify Website is Up
+        run: |
+          sleep 5
+          code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 30 https://helsenvi.com)
+          echo "HTTP status from https://helsenvi.com => $code"
+          if [ "$code" = "000" ]; then
+            echo "::warning::Site unreachable right now (Passenger may still be restarting)."
+          fi
