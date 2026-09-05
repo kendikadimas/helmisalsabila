@@ -1,9 +1,16 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import SearchBanner from "@/components/SearchBanner";
 import Pagination from "@/components/Pagination";
 import SectionHeader from "@/components/SectionHeader";
 import { getArticles, getPopularArticles, getAllCategories } from "@/actions/articles";
 import { formatDateIndo } from "@/lib/utils";
+
+export const metadata: Metadata = {
+  title: "Artikel & Wawasan Teknologi | Helmi Salsabila",
+  description:
+    "Kumpulan tulisan seputar data analytics, tips spreadsheet, automasi kerja, dan studi kasus implementasi teknologi.",
+};
 
 export default async function BlogPage({
   searchParams,

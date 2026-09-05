@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { Sun, ChevronDown, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -56,13 +56,6 @@ export default function Navbar() {
               </Link>
             ))}
           </nav>
-
-          {/* Theme Switcher Button */}
-          <div className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border border-[#0D9488]/70 text-xs font-semibold text-[#0D9488] bg-white shadow-2xs cursor-pointer hover:bg-teal-50/50 transition-colors">
-            <Sun className="w-3.5 h-3.5 text-[#0D9488]" />
-            <span>Light</span>
-            <ChevronDown className="w-3.5 h-3.5 text-[#0D9488]" />
-          </div>
         </div>
 
         {/* Mobile Hamburger */}

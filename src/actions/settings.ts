@@ -3,6 +3,7 @@
 import { db, schema } from "@/db";
 import { eq, asc } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { getSession } from "@/lib/auth";
 
 export async function getSiteSettings() {
   try {
@@ -47,6 +48,9 @@ export async function getValuePropositions() {
 
 export async function updateSiteSettings(formData: FormData) {
   try {
+    const session = await getSession();
+    if (!session) return { success: false, error: "Unauthorized" };
+
     const heroTitle = formData.get("heroTitle") as string;
     const heroSubtitle = formData.get("heroSubtitle") as string;
     const contactPhone = formData.get("contactPhone") as string;

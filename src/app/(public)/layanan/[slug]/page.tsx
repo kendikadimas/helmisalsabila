@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ShieldCheck } from "lucide-react";
 import { getServiceBySlug, getServices } from "@/actions/services";
@@ -6,6 +7,31 @@ import { getSiteSettings } from "@/actions/settings";
 import { formatRupiah } from "@/lib/utils";
 import SectionHeader from "@/components/SectionHeader";
 import ShareButton from "@/components/ShareButton";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const service = await getServiceBySlug(slug);
+
+  if (!service) {
+    return {
+      title: "Layanan Tidak Ditemukan | Helmi Salsabila",
+    };
+  }
+
+  return {
+    title: `${service.title} | Layanan Helmi Salsabila`,
+    description: service.shortDescription || "Detail paket dan ruang lingkup layanan dari Helmi Salsabila.",
+    openGraph: {
+      title: service.title,
+      description: service.shortDescription || "",
+      images: service.thumbnailUrl ? [{ url: service.thumbnailUrl }] : [],
+    },
+  };
+}
 
 export default async function DetailLayananPage({
   params,

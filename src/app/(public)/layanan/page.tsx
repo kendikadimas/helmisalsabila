@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { MousePointer } from "lucide-react";
 import SearchBanner from "@/components/SearchBanner";
 import FilterSidebar from "@/components/FilterSidebar";
@@ -6,6 +7,12 @@ import Pagination from "@/components/Pagination";
 import { getServices } from "@/actions/services";
 import { getAllCategories } from "@/actions/articles";
 import { formatRupiah } from "@/lib/utils";
+
+export const metadata: Metadata = {
+  title: "Layanan & Portfolio | Helmi Salsabila",
+  description:
+    "Eksplorasi layanan konsultasi data, automasi bisnis, perancangan dashboard, dan portofolio implementasi solusi digital.",
+};
 
 export default async function LayananPage({
   searchParams,

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { Star } from "lucide-react";
 import SearchBanner from "@/components/SearchBanner";
 import FilterSidebar from "@/components/FilterSidebar";
@@ -6,6 +7,12 @@ import Pagination from "@/components/Pagination";
 import { getProducts } from "@/actions/products";
 import { getAllCategories } from "@/actions/articles";
 import { formatRupiah } from "@/lib/utils";
+
+export const metadata: Metadata = {
+  title: "Produk Digital & E-Course | Helmi Salsabila",
+  description:
+    "Katalog template spreadsheet, mini course praktis, dan aset digital siap pakai untuk kebutuhan profesional dan bisnis.",
+};
 
 export default async function ProdukPage({
   searchParams,

@@ -4,6 +4,7 @@ import { db, schema } from "@/db";
 import { eq, desc, asc, and, like, gt, lte, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { slugify } from "@/lib/utils";
+import { getSession } from "@/lib/auth";
 
 export interface ServiceFilterOptions {
   limit?: number;
@@ -127,6 +128,9 @@ export async function getServiceBySlug(slug: string) {
 
 export async function createService(formData: FormData) {
   try {
+    const session = await getSession();
+    if (!session) return { success: false, error: "Unauthorized" };
+
     const title = formData.get("title") as string;
     const slug = (formData.get("slug") as string) || slugify(title);
     const shortDescription = formData.get("shortDescription") as string;
@@ -165,6 +169,9 @@ export async function createService(formData: FormData) {
 
 export async function updateService(id: string, formData: FormData) {
   try {
+    const session = await getSession();
+    if (!session) return { success: false, error: "Unauthorized" };
+
     const title = formData.get("title") as string;
     const slug = formData.get("slug") as string;
     const shortDescription = formData.get("shortDescription") as string;
@@ -200,6 +207,9 @@ export async function updateService(id: string, formData: FormData) {
 
 export async function deleteService(id: string) {
   try {
+    const session = await getSession();
+    if (!session) return { success: false, error: "Unauthorized" };
+
     await db.delete(schema.services).where(eq(schema.services.id, id));
     revalidatePath("/");
     revalidatePath("/layanan");

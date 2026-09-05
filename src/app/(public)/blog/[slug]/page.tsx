@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Eye, Share2, MessageCircle, Facebook, Copy, ChevronDown } from "lucide-react";
 import { getArticleBySlug, getArticles, getTrendingArticles, getAllTags } from "@/actions/articles";
@@ -6,6 +7,31 @@ import { getSiteSettings } from "@/actions/settings";
 import { formatDateIndo } from "@/lib/utils";
 import SectionHeader from "@/components/SectionHeader";
 import ShareButton from "@/components/ShareButton";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const article = await getArticleBySlug(slug);
+
+  if (!article) {
+    return {
+      title: "Artikel Tidak Ditemukan | Helmi Salsabila",
+    };
+  }
+
+  return {
+    title: `${article.title} | Helmi Salsabila`,
+    description: article.excerpt || "Baca artikel selengkapnya di website Helmi Salsabila.",
+    openGraph: {
+      title: article.title,
+      description: article.excerpt || "",
+      images: article.featuredImage ? [{ url: article.featuredImage }] : [],
+    },
+  };
+}
 
 export default async function DetailArtikelPage({
   params,

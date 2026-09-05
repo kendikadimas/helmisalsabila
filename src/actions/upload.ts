@@ -2,9 +2,15 @@
 
 import { writeFile, mkdir } from "fs/promises";
 import { join } from "path";
+import { getSession } from "@/lib/auth";
 
 export async function uploadFileAction(formData: FormData) {
   try {
+    const session = await getSession();
+    if (!session) {
+      return { success: false, error: "Unauthorized" };
+    }
+
     const file = formData.get("file") as File;
     if (!file || typeof file === "string") {
       return { success: false, error: "Tidak ada file yang dipilih." };

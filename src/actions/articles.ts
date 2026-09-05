@@ -210,6 +210,9 @@ export async function createArticle(formData: FormData) {
 
 export async function deleteArticle(id: string) {
   try {
+    const session = await getSession();
+    if (!session) return { success: false, error: "Unauthorized" };
+
     await db.delete(schema.articles).where(eq(schema.articles.id, id));
     revalidatePath("/");
     revalidatePath("/blog");

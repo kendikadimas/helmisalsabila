@@ -1,10 +1,38 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { BarChart3, FileText, BookOpen, Star } from "lucide-react";
 import { getProductBySlug } from "@/actions/products";
 import { getSiteSettings } from "@/actions/settings";
 import { formatRupiah } from "@/lib/utils";
 import ShareButton from "@/components/ShareButton";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const product = await getProductBySlug(slug);
+
+  if (!product) {
+    return {
+      title: "Produk Tidak Ditemukan | Helmi Salsabila",
+    };
+  }
+
+  return {
+    title: `${product.title} | Produk Digital Helmi Salsabila`,
+    description:
+      product.aboutProduct?.substring(0, 160) ||
+      "Dapatkan template dan modul pembelajaran eksklusif dari Helmi Salsabila.",
+    openGraph: {
+      title: product.title,
+      description: product.aboutProduct?.substring(0, 160) || "",
+      images: product.thumbnailUrl ? [{ url: product.thumbnailUrl }] : [],
+    },
+  };
+}
 
 function parseJsonArray(val: unknown): string[] {
   if (!val) return [];

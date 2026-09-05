@@ -4,6 +4,7 @@ import { db, schema } from "@/db";
 import { eq, desc, asc, and, like, gt, lte } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { slugify } from "@/lib/utils";
+import { getSession } from "@/lib/auth";
 
 export interface ProductFilterOptions {
   limit?: number;
@@ -139,6 +140,9 @@ export async function getProductBySlug(slug: string) {
 
 export async function createProduct(formData: FormData) {
   try {
+    const session = await getSession();
+    if (!session) return { success: false, error: "Unauthorized" };
+
     const title = formData.get("title") as string;
     const slug = (formData.get("slug") as string) || slugify(title);
     const levelBadge = (formData.get("levelBadge") as string) || "Semua Level";
@@ -180,6 +184,9 @@ export async function createProduct(formData: FormData) {
 
 export async function deleteProduct(id: string) {
   try {
+    const session = await getSession();
+    if (!session) return { success: false, error: "Unauthorized" };
+
     await db.delete(schema.products).where(eq(schema.products.id, id));
     revalidatePath("/");
     revalidatePath("/produk");

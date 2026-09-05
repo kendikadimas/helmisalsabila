@@ -12,8 +12,16 @@ import {
 } from "lucide-react";
 import { logoutAction } from "@/actions/auth";
 
-export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+export default async function AdminDashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const session = await getSession();
+
+  if (!session) {
+    redirect("/admin/login");
+  }
 
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col md:flex-row">
@@ -89,7 +97,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <form action={logoutAction}>
             <button
               type="submit"
-              className="w-full flex items-center gap-2 px-3.5 py-2 rounded-xl text-rose-400 hover:bg-rose-500/10 text-xs font-medium transition-colors"
+              className="w-full flex items-center gap-2 px-3.5 py-2 rounded-xl text-rose-400 hover:bg-rose-500/10 text-xs font-medium transition-colors cursor-pointer"
             >
               <LogOut className="w-4 h-4" />
               <span>Logout</span>
