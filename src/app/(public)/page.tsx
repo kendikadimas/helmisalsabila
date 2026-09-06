@@ -413,9 +413,11 @@ export default async function HomePage() {
       </section>
 
       {/* 5. TESTIMONI KLIEN SECTION */}
-      <section className="max-w-[1440px] mx-auto px-6 sm:px-12 lg:px-[96px]">
-        <SectionHeader title="Testimoni Klien" subtitle="Apa kata klien tentang" />
-        <TestimonialCarousel testimonials={testimonials} />
+      <section className="bg-[#E6FAF8]/70 py-16 -mt-12 mb-4 border-y border-[#99F6E4]/50">
+        <div className="max-w-[1440px] mx-auto px-6 sm:px-12 lg:px-[96px] space-y-6">
+          <SectionHeader title="Testimoni Klien" subtitle="Apa kata klien tentang" />
+          <TestimonialCarousel testimonials={testimonials} />
+        </div>
       </section>
 
       {/* 6. ARTIKEL SECTION */}

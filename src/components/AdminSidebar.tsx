@@ -8,6 +8,7 @@ import {
   Briefcase,
   Package,
   BookOpen,
+  MessageSquareQuote,
   Settings,
   LogOut,
   ExternalLink,
@@ -44,6 +45,11 @@ export default function AdminSidebar({ logoutAction, userEmail = "admin@helmisal
       label: "Artikel & Blog",
       href: "/admin/articles",
       icon: BookOpen,
+    },
+    {
+      label: "Testimoni Klien",
+      href: "/admin/testimonials",
+      icon: MessageSquareQuote,
     },
     {
       label: "Site Settings",

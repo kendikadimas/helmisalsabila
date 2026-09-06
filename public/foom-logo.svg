@@ -1,0 +1,5 @@
+<svg viewBox="0 0 100 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <text x="0" y="21" font-family="system-ui, -apple-system, sans-serif" font-weight="900" font-size="22" letter-spacing="0.05em" fill="#0F172A">FOOM</text>
+  <circle cx="86" cy="8" r="4" stroke="#0F172A" stroke-width="1.2" fill="none" />
+  <text x="84" y="10.5" font-family="system-ui, -apple-system, sans-serif" font-weight="700" font-size="6" fill="#0F172A">R</text>
+</svg>
