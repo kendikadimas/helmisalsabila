@@ -72,6 +72,45 @@ export default async function AdminSettingsPage() {
             />
           </div>
 
+          {/* Counter Banner Stats */}
+          <div className="pt-4 border-t border-slate-200 space-y-3">
+            <h3 className="font-semibold text-slate-800 text-sm">Angka Counter Stats Ribbon (Landing Page)</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-slate-600">Tahun Pengalaman</label>
+                <input
+                  type="text"
+                  name="statsYears"
+                  defaultValue={settings?.statsCounters?.years || "5+"}
+                  placeholder="5+"
+                  className="w-full p-3 bg-white border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-teal-600 transition-colors font-mono font-bold"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-slate-600">Klien Sudah Percaya</label>
+                <input
+                  type="text"
+                  name="statsClients"
+                  defaultValue={settings?.statsCounters?.clients || "100+"}
+                  placeholder="100+"
+                  className="w-full p-3 bg-white border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-teal-600 transition-colors font-mono font-bold"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-slate-600">Project Selesai</label>
+                <input
+                  type="text"
+                  name="statsProjects"
+                  defaultValue={settings?.statsCounters?.projects || "100%"}
+                  placeholder="100%"
+                  className="w-full p-3 bg-white border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-teal-600 transition-colors font-mono font-bold"
+                />
+              </div>
+            </div>
+          </div>
+
           <div className="pt-4 border-t border-slate-200 flex justify-end">
             <button
               type="submit"

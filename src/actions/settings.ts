@@ -57,6 +57,16 @@ export async function updateSiteSettings(formData: FormData) {
     const contactAddress = formData.get("contactAddress") as string;
     const saweriaUrl = formData.get("saweriaUrl") as string;
 
+    const statsYears = (formData.get("statsYears") as string) || "5+";
+    const statsClients = (formData.get("statsClients") as string) || "100+";
+    const statsProjects = (formData.get("statsProjects") as string) || "100%";
+
+    const statsCounters = {
+      years: statsYears,
+      clients: statsClients,
+      projects: statsProjects,
+    };
+
     await db
       .update(schema.siteSettings)
       .set({
@@ -65,6 +75,7 @@ export async function updateSiteSettings(formData: FormData) {
         contactPhone,
         contactAddress,
         saweriaUrl,
+        statsCounters,
       })
       .where(eq(schema.siteSettings.id, 1));
 
