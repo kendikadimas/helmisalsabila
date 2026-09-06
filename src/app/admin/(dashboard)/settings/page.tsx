@@ -111,6 +111,91 @@ export default async function AdminSettingsPage() {
             </div>
           </div>
 
+          {/* Social Media Links */}
+          <div className="pt-4 border-t border-slate-200 space-y-3">
+            <h3 className="font-semibold text-slate-800 text-sm">Tautan Media Sosial Resmi</h3>
+            <p className="text-xs text-slate-500">Tautan ini otomatis terpasang di Hero, Footer, dan CTA halaman utama.</p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-slate-600">LinkedIn Profile URL</label>
+                <input
+                  type="url"
+                  name="linkedin"
+                  defaultValue={settings?.socialLinks?.linkedin || "https://linkedin.com"}
+                  placeholder="https://linkedin.com/in/username"
+                  className="w-full p-3 bg-white border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-teal-600 transition-colors font-mono"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-slate-600">Instagram Profile URL</label>
+                <input
+                  type="url"
+                  name="instagram"
+                  defaultValue={settings?.socialLinks?.instagram || "https://instagram.com"}
+                  placeholder="https://instagram.com/username"
+                  className="w-full p-3 bg-white border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-teal-600 transition-colors font-mono"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-slate-600">Threads Profile URL</label>
+                <input
+                  type="url"
+                  name="threads"
+                  defaultValue={settings?.socialLinks?.threads || "https://threads.net"}
+                  placeholder="https://threads.net/@username"
+                  className="w-full p-3 bg-white border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-teal-600 transition-colors font-mono"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-slate-600">Dribbble Portfolio URL</label>
+                <input
+                  type="url"
+                  name="dribbble"
+                  defaultValue={settings?.socialLinks?.dribbble || "https://dribbble.com"}
+                  placeholder="https://dribbble.com/username"
+                  className="w-full p-3 bg-white border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-teal-600 transition-colors font-mono"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-slate-600">YouTube Channel URL</label>
+                <input
+                  type="url"
+                  name="youtube"
+                  defaultValue={settings?.socialLinks?.youtube || "https://youtube.com"}
+                  placeholder="https://youtube.com/@channel"
+                  className="w-full p-3 bg-white border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-teal-600 transition-colors font-mono"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-slate-600">TikTok Profile URL</label>
+                <input
+                  type="url"
+                  name="tiktok"
+                  defaultValue={settings?.socialLinks?.tiktok || "https://tiktok.com"}
+                  placeholder="https://tiktok.com/@username"
+                  className="w-full p-3 bg-white border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-teal-600 transition-colors font-mono"
+                />
+              </div>
+
+              <div className="space-y-1.5 md:col-span-2">
+                <label className="text-xs font-medium text-slate-600">Facebook Page / Profile URL</label>
+                <input
+                  type="url"
+                  name="facebook"
+                  defaultValue={settings?.socialLinks?.facebook || "https://facebook.com"}
+                  placeholder="https://facebook.com/profile"
+                  className="w-full p-3 bg-white border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-teal-600 transition-colors font-mono"
+                />
+              </div>
+            </div>
+          </div>
+
           <div className="pt-4 border-t border-slate-200 flex justify-end">
             <button
               type="submit"

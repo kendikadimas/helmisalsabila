@@ -67,6 +67,24 @@ export async function updateSiteSettings(formData: FormData) {
       projects: statsProjects,
     };
 
+    const linkedin = formData.get("linkedin") as string;
+    const instagram = formData.get("instagram") as string;
+    const threads = formData.get("threads") as string;
+    const youtube = formData.get("youtube") as string;
+    const facebook = formData.get("facebook") as string;
+    const tiktok = formData.get("tiktok") as string;
+    const dribbble = formData.get("dribbble") as string;
+
+    const socialLinks = {
+      linkedin,
+      instagram,
+      threads,
+      youtube,
+      facebook,
+      tiktok,
+      dribbble,
+    };
+
     await db
       .update(schema.siteSettings)
       .set({
@@ -76,6 +94,7 @@ export async function updateSiteSettings(formData: FormData) {
         contactAddress,
         saweriaUrl,
         statsCounters,
+        socialLinks,
       })
       .where(eq(schema.siteSettings.id, 1));
 
