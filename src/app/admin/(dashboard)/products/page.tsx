@@ -1,6 +1,6 @@
 import { getAllProductsAdmin, deleteProduct, createProduct } from "@/actions/products";
 import { formatRupiah } from "@/lib/utils";
-import { Plus, Trash2, ExternalLink, Package, DollarSign, Percent, Tag, Award, Sparkles } from "lucide-react";
+import { Plus, Trash2, ExternalLink } from "lucide-react";
 import Link from "next/link";
 
 export default async function AdminProductsPage() {
@@ -18,182 +18,134 @@ export default async function AdminProductsPage() {
   }
 
   return (
-    <div className="space-y-8 max-w-6xl mx-auto">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="space-y-6 max-w-5xl mx-auto">
+      {/* Title */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-[#21262d]">
         <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/10 border border-rose-500/20 text-[11px] font-semibold text-rose-300 mb-2">
-            <Package className="w-3.5 h-3.5" />
-            <span>Katalog Produk Digital</span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-            Kelola Produk Digital
-          </h1>
-          <p className="text-xs sm:text-sm text-slate-400 mt-1">
-            Atur harga normal, diskon promo, level badge, dan deskripsi produk digital.
-          </p>
+          <h1 className="text-xl font-semibold text-slate-100 tracking-tight">Kelola Produk Digital</h1>
+          <p className="text-xs text-slate-400 mt-1">Daftar produk, kursus, dan modul pembelajaran.</p>
         </div>
-
-        <div className="flex items-center gap-2">
-          <span className="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-xs font-mono text-rose-400 font-bold">
-            Total: {products.length} Produk
-          </span>
-        </div>
+        <span className="text-xs font-mono text-slate-400 bg-[#161b22] px-3 py-1 rounded-md border border-[#30363d] self-start sm:self-auto">
+          {products.length} Produk
+        </span>
       </div>
 
       {/* Form Tambah Produk */}
-      <div className="bg-slate-900/80 border border-slate-800/90 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl relative overflow-hidden">
-        <div className="absolute top-0 right-0 -mt-10 -mr-10 w-48 h-48 bg-rose-500/5 rounded-full blur-2xl pointer-events-none" />
+      <div className="p-5 rounded-xl bg-[#0d1117] border border-[#21262d] space-y-4">
+        <h2 className="text-sm font-semibold text-slate-200 flex items-center gap-2">
+          <Plus className="w-4 h-4 text-teal-400" />
+          <span>Tambah Produk Baru</span>
+        </h2>
 
-        <div className="flex items-center justify-between border-b border-slate-800/80 pb-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-rose-500/10 text-rose-400 border border-rose-500/20">
-              <Plus className="w-5 h-5" />
-            </div>
-            <div>
-              <h3 className="text-base font-bold text-white">Tambah Produk Digital Baru</h3>
-              <p className="text-xs text-slate-400">Isi informasi produk digital yang akan dijual.</p>
-            </div>
-          </div>
-        </div>
-
-        <form action={handleCreate} className="grid grid-cols-1 md:grid-cols-3 gap-5 text-xs">
-          <div className="space-y-1.5 md:col-span-2">
-            <label className="text-slate-300 font-semibold flex items-center gap-1.5">
-              <Tag className="w-3.5 h-3.5 text-rose-400" />
-              <span>Judul Produk</span>
-            </label>
+        <form action={handleCreate} className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+          <div className="space-y-1 md:col-span-2">
+            <label className="text-slate-400 font-medium">Judul Produk</label>
             <input
               type="text"
               name="title"
               required
-              placeholder="Contoh: [LIFETIME ACCESS] - PERSONAL BRANDING BUILDER [BASIC]"
-              className="w-full p-3 bg-slate-950 border border-slate-800 rounded-xl text-white placeholder:text-slate-600 focus:outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500 transition-all"
+              placeholder="Contoh: [LIFETIME ACCESS] - DATA ANALYST BOOTCAMP"
+              className="w-full p-2.5 bg-[#090d13] border border-[#30363d] rounded-lg text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-teal-500 transition-colors"
             />
           </div>
 
-          <div className="space-y-1.5">
-            <label className="text-slate-300 font-semibold flex items-center gap-1.5">
-              <Award className="w-3.5 h-3.5 text-amber-400" />
-              <span>Level Badge</span>
-            </label>
+          <div className="space-y-1">
+            <label className="text-slate-400 font-medium">Level Badge</label>
             <input
               type="text"
               name="levelBadge"
               defaultValue="Semua Level"
-              className="w-full p-3 bg-slate-950 border border-slate-800 rounded-xl text-white placeholder:text-slate-600 focus:outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500 transition-all"
+              className="w-full p-2.5 bg-[#090d13] border border-[#30363d] rounded-lg text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-teal-500 transition-colors"
             />
           </div>
 
-          <div className="space-y-1.5">
-            <label className="text-slate-300 font-semibold flex items-center gap-1.5">
-              <DollarSign className="w-3.5 h-3.5 text-slate-400" />
-              <span>Harga Normal (Rp)</span>
-            </label>
+          <div className="space-y-1">
+            <label className="text-slate-400 font-medium">Harga Normal (Rp)</label>
             <input
               type="number"
               name="originalPrice"
               defaultValue="350000"
-              className="w-full p-3 bg-slate-950 border border-slate-800 rounded-xl text-white placeholder:text-slate-600 focus:outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500 transition-all font-mono"
+              className="w-full p-2.5 bg-[#090d13] border border-[#30363d] rounded-lg text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-teal-500 transition-colors font-mono"
             />
           </div>
 
-          <div className="space-y-1.5">
-            <label className="text-slate-300 font-semibold flex items-center gap-1.5">
-              <Percent className="w-3.5 h-3.5 text-sky-400" />
-              <span>Diskon (%)</span>
-            </label>
+          <div className="space-y-1">
+            <label className="text-slate-400 font-medium">Diskon (%)</label>
             <input
               type="number"
               name="discountPercent"
               defaultValue="10"
-              className="w-full p-3 bg-slate-950 border border-slate-800 rounded-xl text-white placeholder:text-slate-600 focus:outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500 transition-all font-mono"
+              className="w-full p-2.5 bg-[#090d13] border border-[#30363d] rounded-lg text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-teal-500 transition-colors font-mono"
             />
           </div>
 
-          <div className="space-y-1.5">
-            <label className="text-slate-300 font-semibold flex items-center gap-1.5">
-              <DollarSign className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Harga Akhir Diskon (Rp)</span>
-            </label>
+          <div className="space-y-1">
+            <label className="text-slate-400 font-medium">Harga Akhir (Rp)</label>
             <input
               type="number"
               name="discountedPrice"
               defaultValue="200000"
-              className="w-full p-3 bg-slate-950 border border-slate-800 rounded-xl text-white placeholder:text-slate-600 focus:outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500 transition-all font-mono"
+              className="w-full p-2.5 bg-[#090d13] border border-[#30363d] rounded-lg text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-teal-500 transition-colors font-mono"
             />
           </div>
 
-          <div className="space-y-1.5 md:col-span-3">
-            <label className="text-slate-300 font-semibold flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-teal-400" />
-              <span>Tentang Produk & Keunggulan</span>
-            </label>
+          <div className="space-y-1 md:col-span-3">
+            <label className="text-slate-400 font-medium">Tentang Produk</label>
             <textarea
               name="aboutProduct"
               rows={4}
               required
-              placeholder="Deskripsikan keunggulan produk dan apa saja yang didapatkan..."
-              className="w-full p-3 bg-slate-950 border border-slate-800 rounded-xl text-white placeholder:text-slate-600 focus:outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500 transition-all leading-relaxed"
+              placeholder="Deskripsikan keunggulan produk dan materi yang didapatkan..."
+              className="w-full p-2.5 bg-[#090d13] border border-[#30363d] rounded-lg text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-teal-500 transition-colors leading-relaxed"
             />
           </div>
 
-          <div className="md:col-span-3 pt-2 flex justify-end">
+          <div className="md:col-span-3 flex justify-end">
             <button
               type="submit"
-              className="px-6 py-3 rounded-xl bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-400 hover:to-rose-500 text-white font-bold text-xs shadow-lg shadow-rose-500/20 transition-all flex items-center gap-2 cursor-pointer"
+              className="px-4 py-2 rounded-lg bg-teal-600 hover:bg-teal-500 text-white font-medium text-xs transition-colors cursor-pointer"
             >
-              <Plus className="w-4 h-4" />
-              <span>Simpan & Publikasikan Produk</span>
+              Simpan Produk
             </button>
           </div>
         </form>
       </div>
 
       {/* Tabel Produk */}
-      <div className="bg-slate-900/80 border border-slate-800/90 rounded-3xl overflow-hidden shadow-xl">
-        <div className="p-5 border-b border-slate-800/80 bg-slate-950/40 flex items-center justify-between">
-          <h3 className="text-sm font-bold text-white">Daftar Produk Digital</h3>
-          <span className="text-xs text-slate-400">Status harga & penjualan</span>
-        </div>
-
+      <div className="rounded-xl bg-[#0d1117] border border-[#21262d] overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs text-slate-300">
-            <thead className="bg-slate-950 text-slate-400 font-bold uppercase tracking-wider text-[10px] border-b border-slate-800">
+            <thead className="bg-[#161b22] text-slate-400 font-medium border-b border-[#21262d]">
               <tr>
-                <th className="p-4 pl-6">Judul Produk</th>
-                <th className="p-4">Harga Normal</th>
-                <th className="p-4">Harga Diskon</th>
-                <th className="p-4">Terjual</th>
-                <th className="p-4 pr-6 text-right">Aksi</th>
+                <th className="p-3.5 pl-4">Judul Produk</th>
+                <th className="p-3.5">Harga Normal</th>
+                <th className="p-3.5">Harga Diskon</th>
+                <th className="p-3.5">Terjual</th>
+                <th className="p-3.5 pr-4 text-right">Aksi</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/60">
+            <tbody className="divide-y divide-[#21262d]">
               {products.map((prd) => (
-                <tr key={prd.id} className="hover:bg-slate-800/40 transition-colors group">
-                  <td className="p-4 pl-6 font-medium text-white max-w-sm">
-                    <div className="font-bold text-slate-100 group-hover:text-rose-300 transition-colors truncate">
-                      {prd.title}
-                    </div>
-                    <div className="text-[10px] font-mono text-slate-500 mt-0.5">
-                      /produk/{prd.slug}
-                    </div>
+                <tr key={prd.id} className="hover:bg-[#161b22]/50 transition-colors">
+                  <td className="p-3.5 pl-4 font-medium text-slate-200 max-w-sm truncate">
+                    <div>{prd.title}</div>
+                    <div className="text-[10px] text-slate-500 font-mono">/produk/{prd.slug}</div>
                   </td>
-                  <td className="p-4 line-through text-slate-500 font-mono">
+                  <td className="p-3.5 line-through text-slate-500 font-mono">
                     {formatRupiah(prd.originalPrice)}
                   </td>
-                  <td className="p-4 font-bold font-mono text-emerald-400">
+                  <td className="p-3.5 font-mono text-teal-400 font-medium">
                     {formatRupiah(prd.discountedPrice)}
                   </td>
-                  <td className="p-4 text-slate-300 font-mono">
+                  <td className="p-3.5 text-slate-400 font-mono">
                     {prd.totalSales.toLocaleString("id-ID")} pcs
                   </td>
-                  <td className="p-4 pr-6 text-right space-x-2">
+                  <td className="p-3.5 pr-4 text-right space-x-2">
                     <Link
                       href={`/produk/${prd.slug}`}
                       target="_blank"
-                      className="inline-flex p-2 rounded-xl bg-slate-800 hover:bg-rose-500/20 hover:text-rose-300 text-slate-300 transition-colors border border-slate-700/60"
-                      title="Lihat Halaman Client"
+                      className="inline-flex p-1.5 rounded-md bg-[#161b22] hover:bg-[#21262d] text-slate-400 hover:text-white transition-colors"
+                      title="Lihat Website"
                     >
                       <ExternalLink className="w-3.5 h-3.5" />
                     </Link>
@@ -202,7 +154,7 @@ export default async function AdminProductsPage() {
                       <input type="hidden" name="id" value={prd.id} />
                       <button
                         type="submit"
-                        className="p-2 rounded-xl bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 border border-rose-500/20 transition-colors cursor-pointer"
+                        className="p-1.5 rounded-md bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 transition-colors cursor-pointer"
                         title="Hapus Produk"
                       >
                         <Trash2 className="w-3.5 h-3.5" />

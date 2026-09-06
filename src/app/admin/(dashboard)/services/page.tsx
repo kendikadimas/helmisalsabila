@@ -1,6 +1,6 @@
 import { getAllServicesAdmin, deleteService, createService } from "@/actions/services";
 import { formatRupiah } from "@/lib/utils";
-import { Plus, Trash2, ExternalLink, Briefcase, DollarSign, FileText, Sparkles, Tag } from "lucide-react";
+import { Plus, Trash2, ExternalLink } from "lucide-react";
 import Link from "next/link";
 
 export default async function AdminServicesPage() {
@@ -18,156 +18,112 @@ export default async function AdminServicesPage() {
   }
 
   return (
-    <div className="space-y-8 max-w-6xl mx-auto">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="space-y-6 max-w-5xl mx-auto">
+      {/* Title */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-[#21262d]">
         <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-[11px] font-semibold text-amber-300 mb-2">
-            <Briefcase className="w-3.5 h-3.5" />
-            <span>Katalog Layanan Jasa</span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-            Kelola Layanan & Portfolio
-          </h1>
-          <p className="text-xs sm:text-sm text-slate-400 mt-1">
-            Tambah, perbarui, atau hapus daftar layanan konsultasi & olah data yang tampil di website.
-          </p>
+          <h1 className="text-xl font-semibold text-slate-100 tracking-tight">Kelola Layanan</h1>
+          <p className="text-xs text-slate-400 mt-1">Daftar layanan portofolio & jasa profesional.</p>
         </div>
-
-        <div className="flex items-center gap-2">
-          <span className="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-xs font-mono text-amber-400 font-bold">
-            Total: {services.length} Layanan
-          </span>
-        </div>
+        <span className="text-xs font-mono text-slate-400 bg-[#161b22] px-3 py-1 rounded-md border border-[#30363d] self-start sm:self-auto">
+          {services.length} Layanan
+        </span>
       </div>
 
       {/* Form Tambah Layanan */}
-      <div className="bg-slate-900/80 border border-slate-800/90 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl relative overflow-hidden">
-        <div className="absolute top-0 right-0 -mt-10 -mr-10 w-48 h-48 bg-amber-500/5 rounded-full blur-2xl pointer-events-none" />
+      <div className="p-5 rounded-xl bg-[#0d1117] border border-[#21262d] space-y-4">
+        <h2 className="text-sm font-semibold text-slate-200 flex items-center gap-2">
+          <Plus className="w-4 h-4 text-teal-400" />
+          <span>Tambah Layanan Baru</span>
+        </h2>
 
-        <div className="flex items-center justify-between border-b border-slate-800/80 pb-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
-              <Plus className="w-5 h-5" />
-            </div>
-            <div>
-              <h3 className="text-base font-bold text-white">Tambah Layanan Baru</h3>
-              <p className="text-xs text-slate-400">Isi formulir di bawah ini untuk memublikasikan jasa baru.</p>
-            </div>
-          </div>
-        </div>
-
-        <form action={handleCreate} className="grid grid-cols-1 md:grid-cols-2 gap-5 text-xs">
-          <div className="space-y-1.5">
-            <label className="text-slate-300 font-semibold flex items-center gap-1.5">
-              <Tag className="w-3.5 h-3.5 text-amber-400" />
-              <span>Judul Layanan</span>
-            </label>
+        <form action={handleCreate} className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+          <div className="space-y-1">
+            <label className="text-slate-400 font-medium">Judul Layanan</label>
             <input
               type="text"
               name="title"
               required
-              placeholder="Contoh: Jasa Data Analyst & Visualization (Python/Tableau)"
-              className="w-full p-3 bg-slate-950 border border-slate-800 rounded-xl text-white placeholder:text-slate-600 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all"
+              placeholder="Contoh: Jasa Data Analyst (Python)"
+              className="w-full p-2.5 bg-[#090d13] border border-[#30363d] rounded-lg text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-teal-500 transition-colors"
             />
           </div>
 
-          <div className="space-y-1.5">
-            <label className="text-slate-300 font-semibold flex items-center gap-1.5">
-              <DollarSign className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Harga Mulai (Rp)</span>
-            </label>
+          <div className="space-y-1">
+            <label className="text-slate-400 font-medium">Harga Mulai (Rp)</label>
             <input
               type="number"
               name="priceStartingAt"
               defaultValue="200000"
               placeholder="200000"
-              className="w-full p-3 bg-slate-950 border border-slate-800 rounded-xl text-white placeholder:text-slate-600 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all font-mono"
+              className="w-full p-2.5 bg-[#090d13] border border-[#30363d] rounded-lg text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-teal-500 transition-colors font-mono"
             />
           </div>
 
-          <div className="space-y-1.5 md:col-span-2">
-            <label className="text-slate-300 font-semibold flex items-center gap-1.5">
-              <FileText className="w-3.5 h-3.5 text-sky-400" />
-              <span>Deskripsi Singkat (Preview Card)</span>
-            </label>
+          <div className="space-y-1 md:col-span-2">
+            <label className="text-slate-400 font-medium">Deskripsi Singkat (Preview Card)</label>
             <input
               type="text"
               name="shortDescription"
               required
-              placeholder="Jasa Data Analyst – Olah Data, Visualisasi Dashboard & Insight Profesional."
-              className="w-full p-3 bg-slate-950 border border-slate-800 rounded-xl text-white placeholder:text-slate-600 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all"
+              placeholder="Jasa Data Analyst – Olah Data, Visualisasi Dashboard & Insight."
+              className="w-full p-2.5 bg-[#090d13] border border-[#30363d] rounded-lg text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-teal-500 transition-colors"
             />
           </div>
 
-          <div className="space-y-1.5 md:col-span-2">
-            <label className="text-slate-300 font-semibold flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-teal-400" />
-              <span>Deskripsi Lengkap (Markdown / Rich Format)</span>
-            </label>
+          <div className="space-y-1 md:col-span-2">
+            <label className="text-slate-400 font-medium">Deskripsi Lengkap (Markdown)</label>
             <textarea
               name="fullDescription"
-              rows={5}
+              rows={4}
               required
               placeholder="Jelaskan detail layanan, tools yang digunakan, output yang didapatkan..."
-              className="w-full p-3 bg-slate-950 border border-slate-800 rounded-xl text-white placeholder:text-slate-600 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all leading-relaxed"
+              className="w-full p-2.5 bg-[#090d13] border border-[#30363d] rounded-lg text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-teal-500 transition-colors leading-relaxed"
             />
           </div>
 
-          <div className="md:col-span-2 pt-2 flex justify-end">
+          <div className="md:col-span-2 flex justify-end">
             <button
               type="submit"
-              className="px-6 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold text-xs shadow-lg shadow-amber-500/20 transition-all flex items-center gap-2 cursor-pointer"
+              className="px-4 py-2 rounded-lg bg-teal-600 hover:bg-teal-500 text-white font-medium text-xs transition-colors cursor-pointer"
             >
-              <Plus className="w-4 h-4" />
-              <span>Simpan & Publikasikan Layanan</span>
+              Simpan Layanan
             </button>
           </div>
         </form>
       </div>
 
       {/* Tabel Layanan */}
-      <div className="bg-slate-900/80 border border-slate-800/90 rounded-3xl overflow-hidden shadow-xl">
-        <div className="p-5 border-b border-slate-800/80 bg-slate-950/40 flex items-center justify-between">
-          <h3 className="text-sm font-bold text-white">Daftar Layanan Terdaftar</h3>
-          <span className="text-xs text-slate-400">Klik icon mata untuk melihat preview di website</span>
-        </div>
-
+      <div className="rounded-xl bg-[#0d1117] border border-[#21262d] overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs text-slate-300">
-            <thead className="bg-slate-950 text-slate-400 font-bold uppercase tracking-wider text-[10px] border-b border-slate-800">
+            <thead className="bg-[#161b22] text-slate-400 font-medium border-b border-[#21262d]">
               <tr>
-                <th className="p-4 pl-6">Judul Layanan</th>
-                <th className="p-4">Harga Mulai</th>
-                <th className="p-4">Status</th>
-                <th className="p-4 pr-6 text-right">Aksi</th>
+                <th className="p-3.5 pl-4">Judul Layanan</th>
+                <th className="p-3.5">Harga Mulai</th>
+                <th className="p-3.5">Status</th>
+                <th className="p-3.5 pr-4 text-right">Aksi</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/60">
+            <tbody className="divide-y divide-[#21262d]">
               {services.map((srv) => (
-                <tr key={srv.id} className="hover:bg-slate-800/40 transition-colors group">
-                  <td className="p-4 pl-6 font-medium text-white max-w-md">
-                    <div className="font-bold text-slate-100 group-hover:text-amber-300 transition-colors">
-                      {srv.title}
-                    </div>
-                    <div className="text-[10px] font-mono text-slate-500 mt-0.5">
-                      /layanan/{srv.slug}
-                    </div>
+                <tr key={srv.id} className="hover:bg-[#161b22]/50 transition-colors">
+                  <td className="p-3.5 pl-4 font-medium text-slate-200">
+                    <div>{srv.title}</div>
+                    <div className="text-[10px] text-slate-500 font-mono">/layanan/{srv.slug}</div>
                   </td>
-                  <td className="p-4 font-bold font-mono text-emerald-400">
-                    {formatRupiah(srv.priceStartingAt)}
-                  </td>
-                  <td className="p-4">
-                    <span className="px-2.5 py-1 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold text-[10px]">
+                  <td className="p-3.5 font-mono text-teal-400">{formatRupiah(srv.priceStartingAt)}</td>
+                  <td className="p-3.5">
+                    <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-medium text-[10px]">
                       Aktif
                     </span>
                   </td>
-                  <td className="p-4 pr-6 text-right space-x-2">
+                  <td className="p-3.5 pr-4 text-right space-x-2">
                     <Link
                       href={`/layanan/${srv.slug}`}
                       target="_blank"
-                      className="inline-flex p-2 rounded-xl bg-slate-800 hover:bg-amber-500/20 hover:text-amber-300 text-slate-300 transition-colors border border-slate-700/60"
-                      title="Lihat Halaman Client"
+                      className="inline-flex p-1.5 rounded-md bg-[#161b22] hover:bg-[#21262d] text-slate-400 hover:text-white transition-colors"
+                      title="Lihat Website"
                     >
                       <ExternalLink className="w-3.5 h-3.5" />
                     </Link>
@@ -176,7 +132,7 @@ export default async function AdminServicesPage() {
                       <input type="hidden" name="id" value={srv.id} />
                       <button
                         type="submit"
-                        className="p-2 rounded-xl bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 border border-rose-500/20 transition-colors cursor-pointer"
+                        className="p-1.5 rounded-md bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 transition-colors cursor-pointer"
                         title="Hapus Layanan"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
