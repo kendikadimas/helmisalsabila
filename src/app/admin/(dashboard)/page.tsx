@@ -28,7 +28,9 @@ export default async function AdminDashboardPage() {
       value: services.length,
       description: "Layanan jasa & portfolio",
       icon: Briefcase,
-      color: "text-amber-600 bg-amber-50 border-amber-200/80",
+      cardBg: "bg-gradient-to-br from-amber-500/10 via-amber-500/5 to-white border-amber-200/90",
+      iconBg: "bg-amber-500 text-white shadow-sm shadow-amber-500/30",
+      valueColor: "text-amber-900",
       href: "/admin/services",
     },
     {
@@ -36,7 +38,9 @@ export default async function AdminDashboardPage() {
       value: products.length,
       description: `${totalSales.toLocaleString("id-ID")} total terjual`,
       icon: Package,
-      color: "text-rose-600 bg-rose-50 border-rose-200/80",
+      cardBg: "bg-gradient-to-br from-rose-500/10 via-rose-500/5 to-white border-rose-200/90",
+      iconBg: "bg-rose-500 text-white shadow-sm shadow-rose-500/30",
+      valueColor: "text-rose-900",
       href: "/admin/products",
     },
     {
@@ -44,7 +48,9 @@ export default async function AdminDashboardPage() {
       value: articles.length,
       description: "Postingan blog",
       icon: BookOpen,
-      color: "text-sky-600 bg-sky-50 border-sky-200/80",
+      cardBg: "bg-gradient-to-br from-sky-500/10 via-sky-500/5 to-white border-sky-200/90",
+      iconBg: "bg-sky-500 text-white shadow-sm shadow-sky-500/30",
+      valueColor: "text-sky-900",
       href: "/admin/articles",
     },
     {
@@ -52,7 +58,9 @@ export default async function AdminDashboardPage() {
       value: totalViews.toLocaleString("id-ID"),
       description: "Akumulasi tayangan artikel",
       icon: Eye,
-      color: "text-teal-600 bg-teal-50 border-teal-200/80",
+      cardBg: "bg-gradient-to-br from-teal-500/10 via-teal-500/5 to-white border-teal-200/90",
+      iconBg: "bg-teal-500 text-white shadow-sm shadow-teal-500/30",
+      valueColor: "text-teal-900",
       href: "/admin/articles",
     },
   ];
@@ -77,7 +85,7 @@ export default async function AdminDashboardPage() {
         </Link>
       </div>
 
-      {/* 4 Stat Cards */}
+      {/* 4 Rich Colored Stat Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         {stats.map((stat) => {
           const Icon = stat.icon;
@@ -85,17 +93,17 @@ export default async function AdminDashboardPage() {
             <Link
               key={stat.title}
               href={stat.href}
-              className="p-6 rounded-2xl bg-white border border-slate-200/90 hover:border-slate-300 hover:shadow-md transition-all group space-y-4 shadow-xs"
+              className={`p-6 rounded-2xl border ${stat.cardBg} hover:shadow-md transition-all group space-y-4 shadow-xs`}
             >
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-slate-500">{stat.title}</span>
-                <div className={`p-2.5 rounded-xl border ${stat.color}`}>
+                <span className="text-sm font-semibold text-slate-600">{stat.title}</span>
+                <div className={`p-2.5 rounded-xl ${stat.iconBg}`}>
                   <Icon className="w-5 h-5" />
                 </div>
               </div>
               <div>
-                <div className="text-3xl font-extrabold text-slate-900 tracking-tight">{stat.value}</div>
-                <div className="text-xs text-slate-500 mt-1">{stat.description}</div>
+                <div className={`text-3xl font-extrabold tracking-tight ${stat.valueColor}`}>{stat.value}</div>
+                <div className="text-xs text-slate-500 mt-1 font-medium">{stat.description}</div>
               </div>
             </Link>
           );
@@ -113,82 +121,82 @@ export default async function AdminDashboardPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Link
               href="/admin/services"
-              className="p-6 rounded-2xl bg-white border border-slate-200/90 hover:border-slate-300 hover:shadow-md transition-all group flex items-start justify-between space-x-4 shadow-xs"
+              className="p-6 rounded-2xl bg-gradient-to-br from-amber-50/80 via-white to-white border border-amber-200/80 hover:border-amber-300 hover:shadow-md transition-all group flex items-start justify-between space-x-4 shadow-xs"
             >
               <div className="space-y-1.5">
                 <div className="flex items-center gap-2.5">
-                  <div className="p-2 rounded-lg bg-amber-50 text-amber-600 border border-amber-200">
+                  <div className="p-2 rounded-lg bg-amber-500 text-white shadow-xs">
                     <Briefcase className="w-4 h-4" />
                   </div>
                   <span className="text-base font-bold text-slate-900 group-hover:text-amber-700 transition-colors">
                     Layanan & Portfolio
                   </span>
                 </div>
-                <p className="text-xs text-slate-500 leading-relaxed">
+                <p className="text-xs text-slate-500 leading-relaxed pt-1">
                   {services.length} layanan terdaftar
                 </p>
               </div>
-              <ArrowRight className="w-5 h-5 text-slate-400 group-hover:text-slate-700 transition-colors mt-0.5" />
+              <ArrowRight className="w-5 h-5 text-amber-500 group-hover:translate-x-1 transition-transform mt-0.5" />
             </Link>
 
             <Link
               href="/admin/products"
-              className="p-6 rounded-2xl bg-white border border-slate-200/90 hover:border-slate-300 hover:shadow-md transition-all group flex items-start justify-between space-x-4 shadow-xs"
+              className="p-6 rounded-2xl bg-gradient-to-br from-rose-50/80 via-white to-white border border-rose-200/80 hover:border-rose-300 hover:shadow-md transition-all group flex items-start justify-between space-x-4 shadow-xs"
             >
               <div className="space-y-1.5">
                 <div className="flex items-center gap-2.5">
-                  <div className="p-2 rounded-lg bg-rose-50 text-rose-600 border border-rose-200">
+                  <div className="p-2 rounded-lg bg-rose-500 text-white shadow-xs">
                     <Package className="w-4 h-4" />
                   </div>
                   <span className="text-base font-bold text-slate-900 group-hover:text-rose-700 transition-colors">
                     Produk Digital
                   </span>
                 </div>
-                <p className="text-xs text-slate-500 leading-relaxed">
+                <p className="text-xs text-slate-500 leading-relaxed pt-1">
                   {products.length} produk aktif
                 </p>
               </div>
-              <ArrowRight className="w-5 h-5 text-slate-400 group-hover:text-slate-700 transition-colors mt-0.5" />
+              <ArrowRight className="w-5 h-5 text-rose-500 group-hover:translate-x-1 transition-transform mt-0.5" />
             </Link>
 
             <Link
               href="/admin/articles"
-              className="p-6 rounded-2xl bg-white border border-slate-200/90 hover:border-slate-300 hover:shadow-md transition-all group flex items-start justify-between space-x-4 shadow-xs"
+              className="p-6 rounded-2xl bg-gradient-to-br from-sky-50/80 via-white to-white border border-sky-200/80 hover:border-sky-300 hover:shadow-md transition-all group flex items-start justify-between space-x-4 shadow-xs"
             >
               <div className="space-y-1.5">
                 <div className="flex items-center gap-2.5">
-                  <div className="p-2 rounded-lg bg-sky-50 text-sky-600 border border-sky-200">
+                  <div className="p-2 rounded-lg bg-sky-500 text-white shadow-xs">
                     <BookOpen className="w-4 h-4" />
                   </div>
                   <span className="text-base font-bold text-slate-900 group-hover:text-sky-700 transition-colors">
                     Artikel & Blog
                   </span>
                 </div>
-                <p className="text-xs text-slate-500 leading-relaxed">
+                <p className="text-xs text-slate-500 leading-relaxed pt-1">
                   {articles.length} postingan diterbitkan
                 </p>
               </div>
-              <ArrowRight className="w-5 h-5 text-slate-400 group-hover:text-slate-700 transition-colors mt-0.5" />
+              <ArrowRight className="w-5 h-5 text-sky-500 group-hover:translate-x-1 transition-transform mt-0.5" />
             </Link>
 
             <Link
               href="/admin/settings"
-              className="p-6 rounded-2xl bg-white border border-slate-200/90 hover:border-slate-300 hover:shadow-md transition-all group flex items-start justify-between space-x-4 shadow-xs"
+              className="p-6 rounded-2xl bg-gradient-to-br from-teal-50/80 via-white to-white border border-teal-200/80 hover:border-teal-300 hover:shadow-md transition-all group flex items-start justify-between space-x-4 shadow-xs"
             >
               <div className="space-y-1.5">
                 <div className="flex items-center gap-2.5">
-                  <div className="p-2 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-200 text-xs font-bold">
+                  <div className="p-2 rounded-lg bg-teal-500 text-white text-xs font-bold shadow-xs">
                     ⚙
                   </div>
-                  <span className="text-base font-bold text-slate-900 group-hover:text-emerald-700 transition-colors">
+                  <span className="text-base font-bold text-slate-900 group-hover:text-teal-700 transition-colors">
                     Site Settings
                   </span>
                 </div>
-                <p className="text-xs text-slate-500 leading-relaxed">
+                <p className="text-xs text-slate-500 leading-relaxed pt-1">
                   Konfigurasi kontak & identitas
                 </p>
               </div>
-              <ArrowRight className="w-5 h-5 text-slate-400 group-hover:text-slate-700 transition-colors mt-0.5" />
+              <ArrowRight className="w-5 h-5 text-teal-500 group-hover:translate-x-1 transition-transform mt-0.5" />
             </Link>
           </div>
         </div>
