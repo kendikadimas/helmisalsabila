@@ -55,14 +55,14 @@ export default function AdminSidebar({ logoutAction, userEmail = "admin@helmisal
   return (
     <>
       {/* Mobile Top Header Bar */}
-      <div className="md:hidden flex items-center justify-between px-5 py-4 bg-[#0d1117] border-b border-[#21262d] sticky top-0 z-40">
+      <div className="md:hidden flex items-center justify-between px-6 py-4 bg-[#0d1117] border-b border-[#21262d] sticky top-0 z-40">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-teal-500/10 border border-teal-500/20 flex items-center justify-center font-bold text-teal-400 text-sm">
+          <div className="w-9 h-9 rounded-xl bg-teal-500/10 border border-teal-500/20 flex items-center justify-center font-bold text-teal-400 text-sm">
             H
           </div>
           <div>
             <h2 className="font-semibold text-sm text-slate-100">helsenvi.com</h2>
-            <p className="text-[11px] text-slate-500">Admin Dashboard</p>
+            <p className="text-xs text-slate-500">Admin Dashboard</p>
           </div>
         </div>
 
@@ -71,7 +71,7 @@ export default function AdminSidebar({ logoutAction, userEmail = "admin@helmisal
           className="p-2 rounded-lg bg-[#161b22] border border-[#30363d] text-slate-300 hover:text-white transition-colors"
           aria-label="Toggle menu"
         >
-          {isOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+          {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
       </div>
 
@@ -85,20 +85,20 @@ export default function AdminSidebar({ logoutAction, userEmail = "admin@helmisal
 
       {/* Sidebar Container */}
       <aside
-        className={`fixed md:sticky top-0 left-0 h-screen z-50 w-64 bg-[#0d1117] border-r border-[#21262d] p-4 flex flex-col justify-between shrink-0 transition-transform duration-200 ease-in-out ${
+        className={`fixed md:sticky top-0 left-0 h-screen z-50 w-64 lg:w-72 bg-[#0d1117] border-r border-[#21262d] p-5 lg:p-6 flex flex-col justify-between shrink-0 transition-transform duration-200 ease-in-out ${
           isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         }`}
       >
-        <div className="space-y-6">
+        <div className="space-y-8">
           {/* Brand Header */}
-          <div className="flex items-center justify-between px-2 pt-2">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-teal-500/10 border border-teal-500/20 flex items-center justify-center font-bold text-teal-400 text-sm">
+          <div className="flex items-center justify-between px-1">
+            <div className="flex items-center gap-3.5">
+              <div className="w-10 h-10 rounded-xl bg-teal-500/10 border border-teal-500/20 flex items-center justify-center font-bold text-teal-400 text-base">
                 H
               </div>
               <div>
-                <h2 className="font-semibold text-sm text-slate-100 tracking-tight">helsenvi.com</h2>
-                <p className="text-[11px] text-slate-500">Admin Dashboard</p>
+                <h2 className="font-bold text-base text-slate-100 tracking-tight">helsenvi.com</h2>
+                <p className="text-xs text-slate-400">Admin Dashboard</p>
               </div>
             </div>
 
@@ -106,17 +106,17 @@ export default function AdminSidebar({ logoutAction, userEmail = "admin@helmisal
               onClick={() => setIsOpen(false)}
               className="md:hidden text-slate-400 hover:text-white p-1"
             >
-              <X className="w-4 h-4" />
+              <X className="w-5 h-5" />
             </button>
           </div>
 
           {/* Navigation Section */}
-          <div className="space-y-1">
-            <div className="px-3 py-1 text-[11px] font-medium tracking-wide text-slate-500 uppercase">
-              Menu
+          <div className="space-y-2">
+            <div className="px-3 text-xs font-semibold tracking-wider text-slate-400 uppercase">
+              Menu Utama
             </div>
 
-            <nav className="space-y-0.5">
+            <nav className="space-y-1">
               {navItems.map((item) => {
                 const Icon = item.icon;
                 const isActive =
@@ -129,13 +129,13 @@ export default function AdminSidebar({ logoutAction, userEmail = "admin@helmisal
                     key={item.href}
                     href={item.href}
                     onClick={() => setIsOpen(false)}
-                    className={`flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] font-medium transition-colors ${
+                    className={`flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-colors ${
                       isActive
-                        ? "bg-teal-500/10 text-teal-300 font-semibold"
-                        : "text-slate-400 hover:text-slate-200 hover:bg-[#161b22]"
+                        ? "bg-teal-500/10 text-teal-300 font-semibold border border-teal-500/20"
+                        : "text-slate-400 hover:text-slate-200 hover:bg-[#161b22] border border-transparent"
                     }`}
                   >
-                    <Icon className={`w-4 h-4 shrink-0 ${isActive ? "text-teal-400" : "text-slate-400"}`} />
+                    <Icon className={`w-4.5 h-4.5 shrink-0 ${isActive ? "text-teal-400" : "text-slate-400"}`} />
                     <span>{item.label}</span>
                   </Link>
                 );
@@ -145,13 +145,13 @@ export default function AdminSidebar({ logoutAction, userEmail = "admin@helmisal
         </div>
 
         {/* Bottom Actions */}
-        <div className="pt-4 border-t border-[#21262d] space-y-1">
+        <div className="pt-5 border-t border-[#21262d] space-y-1.5 pb-2">
           <Link
             href="/"
             target="_blank"
-            className="flex items-center justify-between px-3 py-2 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-[#161b22] text-[13px] font-medium transition-colors"
+            className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-[#161b22] text-sm font-medium transition-colors"
           >
-            <span className="flex items-center gap-2.5">
+            <span className="flex items-center gap-3">
               <ExternalLink className="w-4 h-4 text-slate-500" />
               <span>Lihat Website</span>
             </span>
@@ -160,7 +160,7 @@ export default function AdminSidebar({ logoutAction, userEmail = "admin@helmisal
           <form action={logoutAction}>
             <button
               type="submit"
-              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-rose-400/90 hover:text-rose-400 hover:bg-rose-500/10 text-[13px] font-medium transition-colors cursor-pointer"
+              className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-rose-400/90 hover:text-rose-400 hover:bg-rose-500/10 text-sm font-medium transition-colors cursor-pointer"
             >
               <LogOut className="w-4 h-4" />
               <span>Keluar</span>
