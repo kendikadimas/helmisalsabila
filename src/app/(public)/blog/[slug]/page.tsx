@@ -1,7 +1,8 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { Eye, Share2, MessageCircle, Facebook, Copy, ChevronDown } from "lucide-react";
+import { Eye, Share2, Facebook, Copy, ChevronDown } from "lucide-react";
+import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 import { getArticleBySlug, getArticles, getTrendingArticles, getAllTags } from "@/actions/articles";
 import { getSiteSettings } from "@/actions/settings";
 import { formatDateIndo } from "@/lib/utils";
@@ -153,10 +154,10 @@ export default async function DetailArtikelPage({
                   href={`https://api.whatsapp.com/send?text=${encodeURIComponent(article.title)}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="w-7 h-7 rounded-full bg-emerald-500 text-white flex items-center justify-center hover:opacity-90"
+                  className="w-7 h-7 rounded-full bg-[#25D366] text-white flex items-center justify-center hover:opacity-90"
                   aria-label="WhatsApp"
                 >
-                  <MessageCircle className="w-4 h-4" />
+                  <WhatsAppIcon className="w-4 h-4 text-white" fill="currentColor" />
                 </a>
                 <a
                   href="https://facebook.com"
@@ -186,9 +187,9 @@ export default async function DetailArtikelPage({
                   href={`https://api.whatsapp.com/send?text=${encodeURIComponent(article.title)}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center hover:opacity-90"
+                  className="w-6 h-6 rounded-full bg-[#25D366] text-white flex items-center justify-center hover:opacity-90"
                 >
-                  <MessageCircle className="w-3.5 h-3.5" />
+                  <WhatsAppIcon className="w-3.5 h-3.5 text-white" fill="currentColor" />
                 </a>
                 <a
                   href="https://facebook.com"

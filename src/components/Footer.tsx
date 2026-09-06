@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Phone, MapPin, Linkedin, Youtube, Facebook, Instagram, Music2 } from "lucide-react";
+import { MapPin, Linkedin, Youtube, Facebook, Instagram, Music2 } from "lucide-react";
+import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 import { getSiteSettings } from "@/actions/settings";
 
 export default async function Footer() {
@@ -38,8 +39,15 @@ export default async function Footer() {
             <h4 className="font-bold text-slate-900 text-sm">Kontak Resmi</h4>
             <ul className="space-y-2.5 text-xs text-slate-600">
               <li className="flex items-center gap-2.5">
-                <Phone className="w-4 h-4 text-teal-600 shrink-0" />
-                <span>{phone}</span>
+                <a
+                  href={`https://wa.me/${phone.replace(/[^0-9]/g, "")}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center gap-2.5 hover:text-emerald-600 transition-colors"
+                >
+                  <WhatsAppIcon className="w-4 h-4 text-emerald-600 shrink-0" fill="currentColor" />
+                  <span>{phone}</span>
+                </a>
               </li>
               <li className="flex items-start gap-2.5">
                 <MapPin className="w-4 h-4 text-teal-600 shrink-0 mt-0.5" />

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
-import { MessageCircle, ArrowRight, Lock, Award, Banknote, Users2, Linkedin, Instagram, Star, Sparkles, MousePointer, ShieldCheck, Mail } from "lucide-react";
+import { ArrowRight, Lock, Award, Banknote, Users2, Linkedin, Instagram, Star, Sparkles, MousePointer, ShieldCheck, Mail } from "lucide-react";
+import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 import SectionHeader from "@/components/SectionHeader";
 import TestimonialCarousel from "@/components/TestimonialCarousel";
 import { getServices } from "@/actions/services";
@@ -168,7 +169,7 @@ export default async function HomePage() {
                 className="inline-flex items-center gap-2.5 px-7 py-3.5 rounded-xl bg-[#1E3A5F] hover:bg-[#152A45] text-white text-[16px] font-bold tracking-[-0.006em] shadow-sm transition-all transform hover:-translate-y-0.5"
               >
                 <span>Kontak Saya</span>
-                <MessageCircle className="w-5 h-5 text-white" />
+                <WhatsAppIcon className="w-5 h-5 text-white" fill="currentColor" />
               </a>
             </div>
 

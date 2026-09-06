@@ -6,6 +6,7 @@ import { getProductBySlug } from "@/actions/products";
 import { getSiteSettings } from "@/actions/settings";
 import { formatRupiah } from "@/lib/utils";
 import ShareButton from "@/components/ShareButton";
+import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 
 export async function generateMetadata({
   params,
@@ -160,9 +161,10 @@ export default async function DetailProdukPage({
                   )}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="w-full py-3.5 px-4 rounded-xl bg-[#1E3A5F] hover:bg-[#162E4A] text-white text-xs font-bold text-center block shadow-md transition-all"
+                  className="w-full py-3.5 px-4 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-white text-xs font-bold flex items-center justify-center gap-2 shadow-md transition-all"
                 >
-                  Beli Produk Ini
+                  <WhatsAppIcon className="w-4 h-4 text-white" fill="currentColor" />
+                  <span>Beli Produk Ini</span>
                 </a>
 
                 <ShareButton
