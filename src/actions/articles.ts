@@ -28,14 +28,17 @@ export async function getArticles(options: ArticleFilterOptions | number = {}) {
     let query = db
       .select({
         id: schema.articles.id,
+        categoryId: schema.articles.categoryId,
         title: schema.articles.title,
         slug: schema.articles.slug,
         excerpt: schema.articles.excerpt,
+        content: schema.articles.content,
         featuredImage: schema.articles.featuredImage,
         readingTimeMin: schema.articles.readingTimeMin,
         viewsCount: schema.articles.viewsCount,
         isPopular: schema.articles.isPopular,
         isTrending: schema.articles.isTrending,
+        isPublished: schema.articles.isPublished,
         trendingRank: schema.articles.trendingRank,
         publishedAt: schema.articles.publishedAt,
         category: schema.categories.name,
@@ -231,6 +234,47 @@ export async function deleteArticle(id: string) {
     revalidatePath("/admin/articles");
     return { success: true };
   } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}
+
+export async function updateArticle(id: string, formData: FormData) {
+  try {
+    const session = await getSession();
+    if (!session) return { success: false, error: "Unauthorized" };
+
+    const title = formData.get("title") as string;
+    const excerpt = (formData.get("excerpt") as string) || title;
+    const content = (formData.get("content") as string) || excerpt;
+    const featuredImage = (formData.get("featuredImage") as string) || null;
+    const categoryId = (formData.get("categoryId") as string) || null;
+    const isPublished = formData.get("isPublished") === "true";
+    const isPopular = formData.get("isPopular") === "true";
+    const isTrending = formData.get("isTrending") === "true";
+
+    const readingTimeMin = calculateReadingTime(content);
+
+    await db
+      .update(schema.articles)
+      .set({
+        categoryId,
+        title,
+        excerpt,
+        content,
+        featuredImage: featuredImage || undefined,
+        readingTimeMin,
+        isPopular,
+        isTrending,
+        isPublished,
+      })
+      .where(eq(schema.articles.id, id));
+
+    revalidatePath("/");
+    revalidatePath("/blog");
+    revalidatePath("/admin/articles");
+    return { success: true };
+  } catch (error: any) {
+    console.error("Error updating article:", error);
     return { success: false, error: error.message };
   }
 }

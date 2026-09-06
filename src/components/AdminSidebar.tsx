@@ -8,6 +8,9 @@ import {
   Briefcase,
   Package,
   BookOpen,
+  Tag,
+  ListOrdered,
+  Award,
   MessageSquareQuote,
   Settings,
   LogOut,
@@ -37,6 +40,16 @@ export default function AdminSidebar({ logoutAction, userEmail = "admin@helmisal
       icon: Briefcase,
     },
     {
+      label: "Langkah Kerja",
+      href: "/admin/work-steps",
+      icon: ListOrdered,
+    },
+    {
+      label: "Keunggulan Layanan",
+      href: "/admin/value-props",
+      icon: Award,
+    },
+    {
       label: "Produk Digital",
       href: "/admin/products",
       icon: Package,
@@ -45,6 +58,11 @@ export default function AdminSidebar({ logoutAction, userEmail = "admin@helmisal
       label: "Artikel & Blog",
       href: "/admin/articles",
       icon: BookOpen,
+    },
+    {
+      label: "Kategori",
+      href: "/admin/categories",
+      icon: Tag,
     },
     {
       label: "Testimoni Klien",

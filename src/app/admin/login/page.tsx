@@ -67,7 +67,6 @@ export default function AdminLoginPage() {
                 type="password"
                 name="password"
                 required
-                defaultValue="admin12345"
                 placeholder="••••••••"
                 className="w-full pl-10 pr-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-hidden focus:ring-2 focus:ring-teal-500"
               />
@@ -78,7 +77,7 @@ export default function AdminLoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3.5 px-4 rounded-xl bg-[#1E3A5F] hover:bg-[#162E4A] text-white font-bold text-sm shadow-md flex items-center justify-center gap-2 transition-all disabled:opacity-50"
+            className="w-full py-3.5 px-4 rounded-xl bg-[#1E3A5F] hover:bg-[#162E4A] text-white font-bold text-sm shadow-md flex items-center justify-center gap-2 transition-all disabled:opacity-50 cursor-pointer"
           >
             {loading ? (
               <>
@@ -93,10 +92,6 @@ export default function AdminLoginPage() {
             )}
           </button>
         </form>
-
-        <div className="text-center text-[11px] text-slate-500">
-          Kredensial Default: <span className="text-slate-300">admin@helmisalsabila.com</span> / <span className="text-slate-300">admin12345</span>
-        </div>
       </div>
     </div>
   );

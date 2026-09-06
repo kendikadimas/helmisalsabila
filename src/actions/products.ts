@@ -208,3 +208,41 @@ export async function deleteProduct(id: string) {
     return { success: false, error: error.message };
   }
 }
+
+export async function updateProduct(id: string, formData: FormData) {
+  try {
+    const session = await getSession();
+    if (!session) return { success: false, error: "Unauthorized" };
+
+    const title = formData.get("title") as string;
+    const levelBadge = (formData.get("levelBadge") as string) || "Semua Level";
+    const originalPrice = (formData.get("originalPrice") as string) || "0";
+    const discountedPrice = (formData.get("discountedPrice") as string) || originalPrice;
+    const discountPercent = formData.get("discountPercent")
+      ? parseInt(formData.get("discountPercent") as string, 10)
+      : 0;
+    const aboutProduct = (formData.get("aboutProduct") as string) || title;
+    const thumbnailUrl = (formData.get("thumbnailUrl") as string) || null;
+
+    await db
+      .update(schema.products)
+      .set({
+        title,
+        levelBadge,
+        originalPrice,
+        discountedPrice,
+        discountPercent,
+        aboutProduct,
+        thumbnailUrl: thumbnailUrl || undefined,
+      })
+      .where(eq(schema.products.id, id));
+
+    revalidatePath("/");
+    revalidatePath("/produk");
+    revalidatePath("/admin/products");
+    return { success: true };
+  } catch (error: any) {
+    console.error("Error updating product:", error);
+    return { success: false, error: error.message };
+  }
+}
