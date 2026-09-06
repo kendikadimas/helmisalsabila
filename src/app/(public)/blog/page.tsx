@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import SearchBanner from "@/components/SearchBanner";
 import Pagination from "@/components/Pagination";
 import SectionHeader from "@/components/SectionHeader";
-import { getArticles, getPopularArticles, getAllCategories } from "@/actions/articles";
+import { getArticles, getPopularArticles, getAllCategories, getArticlesCount } from "@/actions/articles";
 import { formatDateIndo } from "@/lib/utils";
 
 export const metadata: Metadata = {
@@ -12,21 +12,33 @@ export const metadata: Metadata = {
     "Kumpulan tulisan seputar data analytics, tips spreadsheet, automasi kerja, dan studi kasus implementasi teknologi.",
 };
 
+const PAGE_SIZE = 9;
+
 export default async function BlogPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; kategori?: string }>;
+  searchParams: Promise<{ q?: string; kategori?: string; page?: string }>;
 }) {
   const params = await searchParams;
+  const currentPage = Math.max(1, parseInt(params.page || "1", 10));
+  const offset = (currentPage - 1) * PAGE_SIZE;
 
-  const [articles, popularArticles, categories] = await Promise.all([
+  const [articles, popularArticles, categories, totalCount] = await Promise.all([
     getArticles({
       searchQuery: params.q,
       categorySlug: params.kategori,
+      limit: PAGE_SIZE,
+      offset,
     }),
     getPopularArticles(),
     getAllCategories("article"),
+    getArticlesCount({
+      searchQuery: params.q,
+      categorySlug: params.kategori,
+    }),
   ]);
+
+  const totalPages = Math.ceil(totalCount / PAGE_SIZE);
 
   return (
     <div className="space-y-12 pb-16">
@@ -52,7 +64,15 @@ export default async function BlogPage({
                   className="group relative aspect-[16/9] rounded-3xl overflow-hidden shadow-sm hover:shadow-lg transition-all flex flex-col justify-end p-6 sm:p-8 bg-slate-900"
                 >
                   <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent z-10" />
-                  <div className="absolute inset-0 bg-gradient-to-tr from-cyan-900 via-slate-800 to-amber-900 opacity-60 group-hover:scale-105 transition-transform duration-500" />
+                  {art.featuredImage && !art.featuredImage.includes("placeholder") ? (
+                    <img
+                      src={art.featuredImage}
+                      alt={art.title}
+                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                  ) : (
+                    <div className="absolute inset-0 bg-gradient-to-tr from-cyan-900 via-slate-800 to-amber-900 opacity-60 group-hover:scale-105 transition-transform duration-500" />
+                  )}
 
                   <div className="relative z-20 space-y-2">
                     <h3 className="text-lg sm:text-xl font-bold text-white leading-snug group-hover:text-teal-300 transition-colors">
@@ -111,8 +131,18 @@ export default async function BlogPage({
                   className="group bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs hover:shadow-lg transition-all flex flex-col justify-between"
                 >
                   <div>
-                    <div className="aspect-[16/10] bg-slate-900 relative overflow-hidden flex items-center justify-center text-white p-4">
-                      <span className="text-xs font-bold text-teal-400">INSIGHT ARTICLE</span>
+                    <div className="aspect-[16/10] bg-slate-900 relative overflow-hidden flex items-center justify-center text-white">
+                      {art.featuredImage && !art.featuredImage.includes("placeholder") ? (
+                        <img
+                          src={art.featuredImage}
+                          alt={art.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-tr from-slate-900 to-slate-800 flex items-center justify-center p-4">
+                          <span className="text-xs font-bold text-teal-400">INSIGHT ARTICLE</span>
+                        </div>
+                      )}
                     </div>
 
                     <div className="p-5 space-y-2">
@@ -131,7 +161,12 @@ export default async function BlogPage({
           )}
 
           {/* Pagination */}
-          <Pagination totalDataText={`Menampilkan 1-${articles.length} dari ${articles.length} data`} />
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalDataCount={totalCount}
+            pageSize={PAGE_SIZE}
+          />
         </section>
       </div>
     </div>

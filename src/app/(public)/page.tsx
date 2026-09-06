@@ -128,8 +128,23 @@ export default async function HomePage() {
     );
   };
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name: settings?.siteName || "Helmi Salsabila",
+    jobTitle: "Data Analyst & Digital Solution Specialist",
+    url: process.env.NEXT_PUBLIC_APP_URL || "https://helsenvi.com",
+    image: `${process.env.NEXT_PUBLIC_APP_URL || "https://helsenvi.com"}/profile-talent.png`,
+    sameAs: [socials.linkedin, socials.instagram, socials.threads].filter(Boolean),
+    knowsAbout: ["Data Analytics", "Python", "Tableau", "SQL", "Spreadsheet Automation"],
+  };
+
   return (
     <div className="space-y-24 pb-20">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* 1. HERO SECTION (100% Matching Exact Figma Curve, Social Icons & Layout) */}
       <section className="relative overflow-hidden bg-white w-full">
 
@@ -456,7 +471,13 @@ export default async function HomePage() {
             >
               <div>
                 <div className="aspect-[16/10] bg-slate-900 relative overflow-hidden flex items-center justify-center text-white">
-                  {idx === 0 ? (
+                  {art.featuredImage && !art.featuredImage.includes("placeholder") ? (
+                    <img
+                      src={art.featuredImage}
+                      alt={art.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  ) : idx === 0 ? (
                     <div className="w-full h-full bg-gradient-to-tr from-blue-950 via-slate-900 to-cyan-950 flex items-center justify-center relative p-6">
                       <div className="w-14 h-14 rounded-2xl bg-cyan-500/20 border border-cyan-400 flex items-center justify-center shadow-lg">
                         <Lock className="w-7 h-7 text-cyan-300" />

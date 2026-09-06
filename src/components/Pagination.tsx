@@ -1,52 +1,99 @@
+"use client";
+
 import Link from "next/link";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { usePathname, useSearchParams } from "next/navigation";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 
 interface PaginationProps {
-  currentPage?: number;
-  totalPages?: number;
-  totalDataText?: string;
+  currentPage: number;
+  totalPages: number;
+  totalDataCount: number;
+  pageSize: number;
 }
 
 export default function Pagination({
-  currentPage = 1,
-  totalPages = 68,
-  totalDataText = "Menampilkan 1-15 dari 1.250 data",
+  currentPage,
+  totalPages,
+  totalDataCount,
+  pageSize,
 }: PaginationProps) {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  if (totalPages <= 1 && totalDataCount === 0) return null;
+
+  const createPageUrl = (page: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("page", page.toString());
+    return `${pathname}?${params.toString()}`;
+  };
+
+  const startItem = totalDataCount === 0 ? 0 : (currentPage - 1) * pageSize + 1;
+  const endItem = Math.min(currentPage * pageSize, totalDataCount);
+
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-10 border-t border-slate-100 text-xs text-slate-500">
-      <div>{totalDataText}</div>
-
-      <div className="flex items-center gap-1.5 font-medium">
-        <button
-          disabled={currentPage <= 1}
-          className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:pointer-events-none transition-colors"
-        >
-          <ChevronLeft className="w-3.5 h-3.5" />
-          <span>Previous</span>
-        </button>
-
-        <button className="w-8 h-8 rounded-lg bg-[#1E3A5F] text-white font-bold flex items-center justify-center shadow-xs">
-          1
-        </button>
-        <button className="w-8 h-8 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-700 flex items-center justify-center transition-colors">
-          2
-        </button>
-        <button className="w-8 h-8 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-700 flex items-center justify-center transition-colors">
-          3
-        </button>
-        <span className="px-1 text-slate-400">...</span>
-        <button className="w-8 h-8 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-700 flex items-center justify-center transition-colors">
-          67
-        </button>
-        <button className="w-8 h-8 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-700 flex items-center justify-center transition-colors">
-          68
-        </button>
-
-        <button className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors">
-          <span>Next</span>
-          <ChevronRight className="w-3.5 h-3.5" />
-        </button>
+    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-slate-100 text-xs text-slate-500 font-medium">
+      <div>
+        Menampilkan <span className="font-bold text-slate-800">{startItem}-{endItem}</span> dari{" "}
+        <span className="font-bold text-slate-800">{totalDataCount}</span> data
       </div>
+
+      {totalPages > 1 && (
+        <div className="flex items-center gap-1.5">
+          {/* Previous Button */}
+          {currentPage > 1 ? (
+            <Link
+              href={createPageUrl(currentPage - 1)}
+              className="p-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 transition-colors shadow-2xs flex items-center justify-center"
+              aria-label="Previous Page"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+            </Link>
+          ) : (
+            <div className="p-2 rounded-lg border border-slate-100 bg-slate-50 text-slate-300 opacity-50 cursor-not-allowed flex items-center justify-center">
+              <ArrowLeft className="w-3.5 h-3.5" />
+            </div>
+          )}
+
+          {/* Page Numbers */}
+          {Array.from({ length: totalPages }).map((_, idx) => {
+            const pageNum = idx + 1;
+            const isCurrent = pageNum === currentPage;
+
+            return isCurrent ? (
+              <span
+                key={pageNum}
+                className="w-8 h-8 rounded-lg bg-[#1E3A5F] text-white font-bold flex items-center justify-center text-xs shadow-xs"
+              >
+                {pageNum}
+              </span>
+            ) : (
+              <Link
+                key={pageNum}
+                href={createPageUrl(pageNum)}
+                className="w-8 h-8 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-medium flex items-center justify-center text-xs transition-colors shadow-2xs"
+              >
+                {pageNum}
+              </Link>
+            );
+          })}
+
+          {/* Next Button */}
+          {currentPage < totalPages ? (
+            <Link
+              href={createPageUrl(currentPage + 1)}
+              className="p-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 transition-colors shadow-2xs flex items-center justify-center"
+              aria-label="Next Page"
+            >
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          ) : (
+            <div className="p-2 rounded-lg border border-slate-100 bg-slate-50 text-slate-300 opacity-50 cursor-not-allowed flex items-center justify-center">
+              <ArrowRight className="w-3.5 h-3.5" />
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

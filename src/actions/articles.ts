@@ -1,7 +1,7 @@
 "use server";
 
 import { db, schema } from "@/db";
-import { eq, desc, asc, and, like } from "drizzle-orm";
+import { eq, desc, asc, and, like, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { calculateReadingTime, slugify } from "@/lib/utils";
 import { getSession } from "@/lib/auth";
@@ -23,6 +23,10 @@ export async function getArticles(options: ArticleFilterOptions | number = {}) {
 
     if (searchQuery && searchQuery.trim() !== "") {
       whereConditions.push(like(schema.articles.title, `%${searchQuery.trim()}%`));
+    }
+
+    if (categorySlug && categorySlug !== "all") {
+      whereConditions.push(eq(schema.categories.slug, categorySlug));
     }
 
     let query = db
@@ -47,10 +51,6 @@ export async function getArticles(options: ArticleFilterOptions | number = {}) {
       .from(schema.articles)
       .leftJoin(schema.categories, eq(schema.articles.categoryId, schema.categories.id));
 
-    if (categorySlug && categorySlug !== "all") {
-      whereConditions.push(eq(schema.categories.slug, categorySlug));
-    }
-
     let finalQuery = query.where(and(...whereConditions)).orderBy(desc(schema.articles.publishedAt));
 
     if (limit) {
@@ -64,6 +64,30 @@ export async function getArticles(options: ArticleFilterOptions | number = {}) {
   } catch (error) {
     console.error("Error fetching articles from DB:", error);
     return [];
+  }
+}
+
+export async function getArticlesCount(options: { searchQuery?: string; categorySlug?: string } = {}) {
+  try {
+    const { searchQuery, categorySlug } = options;
+    let whereConditions = [eq(schema.articles.isPublished, true)];
+
+    if (searchQuery && searchQuery.trim() !== "") {
+      whereConditions.push(like(schema.articles.title, `%${searchQuery.trim()}%`));
+    }
+    if (categorySlug && categorySlug !== "all") {
+      whereConditions.push(eq(schema.categories.slug, categorySlug));
+    }
+
+    const [res] = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(schema.articles)
+      .leftJoin(schema.categories, eq(schema.articles.categoryId, schema.categories.id))
+      .where(and(...whereConditions));
+
+    return Number(res?.count || 0);
+  } catch (error) {
+    return 0;
   }
 }
 
@@ -107,7 +131,7 @@ export async function getTrendingArticles() {
   }
 }
 
-export async function getArticleBySlug(slug: string) {
+export async function getArticleBySlug(slug: string, incrementView: boolean = true) {
   try {
     const [article] = await db
       .select({
@@ -130,11 +154,13 @@ export async function getArticleBySlug(slug: string) {
 
     if (!article) return null;
 
-    // Increment view count dynamically in database
-    await db
-      .update(schema.articles)
-      .set({ viewsCount: (article.viewsCount || 0) + 1 })
-      .where(eq(schema.articles.id, article.id));
+    // Only increment view count when actually requested on page view (skip on metadata)
+    if (incrementView) {
+      await db
+        .update(schema.articles)
+        .set({ viewsCount: (article.viewsCount || 0) + 1 })
+        .where(eq(schema.articles.id, article.id));
+    }
 
     return article;
   } catch (error) {

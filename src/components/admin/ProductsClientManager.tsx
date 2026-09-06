@@ -2,11 +2,20 @@
 
 import { useState } from "react";
 import { formatRupiah } from "@/lib/utils";
-import { Plus, Trash2, Edit3, ExternalLink } from "lucide-react";
+import { Plus, Trash2, Edit3, ExternalLink, BookOpen, Layers } from "lucide-react";
 import Link from "next/link";
 import EditModal from "@/components/EditModal";
 import ImageUploader from "@/components/ImageUploader";
-import { createProduct, updateProduct, deleteProduct } from "@/actions/products";
+import {
+  createProduct,
+  updateProduct,
+  deleteProduct,
+  getProductCurriculum,
+  createProductModule,
+  deleteProductModule,
+  createProductLesson,
+  deleteProductLesson,
+} from "@/actions/products";
 
 interface ProductItem {
   id: string;
@@ -24,7 +33,15 @@ interface ProductItem {
 export default function ProductsClientManager({ initialProducts }: { initialProducts: ProductItem[] }) {
   const [products, setProducts] = useState<ProductItem[]>(initialProducts);
   const [editingItem, setEditingItem] = useState<ProductItem | null>(null);
+  const [curriculumItem, setCurriculumItem] = useState<ProductItem | null>(null);
+  const [modules, setModules] = useState<any[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const openCurriculum = async (prd: ProductItem) => {
+    setCurriculumItem(prd);
+    const mods = await getProductCurriculum(prd.id);
+    setModules(mods);
+  };
 
   const handleCreate = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -199,6 +216,15 @@ export default function ProductsClientManager({ initialProducts }: { initialProd
                   <td className="p-4 pr-6 text-right space-x-2">
                     <button
                       type="button"
+                      onClick={() => openCurriculum(prd)}
+                      className="inline-flex p-2 rounded-xl bg-sky-50 text-sky-700 hover:bg-sky-100 transition-colors border border-sky-200 cursor-pointer"
+                      title="Kelola Modul Kurikulum"
+                    >
+                      <Layers className="w-4 h-4" />
+                    </button>
+
+                    <button
+                      type="button"
                       onClick={() => setEditingItem(prd)}
                       className="inline-flex p-2 rounded-xl bg-amber-50 text-amber-700 hover:bg-amber-100 transition-colors border border-amber-200 cursor-pointer"
                       title="Edit Produk"
@@ -328,6 +354,140 @@ export default function ProductsClientManager({ initialProducts }: { initialProd
               </button>
             </div>
           </form>
+        )}
+      </EditModal>
+      {/* Curriculum Modal */}
+      <EditModal
+        isOpen={!!curriculumItem}
+        onClose={() => setCurriculumItem(null)}
+        title={`Kurikulum Produk: ${curriculumItem?.title || ""}`}
+      >
+        {curriculumItem && (
+          <div className="space-y-6 text-xs sm:text-sm">
+            {/* Form Add Module */}
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                const form = e.currentTarget;
+                const formData = new FormData(form);
+                const res = await createProductModule(curriculumItem.id, formData);
+                if (res.success) {
+                  const updated = await getProductCurriculum(curriculumItem.id);
+                  setModules(updated);
+                  form.reset();
+                }
+              }}
+              className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3"
+            >
+              <span className="font-bold text-slate-800 text-xs block">Tambah Modul Silabus Baru</span>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <input
+                  type="text"
+                  name="moduleNumber"
+                  defaultValue={`0${modules.length + 1}`}
+                  placeholder="No (01)"
+                  required
+                  className="p-2.5 bg-white border border-slate-200 rounded-lg text-slate-900 font-mono font-bold"
+                />
+                <input
+                  type="text"
+                  name="title"
+                  placeholder="Judul Modul..."
+                  required
+                  className="sm:col-span-2 p-2.5 bg-white border border-slate-200 rounded-lg text-slate-900"
+                />
+              </div>
+              <div className="flex justify-end">
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white font-semibold rounded-lg text-xs"
+                >
+                  + Tambah Modul
+                </button>
+              </div>
+            </form>
+
+            {/* List Modules & Lessons */}
+            <div className="space-y-4">
+              {modules.length === 0 ? (
+                <div className="text-center py-6 text-slate-400 text-xs">Belum ada modul kurikulum.</div>
+              ) : (
+                modules.map((mod) => (
+                  <div key={mod.id} className="p-4 bg-white border border-slate-200 rounded-xl space-y-3">
+                    <div className="flex items-center justify-between font-bold text-slate-900 border-b pb-2">
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono text-teal-700 bg-teal-50 px-2 py-0.5 rounded">
+                          Modul {mod.moduleNumber}
+                        </span>
+                        <span>{mod.title}</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          if (confirm("Hapus modul ini beserta semua materinya?")) {
+                            await deleteProductModule(mod.id);
+                            const updated = await getProductCurriculum(curriculumItem.id);
+                            setModules(updated);
+                          }
+                        }}
+                        className="text-rose-600 hover:text-rose-800 text-xs p-1"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+
+                    {/* Lessons list */}
+                    <div className="pl-4 space-y-2 border-l-2 border-slate-100">
+                      {mod.lessons?.map((les: any) => (
+                        <div key={les.id} className="flex items-center justify-between text-xs text-slate-700">
+                          <span>• {les.title}</span>
+                          <button
+                            type="button"
+                            onClick={async () => {
+                              await deleteProductLesson(les.id);
+                              const updated = await getProductCurriculum(curriculumItem.id);
+                              setModules(updated);
+                            }}
+                            className="text-rose-500 hover:text-rose-700"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      ))}
+
+                      {/* Add lesson form */}
+                      <form
+                        onSubmit={async (e) => {
+                          e.preventDefault();
+                          const form = e.currentTarget;
+                          const formData = new FormData(form);
+                          await createProductLesson(mod.id, formData);
+                          const updated = await getProductCurriculum(curriculumItem.id);
+                          setModules(updated);
+                          form.reset();
+                        }}
+                        className="flex gap-2 pt-2"
+                      >
+                        <input
+                          type="text"
+                          name="title"
+                          placeholder="Tambah nama materi / pelajaran..."
+                          required
+                          className="flex-1 p-2 bg-slate-50 border border-slate-200 rounded text-xs text-slate-900"
+                        />
+                        <button
+                          type="submit"
+                          className="px-3 py-1.5 bg-slate-800 hover:bg-slate-900 text-white rounded text-xs font-medium shrink-0"
+                        >
+                          + Materi
+                        </button>
+                      </form>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
         )}
       </EditModal>
     </div>

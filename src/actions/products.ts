@@ -1,7 +1,7 @@
 "use server";
 
 import { db, schema } from "@/db";
-import { eq, desc, asc, and, like, gt, lte } from "drizzle-orm";
+import { eq, desc, asc, and, like, gt, lte, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { slugify } from "@/lib/utils";
 import { getSession } from "@/lib/auth";
@@ -83,6 +83,37 @@ export async function getProducts(options: ProductFilterOptions | number = {}) {
   } catch (error) {
     console.error("Error fetching products from DB:", error);
     return [];
+  }
+}
+
+export async function getProductsCount(options: ProductFilterOptions = {}) {
+  try {
+    const { searchQuery, categorySlug, priceType } = options;
+    let whereConditions = [eq(schema.products.isPublished, true)];
+
+    if (searchQuery && searchQuery.trim() !== "") {
+      whereConditions.push(like(schema.products.title, `%${searchQuery.trim()}%`));
+    }
+
+    if (priceType === "gratis") {
+      whereConditions.push(lte(schema.products.discountedPrice, "0"));
+    } else if (priceType === "berbayar") {
+      whereConditions.push(gt(schema.products.discountedPrice, "0"));
+    }
+
+    if (categorySlug && categorySlug !== "all") {
+      whereConditions.push(eq(schema.categories.slug, categorySlug));
+    }
+
+    const [res] = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(schema.products)
+      .leftJoin(schema.categories, eq(schema.products.categoryId, schema.categories.id))
+      .where(and(...whereConditions));
+
+    return Number(res?.count || 0);
+  } catch (error) {
+    return 0;
   }
 }
 
@@ -243,6 +274,108 @@ export async function updateProduct(id: string, formData: FormData) {
     return { success: true };
   } catch (error: any) {
     console.error("Error updating product:", error);
+    return { success: false, error: error.message };
+  }
+}
+
+export async function getProductCurriculum(productId: string) {
+  try {
+    const modules = await db
+      .select()
+      .from(schema.productModules)
+      .where(eq(schema.productModules.productId, productId))
+      .orderBy(asc(schema.productModules.orderIndex));
+
+    const result = [];
+    for (const mod of modules) {
+      const lessons = await db
+        .select()
+        .from(schema.productLessons)
+        .where(eq(schema.productLessons.moduleId, mod.id))
+        .orderBy(asc(schema.productLessons.orderIndex));
+      result.push({ ...mod, lessons });
+    }
+    return result;
+  } catch (error) {
+    console.error("Error fetching product curriculum:", error);
+    return [];
+  }
+}
+
+export async function createProductModule(productId: string, formData: FormData) {
+  try {
+    const session = await getSession();
+    if (!session) return { success: false, error: "Unauthorized" };
+
+    const moduleNumber = (formData.get("moduleNumber") as string) || "01";
+    const title = formData.get("title") as string;
+    const id = `mod-${Date.now()}`;
+
+    await db.insert(schema.productModules).values({
+      id,
+      productId,
+      moduleNumber,
+      title,
+      orderIndex: 0,
+    });
+
+    revalidatePath(`/produk`);
+    revalidatePath("/admin/products");
+    return { success: true, id };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}
+
+export async function deleteProductModule(moduleId: string) {
+  try {
+    const session = await getSession();
+    if (!session) return { success: false, error: "Unauthorized" };
+
+    await db.delete(schema.productModules).where(eq(schema.productModules.id, moduleId));
+    revalidatePath(`/produk`);
+    revalidatePath("/admin/products");
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}
+
+export async function createProductLesson(moduleId: string, formData: FormData) {
+  try {
+    const session = await getSession();
+    if (!session) return { success: false, error: "Unauthorized" };
+
+    const title = formData.get("title") as string;
+    const lessonType = (formData.get("lessonType") as string) || "document";
+    const id = `les-${Date.now()}`;
+
+    await db.insert(schema.productLessons).values({
+      id,
+      moduleId,
+      title,
+      lessonType,
+      orderIndex: 0,
+    });
+
+    revalidatePath(`/produk`);
+    revalidatePath("/admin/products");
+    return { success: true, id };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}
+
+export async function deleteProductLesson(lessonId: string) {
+  try {
+    const session = await getSession();
+    if (!session) return { success: false, error: "Unauthorized" };
+
+    await db.delete(schema.productLessons).where(eq(schema.productLessons.id, lessonId));
+    revalidatePath(`/produk`);
+    revalidatePath("/admin/products");
+    return { success: true };
+  } catch (error: any) {
     return { success: false, error: error.message };
   }
 }

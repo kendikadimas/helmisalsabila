@@ -85,6 +85,37 @@ export async function getServices(options: ServiceFilterOptions | number = {}) {
   }
 }
 
+export async function getServicesCount(options: ServiceFilterOptions = {}) {
+  try {
+    const { searchQuery, categorySlug, priceType } = options;
+    let whereConditions = [eq(schema.services.isActive, true)];
+
+    if (searchQuery && searchQuery.trim() !== "") {
+      whereConditions.push(like(schema.services.title, `%${searchQuery.trim()}%`));
+    }
+
+    if (priceType === "gratis") {
+      whereConditions.push(lte(schema.services.priceStartingAt, "0"));
+    } else if (priceType === "berbayar") {
+      whereConditions.push(gt(schema.services.priceStartingAt, "0"));
+    }
+
+    if (categorySlug && categorySlug !== "all") {
+      whereConditions.push(eq(schema.categories.slug, categorySlug));
+    }
+
+    const [res] = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(schema.services)
+      .leftJoin(schema.categories, eq(schema.services.categoryId, schema.categories.id))
+      .where(and(...whereConditions));
+
+    return Number(res?.count || 0);
+  } catch (error) {
+    return 0;
+  }
+}
+
 export async function getAllServicesAdmin() {
   try {
     return await db
@@ -152,6 +183,14 @@ export async function createService(formData: FormData) {
     const isFeatured = formData.get("isFeatured") === "true";
     const isActive = formData.get("isActive") !== "false";
 
+    const featuresRaw = (formData.get("features") as string) || "";
+    const toolsRaw = (formData.get("toolsUsed") as string) || "";
+    const outputsRaw = (formData.get("outputsReceived") as string) || "";
+
+    const features = featuresRaw.split("\n").map((s) => s.trim()).filter(Boolean);
+    const toolsUsed = toolsRaw.split("\n").map((s) => s.trim()).filter(Boolean);
+    const outputsReceived = outputsRaw.split("\n").map((s) => s.trim()).filter(Boolean);
+
     const id = `srv-${Date.now()}`;
 
     await db.insert(schema.services).values({
@@ -163,6 +202,9 @@ export async function createService(formData: FormData) {
       thumbnailUrl,
       categoryId,
       priceStartingAt: priceStartingAt ? priceStartingAt : null,
+      features: features.length > 0 ? features : null,
+      toolsUsed: toolsUsed.length > 0 ? toolsUsed : null,
+      outputsReceived: outputsReceived.length > 0 ? outputsReceived : null,
       isFeatured,
       isActive,
       orderIndex: 0,
@@ -193,15 +235,26 @@ export async function updateService(id: string, formData: FormData) {
     const isFeatured = formData.get("isFeatured") === "true";
     const isActive = formData.get("isActive") !== "false";
 
+    const featuresRaw = (formData.get("features") as string) || "";
+    const toolsRaw = (formData.get("toolsUsed") as string) || "";
+    const outputsRaw = (formData.get("outputsReceived") as string) || "";
+
+    const features = featuresRaw.split("\n").map((s) => s.trim()).filter(Boolean);
+    const toolsUsed = toolsRaw.split("\n").map((s) => s.trim()).filter(Boolean);
+    const outputsReceived = outputsRaw.split("\n").map((s) => s.trim()).filter(Boolean);
+
     await db
       .update(schema.services)
       .set({
         title,
-        slug,
+        ...(slug ? { slug } : {}),
         shortDescription,
         fullDescription,
-        thumbnailUrl,
+        ...(thumbnailUrl ? { thumbnailUrl } : {}),
         priceStartingAt: priceStartingAt ? priceStartingAt : null,
+        features: features.length > 0 ? features : null,
+        toolsUsed: toolsUsed.length > 0 ? toolsUsed : null,
+        outputsReceived: outputsReceived.length > 0 ? outputsReceived : null,
         isFeatured,
         isActive,
       })

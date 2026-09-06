@@ -16,6 +16,9 @@ interface ServiceItem {
   shortDescription: string;
   fullDescription: string;
   thumbnailUrl?: string | null;
+  features?: string[] | null;
+  toolsUsed?: string[] | null;
+  outputsReceived?: string[] | null;
 }
 
 export default function ServicesClientManager({ initialServices }: { initialServices: ServiceItem[] }) {
@@ -131,6 +134,26 @@ export default function ServicesClientManager({ initialServices }: { initialServ
               required
               placeholder="Jelaskan detail layanan, tools yang digunakan, output yang didapatkan..."
               className="w-full p-3 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-teal-600 transition-colors leading-relaxed"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-slate-700 font-medium">Fitur / Keunggulan (1 baris per item)</label>
+            <textarea
+              name="features"
+              rows={3}
+              placeholder="Olah data Python/Pandas&#10;Dashboard interaktif Tableau&#10;Insight actionable..."
+              className="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-teal-600 font-mono text-xs"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-slate-700 font-medium">Tools Digunakan (1 baris per item)</label>
+            <textarea
+              name="toolsUsed"
+              rows={3}
+              placeholder="Python&#10;Tableau&#10;PostgreSQL&#10;Excel..."
+              className="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-teal-600 font-mono text-xs"
             />
           </div>
 
@@ -262,6 +285,28 @@ export default function ServicesClientManager({ initialServices }: { initialServ
                 defaultValue={editingItem.fullDescription}
                 className="w-full p-3 bg-white border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-teal-600 transition-colors leading-relaxed"
               />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <label className="text-slate-700 font-medium">Fitur / Keunggulan (1 baris per item)</label>
+                <textarea
+                  name="features"
+                  rows={3}
+                  defaultValue={editingItem.features?.join("\n") || ""}
+                  className="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-teal-600 font-mono text-xs"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-slate-700 font-medium">Tools Digunakan (1 baris per item)</label>
+                <textarea
+                  name="toolsUsed"
+                  rows={3}
+                  defaultValue={editingItem.toolsUsed?.join("\n") || ""}
+                  className="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-teal-600 font-mono text-xs"
+                />
+              </div>
             </div>
 
             <div className="pt-3 border-t border-slate-100 flex justify-end gap-2">

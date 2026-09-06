@@ -15,7 +15,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const article = await getArticleBySlug(slug);
+  const article = await getArticleBySlug(slug, false);
 
   if (!article) {
     return {
@@ -57,8 +57,25 @@ export default async function DetailArtikelPage({
   const saweriaUrl = settings?.saweriaUrl || "https://saweria.co/helmisalsabila";
   const authorName = article.authorName || settings?.siteName || "Helmi Salsabila";
 
+  const articleJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: article.title,
+    description: article.excerpt,
+    image: article.featuredImage ? [article.featuredImage] : [],
+    datePublished: article.publishedAt,
+    author: {
+      "@type": "Person",
+      name: authorName,
+    },
+  };
+
   return (
     <div className="space-y-12 pb-16 pt-6">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+      />
       <div className="max-w-[1440px] mx-auto px-6 sm:px-12 lg:px-[96px] space-y-8">
         {/* Breadcrumb */}
         <nav className="flex items-center gap-2 text-xs text-slate-500">
@@ -107,12 +124,20 @@ export default async function DetailArtikelPage({
           <div className="lg:col-span-8 space-y-8">
             {/* Featured Hero Image */}
             <div className="aspect-[16/9] rounded-3xl overflow-hidden bg-slate-900 shadow-sm relative flex items-center justify-center text-white">
-              <div className="absolute inset-0 bg-gradient-to-tr from-cyan-950 via-slate-900 to-amber-950 flex items-center justify-center p-8 text-center">
-                <div className="space-y-2">
-                  <span className="text-xs uppercase tracking-widest text-teal-400 font-bold">FEATURED ARTICLE</span>
-                  <h2 className="text-xl sm:text-2xl font-bold max-w-lg">{article.title}</h2>
+              {article.featuredImage && !article.featuredImage.includes("placeholder") ? (
+                <img
+                  src={article.featuredImage}
+                  alt={article.title}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="absolute inset-0 bg-gradient-to-tr from-cyan-950 via-slate-900 to-amber-950 flex items-center justify-center p-8 text-center">
+                  <div className="space-y-2">
+                    <span className="text-xs uppercase tracking-widest text-teal-400 font-bold">FEATURED ARTICLE</span>
+                    <h2 className="text-xl sm:text-2xl font-bold max-w-lg">{article.title}</h2>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
 
             {/* Article Content Typography from DB */}

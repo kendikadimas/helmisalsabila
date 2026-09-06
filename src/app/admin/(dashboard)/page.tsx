@@ -9,6 +9,11 @@ import {
   Eye,
   ArrowRight,
   ExternalLink,
+  Tag,
+  ListOrdered,
+  Award,
+  MessageSquareQuote,
+  Settings,
 } from "lucide-react";
 import { formatDateIndo } from "@/lib/utils";
 
@@ -180,13 +185,93 @@ export default async function AdminDashboardPage() {
             </Link>
 
             <Link
+              href="/admin/categories"
+              className="p-6 rounded-2xl bg-gradient-to-br from-indigo-50/80 via-white to-white border border-indigo-200/80 hover:border-indigo-300 hover:shadow-md transition-all group flex items-start justify-between space-x-4 shadow-xs"
+            >
+              <div className="space-y-1.5">
+                <div className="flex items-center gap-2.5">
+                  <div className="p-2 rounded-lg bg-indigo-500 text-white shadow-xs">
+                    <Tag className="w-4 h-4" />
+                  </div>
+                  <span className="text-base font-bold text-slate-900 group-hover:text-indigo-700 transition-colors">
+                    Kategori
+                  </span>
+                </div>
+                <p className="text-xs text-slate-500 leading-relaxed pt-1">
+                  Atur kategori artikel & layanan
+                </p>
+              </div>
+              <ArrowRight className="w-5 h-5 text-indigo-500 group-hover:translate-x-1 transition-transform mt-0.5" />
+            </Link>
+
+            <Link
+              href="/admin/testimonials"
+              className="p-6 rounded-2xl bg-gradient-to-br from-emerald-50/80 via-white to-white border border-emerald-200/80 hover:border-emerald-300 hover:shadow-md transition-all group flex items-start justify-between space-x-4 shadow-xs"
+            >
+              <div className="space-y-1.5">
+                <div className="flex items-center gap-2.5">
+                  <div className="p-2 rounded-lg bg-emerald-500 text-white shadow-xs">
+                    <MessageSquareQuote className="w-4 h-4" />
+                  </div>
+                  <span className="text-base font-bold text-slate-900 group-hover:text-emerald-700 transition-colors">
+                    Testimoni Klien
+                  </span>
+                </div>
+                <p className="text-xs text-slate-500 leading-relaxed pt-1">
+                  Kelola ulasan & logo brand klien
+                </p>
+              </div>
+              <ArrowRight className="w-5 h-5 text-emerald-500 group-hover:translate-x-1 transition-transform mt-0.5" />
+            </Link>
+
+            <Link
+              href="/admin/work-steps"
+              className="p-6 rounded-2xl bg-gradient-to-br from-cyan-50/80 via-white to-white border border-cyan-200/80 hover:border-cyan-300 hover:shadow-md transition-all group flex items-start justify-between space-x-4 shadow-xs"
+            >
+              <div className="space-y-1.5">
+                <div className="flex items-center gap-2.5">
+                  <div className="p-2 rounded-lg bg-cyan-500 text-white shadow-xs">
+                    <ListOrdered className="w-4 h-4" />
+                  </div>
+                  <span className="text-base font-bold text-slate-900 group-hover:text-cyan-700 transition-colors">
+                    Langkah Kerja
+                  </span>
+                </div>
+                <p className="text-xs text-slate-500 leading-relaxed pt-1">
+                  Tahapan proses kerja di homepage
+                </p>
+              </div>
+              <ArrowRight className="w-5 h-5 text-cyan-500 group-hover:translate-x-1 transition-transform mt-0.5" />
+            </Link>
+
+            <Link
+              href="/admin/value-props"
+              className="p-6 rounded-2xl bg-gradient-to-br from-amber-50/80 via-white to-white border border-amber-200/80 hover:border-amber-300 hover:shadow-md transition-all group flex items-start justify-between space-x-4 shadow-xs"
+            >
+              <div className="space-y-1.5">
+                <div className="flex items-center gap-2.5">
+                  <div className="p-2 rounded-lg bg-amber-500 text-white shadow-xs">
+                    <Award className="w-4 h-4" />
+                  </div>
+                  <span className="text-base font-bold text-slate-900 group-hover:text-amber-700 transition-colors">
+                    Keunggulan Layanan
+                  </span>
+                </div>
+                <p className="text-xs text-slate-500 leading-relaxed pt-1">
+                  Kenapa memilih layanan saya
+                </p>
+              </div>
+              <ArrowRight className="w-5 h-5 text-amber-500 group-hover:translate-x-1 transition-transform mt-0.5" />
+            </Link>
+
+            <Link
               href="/admin/settings"
               className="p-6 rounded-2xl bg-gradient-to-br from-teal-50/80 via-white to-white border border-teal-200/80 hover:border-teal-300 hover:shadow-md transition-all group flex items-start justify-between space-x-4 shadow-xs"
             >
               <div className="space-y-1.5">
                 <div className="flex items-center gap-2.5">
-                  <div className="p-2 rounded-lg bg-teal-500 text-white text-xs font-bold shadow-xs">
-                    ⚙
+                  <div className="p-2 rounded-lg bg-teal-500 text-white shadow-xs">
+                    <Settings className="w-4 h-4" />
                   </div>
                   <span className="text-base font-bold text-slate-900 group-hover:text-teal-700 transition-colors">
                     Site Settings

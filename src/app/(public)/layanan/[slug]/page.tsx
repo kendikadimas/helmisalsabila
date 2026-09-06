@@ -123,6 +123,38 @@ export default async function DetailLayananPage({
               <div className="prose prose-slate max-w-none text-xs sm:text-sm text-slate-600 space-y-4 leading-relaxed whitespace-pre-line">
                 {service.fullDescription}
               </div>
+
+              {/* Fitur Layanan */}
+              {service.features && service.features.length > 0 && (
+                <div className="space-y-3 pt-4 border-t border-slate-100">
+                  <h3 className="font-bold text-slate-900 text-sm">Apa Saja yang Anda Dapatkan:</h3>
+                  <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-700">
+                    {service.features.map((feat, idx) => (
+                      <li key={idx} className="flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-teal-600 shrink-0" />
+                        <span>{feat}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Tools Digunakan */}
+              {service.toolsUsed && service.toolsUsed.length > 0 && (
+                <div className="space-y-3 pt-2">
+                  <h3 className="font-bold text-slate-900 text-sm">Tools & Teknologi:</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {service.toolsUsed.map((tool, idx) => (
+                      <span
+                        key={idx}
+                        className="px-3 py-1 bg-slate-100 border border-slate-200 rounded-lg text-xs font-medium text-slate-700"
+                      >
+                        {tool}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 

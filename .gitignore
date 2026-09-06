@@ -19,4 +19,7 @@ npm-debug.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# Uploads directory
+public/uploads/
+
 .vercel

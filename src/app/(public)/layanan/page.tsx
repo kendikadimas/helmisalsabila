@@ -4,7 +4,7 @@ import { MousePointer } from "lucide-react";
 import SearchBanner from "@/components/SearchBanner";
 import FilterSidebar from "@/components/FilterSidebar";
 import Pagination from "@/components/Pagination";
-import { getServices } from "@/actions/services";
+import { getServices, getServicesCount } from "@/actions/services";
 import { getAllCategories } from "@/actions/articles";
 import { formatRupiah } from "@/lib/utils";
 
@@ -14,22 +14,35 @@ export const metadata: Metadata = {
     "Eksplorasi layanan konsultasi data, automasi bisnis, perancangan dashboard, dan portofolio implementasi solusi digital.",
 };
 
+const PAGE_SIZE = 9;
+
 export default async function LayananPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; kategori?: string; sort?: string; harga?: string }>;
+  searchParams: Promise<{ q?: string; kategori?: string; sort?: string; harga?: string; page?: string }>;
 }) {
   const params = await searchParams;
+  const currentPage = Math.max(1, parseInt(params.page || "1", 10));
+  const offset = (currentPage - 1) * PAGE_SIZE;
 
-  const [services, categories] = await Promise.all([
+  const [services, categories, totalCount] = await Promise.all([
     getServices({
       searchQuery: params.q,
       categorySlug: params.kategori,
       priceType: params.harga,
       sortBy: params.sort,
+      limit: PAGE_SIZE,
+      offset,
     }),
     getAllCategories("service"),
+    getServicesCount({
+      searchQuery: params.q,
+      categorySlug: params.kategori,
+      priceType: params.harga,
+    }),
   ]);
+
+  const totalPages = Math.ceil(totalCount / PAGE_SIZE);
 
   return (
     <div className="space-y-10 pb-16">
@@ -142,7 +155,12 @@ export default async function LayananPage({
             )}
 
             {/* Pagination Component */}
-            <Pagination totalDataText={`Menampilkan 1-${services.length} dari ${services.length} data`} />
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalDataCount={totalCount}
+              pageSize={PAGE_SIZE}
+            />
           </div>
         </div>
       </div>
