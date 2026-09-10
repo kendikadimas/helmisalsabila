@@ -134,9 +134,6 @@ export default async function DetailArtikelPage({
                 }
                 alt={article.title}
                 className="w-full h-full object-cover"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = "/assets/artikel.png";
-                }}
               />
             </div>
 

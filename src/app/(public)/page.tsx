@@ -47,7 +47,7 @@ export default async function HomePage() {
   }
 
   const getValidArticleImg = (img?: string | null, index: number = 0) => {
-    if (!img || img.includes("placeholder") || img.includes("article-data-viz") || img.includes("article-nextjs") || img.includes("article-marketing")) {
+    if (!img || img.includes("placeholder") || img.includes("/assets/article-")) {
       const idxNum = index % 4;
       return `/assets/artikel${idxNum > 0 ? idxNum : ""}.png`;
     }
@@ -506,9 +506,6 @@ export default async function HomePage() {
                     src={getValidArticleImg(art.featuredImage, idx)}
                     alt={art.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = `/assets/artikel${idx > 0 ? idx % 4 : ""}.png`;
-                    }}
                   />
                 </div>
 

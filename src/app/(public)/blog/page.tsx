@@ -58,7 +58,7 @@ export default async function BlogPage({
   }
 
   const getValidArticleImg = (img?: string | null, index: number = 0) => {
-    if (!img || img.includes("placeholder") || img.includes("article-data-viz") || img.includes("article-nextjs") || img.includes("article-marketing")) {
+    if (!img || img.includes("placeholder") || img.includes("/assets/article-")) {
       const idxNum = index % 4;
       return `/assets/artikel${idxNum > 0 ? idxNum : ""}.png`;
     }
@@ -93,9 +93,6 @@ export default async function BlogPage({
                     src={getValidArticleImg(art.featuredImage, idx)}
                     alt={art.title}
                     className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = `/assets/artikel${idx > 0 ? idx % 4 : ""}.png`;
-                    }}
                   />
 
                   <div className="relative z-20 space-y-2">
@@ -160,9 +157,6 @@ export default async function BlogPage({
                         src={getValidArticleImg(art.featuredImage, idx)}
                         alt={art.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src = `/assets/artikel${idx > 0 ? idx % 4 : ""}.png`;
-                        }}
                       />
                     </div>
 
