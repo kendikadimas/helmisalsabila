@@ -10,6 +10,9 @@ import { getArticles, getAllCategories } from "@/actions/articles";
 import { getTestimonials, getWorkSteps, getValuePropositions, getSiteSettings } from "@/actions/settings";
 import { formatRupiah, formatDateIndo } from "@/lib/utils";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function HomePage() {
   const [services, products, articles, testimonials, workSteps, valueProps, settings, categories] =
     await Promise.all([
@@ -471,32 +474,14 @@ export default async function HomePage() {
             >
               <div>
                 <div className="aspect-[16/10] bg-slate-900 relative overflow-hidden flex items-center justify-center text-white">
-                  {art.featuredImage && !art.featuredImage.includes("placeholder") ? (
-                    <img
-                      src={art.featuredImage}
-                      alt={art.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                  ) : idx === 0 ? (
-                    <div className="w-full h-full bg-gradient-to-tr from-blue-950 via-slate-900 to-cyan-950 flex items-center justify-center relative p-6">
-                      <div className="w-14 h-14 rounded-2xl bg-cyan-500/20 border border-cyan-400 flex items-center justify-center shadow-lg">
-                        <Lock className="w-7 h-7 text-cyan-300" />
-                      </div>
-                    </div>
-                  ) : idx === 1 ? (
-                    <div className="w-full h-full bg-slate-950 flex flex-col items-center justify-center p-6 text-center">
-                      <div className="text-lg font-black tracking-widest text-white flex items-center gap-2">
-                        <div className="w-5 h-5 rounded-full border-2 border-white flex items-center justify-center text-[10px]">⊙</div>
-                        <span>AIRIS PACS</span>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="w-full h-full bg-gradient-to-tr from-amber-950 via-slate-900 to-orange-950 flex items-center justify-center p-6">
-                      <div className="w-14 h-14 rounded-2xl bg-amber-500/20 border border-amber-400 flex items-center justify-center shadow-lg">
-                        <Award className="w-7 h-7 text-amber-300" />
-                      </div>
-                    </div>
-                  )}
+                  <img
+                    src={art.featuredImage || `/assets/artikel${idx > 0 ? idx : ""}.png`}
+                    alt={art.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = `/assets/artikel${idx > 0 ? idx : ""}.png`;
+                    }}
+                  />
                 </div>
 
                 <div className="p-5 space-y-2">

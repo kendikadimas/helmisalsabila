@@ -8,6 +8,9 @@ import { getServices, getServicesCount } from "@/actions/services";
 import { getAllCategories } from "@/actions/articles";
 import { formatRupiah } from "@/lib/utils";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: "Layanan & Portfolio | Helmi Salsabila",
   description:

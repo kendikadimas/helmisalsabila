@@ -6,6 +6,9 @@ import SectionHeader from "@/components/SectionHeader";
 import { getArticles, getPopularArticles, getAllCategories, getArticlesCount } from "@/actions/articles";
 import { formatDateIndo } from "@/lib/utils";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: "Artikel & Wawasan Teknologi | Helmi Salsabila",
   description:
@@ -57,22 +60,21 @@ export default async function BlogPage({
             <SectionHeader title="Artikel Populer" />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {popularArticles.map((art) => (
+              {popularArticles.map((art, idx) => (
                 <Link
                   key={art.id}
                   href={`/blog/${art.slug}`}
                   className="group relative aspect-[16/9] rounded-3xl overflow-hidden shadow-sm hover:shadow-lg transition-all flex flex-col justify-end p-6 sm:p-8 bg-slate-900"
                 >
                   <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent z-10" />
-                  {art.featuredImage && !art.featuredImage.includes("placeholder") ? (
-                    <img
-                      src={art.featuredImage}
-                      alt={art.title}
-                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                  ) : (
-                    <div className="absolute inset-0 bg-gradient-to-tr from-cyan-900 via-slate-800 to-amber-900 opacity-60 group-hover:scale-105 transition-transform duration-500" />
-                  )}
+                  <img
+                    src={art.featuredImage || `/assets/artikel${idx > 0 ? idx : ""}.png`}
+                    alt={art.title}
+                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = `/assets/artikel${idx > 0 ? idx : ""}.png`;
+                    }}
+                  />
 
                   <div className="relative z-20 space-y-2">
                     <h3 className="text-lg sm:text-xl font-bold text-white leading-snug group-hover:text-teal-300 transition-colors">
@@ -124,7 +126,7 @@ export default async function BlogPage({
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
-              {articles.map((art) => (
+              {articles.map((art, idx) => (
                 <Link
                   key={art.id}
                   href={`/blog/${art.slug}`}
@@ -132,17 +134,14 @@ export default async function BlogPage({
                 >
                   <div>
                     <div className="aspect-[16/10] bg-slate-900 relative overflow-hidden flex items-center justify-center text-white">
-                      {art.featuredImage && !art.featuredImage.includes("placeholder") ? (
-                        <img
-                          src={art.featuredImage}
-                          alt={art.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-gradient-to-tr from-slate-900 to-slate-800 flex items-center justify-center p-4">
-                          <span className="text-xs font-bold text-teal-400">INSIGHT ARTICLE</span>
-                        </div>
-                      )}
+                      <img
+                        src={art.featuredImage || `/assets/artikel${idx > 0 ? idx % 4 : ""}.png`}
+                        alt={art.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = `/assets/artikel${idx > 0 ? idx % 4 : ""}.png`;
+                        }}
+                      />
                     </div>
 
                     <div className="p-5 space-y-2">

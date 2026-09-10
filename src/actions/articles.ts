@@ -49,18 +49,17 @@ export async function getArticles(options: ArticleFilterOptions | number = {}) {
         categorySlug: schema.categories.slug,
       })
       .from(schema.articles)
-      .leftJoin(schema.categories, eq(schema.articles.categoryId, schema.categories.id));
+      .leftJoin(schema.categories, eq(schema.articles.categoryId, schema.categories.id))
+      .where(and(...whereConditions))
+      .orderBy(desc(schema.articles.publishedAt));
 
-    let finalQuery = query.where(and(...whereConditions)).orderBy(desc(schema.articles.publishedAt));
-
-    if (limit) {
-      finalQuery = finalQuery.limit(limit) as any;
+    if (typeof limit === "number" && typeof offset === "number") {
+      return await query.limit(limit).offset(offset);
+    } else if (typeof limit === "number") {
+      return await query.limit(limit);
     }
-    if (offset) {
-      finalQuery = finalQuery.offset(offset) as any;
-    }
 
-    return await finalQuery;
+    return await query;
   } catch (error) {
     console.error("Error fetching articles from DB:", error);
     return [];

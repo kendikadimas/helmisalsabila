@@ -64,22 +64,19 @@ export async function getProducts(options: ProductFilterOptions | number = {}) {
       whereConditions.push(eq(schema.categories.slug, categorySlug));
     }
 
-    let finalQuery = query.where(and(...whereConditions));
-
     if (sortBy === "populer") {
-      finalQuery = finalQuery.orderBy(desc(schema.products.totalSales), asc(schema.products.orderIndex)) as any;
+      query = query.where(and(...whereConditions)).orderBy(desc(schema.products.totalSales), asc(schema.products.orderIndex)) as any;
     } else {
-      finalQuery = finalQuery.orderBy(desc(schema.products.createdAt), asc(schema.products.orderIndex)) as any;
+      query = query.where(and(...whereConditions)).orderBy(desc(schema.products.createdAt), asc(schema.products.orderIndex)) as any;
     }
 
-    if (limit) {
-      finalQuery = finalQuery.limit(limit) as any;
-    }
-    if (offset) {
-      finalQuery = finalQuery.offset(offset) as any;
+    if (typeof limit === "number" && typeof offset === "number") {
+      return await query.limit(limit).offset(offset);
+    } else if (typeof limit === "number") {
+      return await query.limit(limit);
     }
 
-    return await finalQuery;
+    return await query;
   } catch (error) {
     console.error("Error fetching products from DB:", error);
     return [];
