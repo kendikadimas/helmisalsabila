@@ -14,8 +14,17 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export default async function HomePage() {
-  const [services, products, articles, testimonials, workSteps, valueProps, settings, categories] =
-    await Promise.all([
+  let services: any[] = [];
+  let products: any[] = [];
+  let articles: any[] = [];
+  let testimonials: any[] = [];
+  let workSteps: any[] = [];
+  let valueProps: any[] = [];
+  let settings: any = null;
+  let categories: any[] = [];
+
+  try {
+    const res = await Promise.all([
       getServices(3),
       getProducts(3),
       getArticles(3),
@@ -25,6 +34,25 @@ export default async function HomePage() {
       getSiteSettings(),
       getAllCategories(),
     ]);
+    services = res[0] || [];
+    products = res[1] || [];
+    articles = res[2] || [];
+    testimonials = res[3] || [];
+    workSteps = res[4] || [];
+    valueProps = res[5] || [];
+    settings = res[6] || null;
+    categories = res[7] || [];
+  } catch (error) {
+    console.error("Error loading HomePage data:", error);
+  }
+
+  const getValidArticleImg = (img?: string | null, index: number = 0) => {
+    if (!img || img.includes("placeholder") || img.includes("article-data-viz") || img.includes("article-nextjs") || img.includes("article-marketing")) {
+      const idxNum = index % 4;
+      return `/assets/artikel${idxNum > 0 ? idxNum : ""}.png`;
+    }
+    return img;
+  };
 
   const heroTitle = settings?.heroTitle || "Data & Digital Solutions.";
   const heroSubtitle = settings?.heroSubtitle || "Masalah ditemukan. Solusi diarahkan. Pilihan terbaik direkomendasikan.";
@@ -475,11 +503,11 @@ export default async function HomePage() {
               <div>
                 <div className="aspect-[16/10] bg-slate-900 relative overflow-hidden flex items-center justify-center text-white">
                   <img
-                    src={art.featuredImage || `/assets/artikel${idx > 0 ? idx : ""}.png`}
+                    src={getValidArticleImg(art.featuredImage, idx)}
                     alt={art.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     onError={(e) => {
-                      (e.target as HTMLImageElement).src = `/assets/artikel${idx > 0 ? idx : ""}.png`;
+                      (e.target as HTMLImageElement).src = `/assets/artikel${idx > 0 ? idx % 4 : ""}.png`;
                     }}
                   />
                 </div>

@@ -125,7 +125,13 @@ export default async function DetailArtikelPage({
             {/* Featured Hero Image */}
             <div className="aspect-[16/9] rounded-3xl overflow-hidden bg-slate-900 shadow-sm relative flex items-center justify-center text-white">
               <img
-                src={article.featuredImage || "/assets/artikel.png"}
+                src={
+                  !article.featuredImage ||
+                  article.featuredImage.includes("placeholder") ||
+                  article.featuredImage.includes("article-")
+                    ? "/assets/artikel.png"
+                    : article.featuredImage
+                }
                 alt={article.title}
                 className="w-full h-full object-cover"
                 onError={(e) => {

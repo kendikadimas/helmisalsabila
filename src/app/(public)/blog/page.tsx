@@ -26,22 +26,44 @@ export default async function BlogPage({
   const currentPage = Math.max(1, parseInt(params.page || "1", 10));
   const offset = (currentPage - 1) * PAGE_SIZE;
 
-  const [articles, popularArticles, categories, totalCount] = await Promise.all([
-    getArticles({
-      searchQuery: params.q,
-      categorySlug: params.kategori,
-      limit: PAGE_SIZE,
-      offset,
-    }),
-    getPopularArticles(),
-    getAllCategories("article"),
-    getArticlesCount({
-      searchQuery: params.q,
-      categorySlug: params.kategori,
-    }),
-  ]);
+  let articles: any[] = [];
+  let popularArticles: any[] = [];
+  let categories: any[] = [];
+  let totalCount = 0;
+  let totalPages = 1;
 
-  const totalPages = Math.ceil(totalCount / PAGE_SIZE);
+  try {
+    const res = await Promise.all([
+      getArticles({
+        searchQuery: params.q,
+        categorySlug: params.kategori,
+        limit: PAGE_SIZE,
+        offset,
+      }),
+      getPopularArticles(),
+      getAllCategories("article"),
+      getArticlesCount({
+        searchQuery: params.q,
+        categorySlug: params.kategori,
+      }),
+    ]);
+
+    articles = res[0] || [];
+    popularArticles = res[1] || [];
+    categories = res[2] || [];
+    totalCount = res[3] || 0;
+    totalPages = Math.ceil(totalCount / PAGE_SIZE);
+  } catch (error) {
+    console.error("Error loading blog page:", error);
+  }
+
+  const getValidArticleImg = (img?: string | null, index: number = 0) => {
+    if (!img || img.includes("placeholder") || img.includes("article-data-viz") || img.includes("article-nextjs") || img.includes("article-marketing")) {
+      const idxNum = index % 4;
+      return `/assets/artikel${idxNum > 0 ? idxNum : ""}.png`;
+    }
+    return img;
+  };
 
   return (
     <div className="space-y-12 pb-16">
@@ -68,11 +90,11 @@ export default async function BlogPage({
                 >
                   <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent z-10" />
                   <img
-                    src={art.featuredImage || `/assets/artikel${idx > 0 ? idx : ""}.png`}
+                    src={getValidArticleImg(art.featuredImage, idx)}
                     alt={art.title}
                     className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     onError={(e) => {
-                      (e.target as HTMLImageElement).src = `/assets/artikel${idx > 0 ? idx : ""}.png`;
+                      (e.target as HTMLImageElement).src = `/assets/artikel${idx > 0 ? idx % 4 : ""}.png`;
                     }}
                   />
 
@@ -135,7 +157,7 @@ export default async function BlogPage({
                   <div>
                     <div className="aspect-[16/10] bg-slate-900 relative overflow-hidden flex items-center justify-center text-white">
                       <img
-                        src={art.featuredImage || `/assets/artikel${idx > 0 ? idx % 4 : ""}.png`}
+                        src={getValidArticleImg(art.featuredImage, idx)}
                         alt={art.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         onError={(e) => {

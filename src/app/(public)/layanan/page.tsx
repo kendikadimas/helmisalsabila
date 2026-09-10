@@ -28,24 +28,36 @@ export default async function LayananPage({
   const currentPage = Math.max(1, parseInt(params.page || "1", 10));
   const offset = (currentPage - 1) * PAGE_SIZE;
 
-  const [services, categories, totalCount] = await Promise.all([
-    getServices({
-      searchQuery: params.q,
-      categorySlug: params.kategori,
-      priceType: params.harga,
-      sortBy: params.sort,
-      limit: PAGE_SIZE,
-      offset,
-    }),
-    getAllCategories("service"),
-    getServicesCount({
-      searchQuery: params.q,
-      categorySlug: params.kategori,
-      priceType: params.harga,
-    }),
-  ]);
+  let services: any[] = [];
+  let categories: any[] = [];
+  let totalCount = 0;
+  let totalPages = 1;
 
-  const totalPages = Math.ceil(totalCount / PAGE_SIZE);
+  try {
+    const res = await Promise.all([
+      getServices({
+        searchQuery: params.q,
+        categorySlug: params.kategori,
+        priceType: params.harga,
+        sortBy: params.sort,
+        limit: PAGE_SIZE,
+        offset,
+      }),
+      getAllCategories("service"),
+      getServicesCount({
+        searchQuery: params.q,
+        categorySlug: params.kategori,
+        priceType: params.harga,
+      }),
+    ]);
+
+    services = res[0] || [];
+    categories = res[1] || [];
+    totalCount = res[2] || 0;
+    totalPages = Math.ceil(totalCount / PAGE_SIZE);
+  } catch (error) {
+    console.error("Error loading services page:", error);
+  }
 
   return (
     <div className="space-y-10 pb-16">

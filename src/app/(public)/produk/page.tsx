@@ -28,24 +28,36 @@ export default async function ProdukPage({
   const currentPage = Math.max(1, parseInt(params.page || "1", 10));
   const offset = (currentPage - 1) * PAGE_SIZE;
 
-  const [products, categories, totalCount] = await Promise.all([
-    getProducts({
-      searchQuery: params.q,
-      categorySlug: params.kategori,
-      priceType: params.harga,
-      sortBy: params.sort,
-      limit: PAGE_SIZE,
-      offset,
-    }),
-    getAllCategories("product"),
-    getProductsCount({
-      searchQuery: params.q,
-      categorySlug: params.kategori,
-      priceType: params.harga,
-    }),
-  ]);
+  let products: any[] = [];
+  let categories: any[] = [];
+  let totalCount = 0;
+  let totalPages = 1;
 
-  const totalPages = Math.ceil(totalCount / PAGE_SIZE);
+  try {
+    const res = await Promise.all([
+      getProducts({
+        searchQuery: params.q,
+        categorySlug: params.kategori,
+        priceType: params.harga,
+        sortBy: params.sort,
+        limit: PAGE_SIZE,
+        offset,
+      }),
+      getAllCategories("product"),
+      getProductsCount({
+        searchQuery: params.q,
+        categorySlug: params.kategori,
+        priceType: params.harga,
+      }),
+    ]);
+
+    products = res[0] || [];
+    categories = res[1] || [];
+    totalCount = res[2] || 0;
+    totalPages = Math.ceil(totalCount / PAGE_SIZE);
+  } catch (error) {
+    console.error("Error loading products page:", error);
+  }
 
   return (
     <div className="space-y-10 pb-16">
