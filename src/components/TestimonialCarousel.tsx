@@ -73,18 +73,15 @@ export default function TestimonialCarousel({ testimonials }: { testimonials: Te
               {/* Left Column: Avatar Photo + Client Name */}
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-lg bg-slate-900 overflow-hidden shrink-0 relative shadow-2xs">
-                  {t.avatarUrl ? (
-                    <img
-                      src={t.avatarUrl}
-                      alt={t.clientName}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = "/profile-talent.png";
-                      }}
-                    />
-                  ) : (
-                    <img src="/profile-talent.png" alt={t.clientName} className="w-full h-full object-cover" />
-                  )}
+                  <img
+                    src={
+                      !t.avatarUrl || t.avatarUrl.includes("client-") || t.avatarUrl.includes("placeholder")
+                        ? "/profile-talent.png"
+                        : t.avatarUrl
+                    }
+                    alt={t.clientName}
+                    className="w-full h-full object-cover"
+                  />
                 </div>
                 <span className="text-xs sm:text-[13px] font-bold text-slate-900">{t.clientName}</span>
               </div>
