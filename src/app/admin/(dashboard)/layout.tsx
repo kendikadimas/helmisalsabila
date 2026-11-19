@@ -2,6 +2,7 @@ import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { logoutAction } from "@/actions/auth";
 import AdminSidebar from "@/components/AdminSidebar";
+import AdminHeaderBreadcrumb from "@/components/AdminHeaderBreadcrumb";
 
 export default async function AdminDashboardLayout({
   children,
@@ -23,11 +24,7 @@ export default async function AdminDashboardLayout({
       <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden bg-[#F1F5F9]">
         {/* Top Header Bar */}
         <header className="h-16 border-b border-slate-200/90 bg-white/80 backdrop-blur-md px-8 lg:px-10 flex items-center justify-between shrink-0 shadow-xs">
-          <div className="flex items-center gap-2.5 text-sm text-slate-500">
-            <span className="font-semibold text-slate-700">Admin</span>
-            <span className="text-slate-300">/</span>
-            <span className="text-slate-600 font-medium">Overview</span>
-          </div>
+          <AdminHeaderBreadcrumb />
 
           <div className="flex items-center gap-4">
             <div className="text-right hidden sm:block">

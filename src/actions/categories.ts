@@ -39,10 +39,39 @@ export async function createCategory(formData: FormData) {
     revalidatePath("/");
     revalidatePath("/blog");
     revalidatePath("/layanan");
+    revalidatePath("/produk");
     revalidatePath("/admin/categories");
-    return { success: true };
+    return { success: true, category: { id, name, slug: baseSlug, type } };
   } catch (error: any) {
     console.error("Error creating category:", error);
+    return { success: false, error: error.message };
+  }
+}
+
+export async function updateCategory(id: string, formData: FormData) {
+  try {
+    const session = await getSession();
+    if (!session) return { success: false, error: "Unauthorized" };
+
+    const name = (formData.get("name") as string)?.trim();
+    const type = (formData.get("type") as any) || "article";
+    if (!name) return { success: false, error: "Nama kategori wajib diisi." };
+
+    const slug = slugify(name) || `category-${Date.now()}`;
+
+    await db
+      .update(schema.categories)
+      .set({ name, slug, type })
+      .where(eq(schema.categories.id, id));
+
+    revalidatePath("/");
+    revalidatePath("/blog");
+    revalidatePath("/layanan");
+    revalidatePath("/produk");
+    revalidatePath("/admin/categories");
+    return { success: true, category: { id, name, slug, type } };
+  } catch (error: any) {
+    console.error("Error updating category:", error);
     return { success: false, error: error.message };
   }
 }

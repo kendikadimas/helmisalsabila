@@ -1,7 +1,7 @@
 "use server";
 
 import { db, schema } from "@/db";
-import { eq, desc, asc, and, like, sql } from "drizzle-orm";
+import { eq, desc, asc, and, or, like, sql, inArray } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { calculateReadingTime, slugify } from "@/lib/utils";
 import { getSession } from "@/lib/auth";
@@ -17,7 +17,7 @@ export interface ArticleFilterOptions {
 export async function getArticles(options: ArticleFilterOptions | number = {}) {
   try {
     const opts: ArticleFilterOptions = typeof options === "number" ? { limit: options } : options;
-    const { limit, offset, searchQuery, categorySlug } = opts;
+    const { limit, offset, searchQuery, categorySlug, tagSlug } = opts;
 
     let whereConditions = [eq(schema.articles.isPublished, true)];
 
@@ -27,6 +27,36 @@ export async function getArticles(options: ArticleFilterOptions | number = {}) {
 
     if (categorySlug && categorySlug !== "all") {
       whereConditions.push(eq(schema.categories.slug, categorySlug));
+    }
+
+    if (tagSlug && tagSlug.trim() !== "") {
+      const slugVal = tagSlug.trim();
+      const [tagRow] = await db
+        .select()
+        .from(schema.tags)
+        .where(eq(schema.tags.slug, slugVal))
+        .limit(1);
+
+      const tagged = tagRow
+        ? await db
+            .select({ articleId: schema.articleTags.articleId })
+            .from(schema.articleTags)
+            .where(eq(schema.articleTags.tagId, tagRow.id))
+        : [];
+
+      const taggedIds = tagged.map((t) => t.articleId);
+      if (taggedIds.length > 0) {
+        whereConditions.push(inArray(schema.articles.id, taggedIds));
+      } else if (tagRow) {
+        const words = tagRow.name.split(/\s+/).filter((w) => w.length >= 3);
+        const keywordConds = words.flatMap((w) => [
+          like(schema.articles.title, `%${w}%`),
+          like(schema.articles.content, `%${w}%`),
+        ]);
+        whereConditions.push(or(eq(schema.categories.slug, slugVal), ...keywordConds)!);
+      } else {
+        return [];
+      }
     }
 
     let query = db
@@ -66,9 +96,9 @@ export async function getArticles(options: ArticleFilterOptions | number = {}) {
   }
 }
 
-export async function getArticlesCount(options: { searchQuery?: string; categorySlug?: string } = {}) {
+export async function getArticlesCount(options: { searchQuery?: string; categorySlug?: string; tagSlug?: string } = {}) {
   try {
-    const { searchQuery, categorySlug } = options;
+    const { searchQuery, categorySlug, tagSlug } = options;
     let whereConditions = [eq(schema.articles.isPublished, true)];
 
     if (searchQuery && searchQuery.trim() !== "") {
@@ -76,6 +106,35 @@ export async function getArticlesCount(options: { searchQuery?: string; category
     }
     if (categorySlug && categorySlug !== "all") {
       whereConditions.push(eq(schema.categories.slug, categorySlug));
+    }
+    if (tagSlug && tagSlug.trim() !== "") {
+      const slugVal = tagSlug.trim();
+      const [tagRow] = await db
+        .select()
+        .from(schema.tags)
+        .where(eq(schema.tags.slug, slugVal))
+        .limit(1);
+
+      const tagged = tagRow
+        ? await db
+            .select({ articleId: schema.articleTags.articleId })
+            .from(schema.articleTags)
+            .where(eq(schema.articleTags.tagId, tagRow.id))
+        : [];
+
+      const taggedIds = tagged.map((t) => t.articleId);
+      if (taggedIds.length > 0) {
+        whereConditions.push(inArray(schema.articles.id, taggedIds));
+      } else if (tagRow) {
+        const words = tagRow.name.split(/\s+/).filter((w) => w.length >= 3);
+        const keywordConds = words.flatMap((w) => [
+          like(schema.articles.title, `%${w}%`),
+          like(schema.articles.content, `%${w}%`),
+        ]);
+        whereConditions.push(or(eq(schema.categories.slug, slugVal), ...keywordConds)!);
+      } else {
+        return 0;
+      }
     }
 
     const [res] = await db

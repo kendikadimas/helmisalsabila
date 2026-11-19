@@ -191,6 +191,8 @@ export async function createProduct(formData: FormData) {
     const totalSales = parseInt((formData.get("totalSales") as string) || "0", 10);
     const thumbnailUrl = (formData.get("thumbnailUrl") as string) || "/assets/placeholder.jpg";
     const aboutProduct = (formData.get("aboutProduct") as string) || title;
+    const liveDemoUrl = ((formData.get("liveDemoUrl") as string) || "").trim() || null;
+    const purchaseLinkExternal = ((formData.get("purchaseLinkExternal") as string) || "").trim() || null;
     const isFeatured = formData.get("isFeatured") === "true";
     const isPublished = formData.get("isPublished") !== "false";
 
@@ -207,6 +209,8 @@ export async function createProduct(formData: FormData) {
       totalSales,
       thumbnailUrl,
       aboutProduct,
+      liveDemoUrl,
+      purchaseLinkExternal,
       isFeatured,
       isPublished,
       orderIndex: 0,
@@ -251,6 +255,8 @@ export async function updateProduct(id: string, formData: FormData) {
       : 0;
     const aboutProduct = (formData.get("aboutProduct") as string) || title;
     const thumbnailUrl = (formData.get("thumbnailUrl") as string) || null;
+    const liveDemoUrl = ((formData.get("liveDemoUrl") as string) || "").trim() || null;
+    const purchaseLinkExternal = ((formData.get("purchaseLinkExternal") as string) || "").trim() || null;
 
     await db
       .update(schema.products)
@@ -262,6 +268,8 @@ export async function updateProduct(id: string, formData: FormData) {
         discountPercent,
         aboutProduct,
         thumbnailUrl: thumbnailUrl || undefined,
+        liveDemoUrl,
+        purchaseLinkExternal,
       })
       .where(eq(schema.products.id, id));
 

@@ -223,6 +223,37 @@ export const valuePropositions = mysqlTable("value_propositions", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+// 11. Orders (Transaksi Payment Gateway DOKU)
+export const orders = mysqlTable("orders", {
+  id: varchar("id", { length: 36 }).primaryKey(),
+  invoiceNumber: varchar("invoice_number", { length: 100 }).notNull().unique(),
+  itemType: mysqlEnum("item_type", ["product", "service"]).default("product").notNull(),
+  itemId: varchar("item_id", { length: 36 }).notNull(),
+  itemTitle: varchar("item_title", { length: 255 }).notNull(),
+  customerName: varchar("customer_name", { length: 150 }).notNull(),
+  customerEmail: varchar("customer_email", { length: 150 }).notNull(),
+  customerPhone: varchar("customer_phone", { length: 50 }).notNull(),
+  amount: decimal("amount", { precision: 12, scale: 2 }).notNull(),
+  status: mysqlEnum("status", ["PENDING", "PAID", "FAILED", "EXPIRED"]).default("PENDING").notNull(),
+  paymentUrl: varchar("payment_url", { length: 500 }),
+  dokuTransactionId: varchar("doku_transaction_id", { length: 150 }),
+  paidAt: timestamp("paid_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+// 12. Webhook Logs (Audit Trail Transaksi Gateway)
+export const webhookLogs = mysqlTable("webhook_logs", {
+  id: varchar("id", { length: 36 }).primaryKey(),
+  provider: varchar("provider", { length: 50 }).default("doku").notNull(),
+  invoiceNumber: varchar("invoice_number", { length: 100 }),
+  status: varchar("status", { length: 50 }).notNull(),
+  payload: longtext("payload").notNull(),
+  ipAddress: varchar("ip_address", { length: 100 }),
+  errorMessage: text("error_message"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 // Drizzle Relations
 export const usersRelations = relations(users, ({ many }) => ({
   articles: many(articles),

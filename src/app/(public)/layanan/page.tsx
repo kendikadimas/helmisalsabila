@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export const metadata: Metadata = {
-  title: "Layanan & Portfolio | Helmi Salsabila",
+  title: "Layanan & Portfolio",
   description:
     "Eksplorasi layanan konsultasi data, automasi bisnis, perancangan dashboard, dan portofolio implementasi solusi digital.",
 };

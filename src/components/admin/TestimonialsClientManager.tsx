@@ -180,7 +180,15 @@ export default function TestimonialsClientManager({
                     <div className="flex items-center gap-3">
                       <div className="w-9 h-9 rounded-xl bg-slate-100 border border-slate-200 text-slate-700 flex items-center justify-center font-bold text-xs shadow-xs overflow-hidden shrink-0">
                         {t.avatarUrl ? (
-                          <img src={t.avatarUrl} alt={t.clientName} className="w-full h-full object-cover" />
+                          <img
+                          src={
+                            t.avatarUrl.includes("client-") || t.avatarUrl.includes("placeholder")
+                              ? "/profile-talent.png"
+                              : t.avatarUrl
+                          }
+                          alt={t.clientName}
+                          className="w-full h-full object-cover"
+                        />
                         ) : (
                           <span>{t.clientName.charAt(0)}</span>
                         )}
@@ -193,7 +201,15 @@ export default function TestimonialsClientManager({
                   </td>
                   <td className="p-4 font-mono text-slate-700">
                     {t.companyLogoUrl ? (
-                      <img src={t.companyLogoUrl} alt={t.clientCompany} className="h-6 max-w-[90px] object-contain" />
+                      <img
+                        src={
+                          t.companyLogoUrl.includes("logo-foom")
+                            ? "/foom-logo.svg"
+                            : t.companyLogoUrl
+                        }
+                        alt={t.clientCompany}
+                        className="h-6 max-w-[90px] object-contain"
+                      />
                     ) : (
                       <span className="font-bold text-slate-900">{t.clientCompany}</span>
                     )}

@@ -90,7 +90,11 @@ export default function TestimonialCarousel({ testimonials }: { testimonials: Te
               <div className="flex items-center justify-end shrink-0">
                 {t.companyLogoUrl ? (
                   <img
-                    src={t.companyLogoUrl}
+                    src={
+                      t.companyLogoUrl.includes("logo-foom")
+                        ? "/foom-logo.svg"
+                        : t.companyLogoUrl
+                    }
                     alt={t.clientCompany}
                     className="h-5 sm:h-6 max-w-[100px] object-contain"
                   />

@@ -3,6 +3,7 @@
 import { db, schema } from "@/db";
 import { eq } from "drizzle-orm";
 import { createSession, deleteSession, getSession, verifyPassword, hashPassword } from "@/lib/auth";
+import { checkRateLimit } from "@/lib/rate-limit";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
@@ -13,6 +14,19 @@ export async function loginAction(formData: FormData) {
 
     if (!email || !password) {
       return { success: false, error: "Email dan password wajib diisi." };
+    }
+
+    const rateLimit = checkRateLimit(`login:${email.toLowerCase().trim()}`, {
+      maxRequests: 5,
+      windowSeconds: 15 * 60,
+    });
+    if (!rateLimit.allowed) {
+      return {
+        success: false,
+        error: `Terlalu banyak percobaan login yang gagal. Akun dibatasi selama ${Math.ceil(
+          rateLimit.resetInSeconds / 60
+        )} menit.`,
+      };
     }
 
     const [user] = await db.select().from(schema.users).where(eq(schema.users.email, email)).limit(1);

@@ -27,6 +27,8 @@ interface ProductItem {
   discountPercent: number;
   aboutProduct: string;
   thumbnailUrl?: string | null;
+  liveDemoUrl?: string | null;
+  purchaseLinkExternal?: string | null;
   totalSales: number;
 }
 
@@ -158,6 +160,26 @@ export default function ProductsClientManager({ initialProducts }: { initialProd
               name="thumbnailUrl"
               label="Thumbnail / Cover Produk Digital"
               placeholder="Upload cover produk digital"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-slate-700 font-medium">URL Live Demo (Opsional)</label>
+            <input
+              type="url"
+              name="liveDemoUrl"
+              placeholder="https://demo.helsenvi.com"
+              className="w-full p-3 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-teal-600 transition-colors"
+            />
+          </div>
+
+          <div className="space-y-1.5 md:col-span-2">
+            <label className="text-slate-700 font-medium">Link Pembelian Eksternal (Opsional - default via WhatsApp)</label>
+            <input
+              type="url"
+              name="purchaseLinkExternal"
+              placeholder="https://lynk.id/... atau https://mayar.id/..."
+              className="w-full p-3 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-teal-600 transition-colors"
             />
           </div>
 
@@ -325,6 +347,29 @@ export default function ProductsClientManager({ initialProducts }: { initialProd
               label="Thumbnail / Cover Produk Digital"
               defaultValue={editingItem.thumbnailUrl}
             />
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <label className="text-slate-700 font-medium">URL Live Demo (Opsional)</label>
+                <input
+                  type="url"
+                  name="liveDemoUrl"
+                  defaultValue={editingItem.liveDemoUrl || ""}
+                  placeholder="https://demo.helsenvi.com"
+                  className="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-teal-600"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-slate-700 font-medium">Link Pembelian Eksternal (Opsional)</label>
+                <input
+                  type="url"
+                  name="purchaseLinkExternal"
+                  defaultValue={editingItem.purchaseLinkExternal || ""}
+                  placeholder="https://lynk.id/..."
+                  className="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-teal-600"
+                />
+              </div>
+            </div>
 
             <div className="space-y-1.5">
               <label className="text-slate-700 font-medium">Tentang Produk</label>

@@ -418,6 +418,25 @@ Dilengkapi Adaptive Noise Cancelling dengan teknologi Smart Ambient untuk mereda
       await db.insert(schema.articles).values(art).onDuplicateKeyUpdate({ target: schema.articles.id, set: art });
     }
 
+    // 6b. Article Tags relations
+    const articleTagsData = [
+      { articleId: "art-01", tagId: "tag-it" },
+      { articleId: "art-01", tagId: "tag-life" },
+      { articleId: "art-02", tagId: "tag-si" },
+      { articleId: "art-02", tagId: "tag-remote" },
+      { articleId: "art-03", tagId: "tag-it" },
+      { articleId: "art-03", tagId: "tag-si" },
+      { articleId: "art-04", tagId: "tag-it" },
+      { articleId: "art-04", tagId: "tag-dm" },
+    ];
+
+    for (const at of articleTagsData) {
+      await db
+        .insert(schema.articleTags)
+        .values(at)
+        .onDuplicateKeyUpdate({ target: [schema.articleTags.articleId, schema.articleTags.tagId], set: at });
+    }
+
     // 7. Testimonials (FOOM / Regina)
     const testimonialsData = [
       {

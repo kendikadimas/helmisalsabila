@@ -2,11 +2,13 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ShieldCheck } from "lucide-react";
+import DOMPurify from "isomorphic-dompurify";
 import { getServiceBySlug, getServices } from "@/actions/services";
 import { getSiteSettings } from "@/actions/settings";
-import { formatRupiah } from "@/lib/utils";
+import { formatRupiah, markdownToHtml } from "@/lib/utils";
 import SectionHeader from "@/components/SectionHeader";
 import ShareButton from "@/components/ShareButton";
+import DokuCheckoutModal from "@/components/DokuCheckoutModal";
 import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 
 export async function generateMetadata({
@@ -24,7 +26,7 @@ export async function generateMetadata({
   }
 
   return {
-    title: `${service.title} | Layanan Helmi Salsabila`,
+    title: `${service.title} | Layanan`,
     description: service.shortDescription || "Detail paket dan ruang lingkup layanan dari Helmi Salsabila.",
     openGraph: {
       title: service.title,
@@ -32,6 +34,20 @@ export async function generateMetadata({
       images: service.thumbnailUrl ? [{ url: service.thumbnailUrl }] : [],
     },
   };
+}
+
+function parseJsonArray(val: unknown): string[] {
+  if (!val) return [];
+  if (Array.isArray(val)) return val.map(String);
+  if (typeof val === "string") {
+    try {
+      const parsed = JSON.parse(val);
+      if (Array.isArray(parsed)) return parsed.map(String);
+    } catch {
+      return val.trim() ? [val] : [];
+    }
+  }
+  return [];
 }
 
 export default async function DetailLayananPage({
@@ -53,6 +69,14 @@ export default async function DetailLayananPage({
 
   const contactPhone = settings?.contactPhone || "+6269233221";
   const relatedServices = relatedServicesAll.filter((s) => s.slug !== slug).slice(0, 3);
+  const features = parseJsonArray(service.features);
+  const toolsUsed = parseJsonArray(service.toolsUsed);
+  const outputsReceived = parseJsonArray(service.outputsReceived);
+  const targetAudience = parseJsonArray(service.targetAudience);
+  const isValidServiceImg = (url?: string | null) =>
+    !!url && !url.includes("placeholder") && !url.includes("/assets/service-");
+  const rawDesc = service.fullDescription || "";
+  const descHtml = DOMPurify.sanitize(/<\/?[a-z][\s\S]*>/i.test(rawDesc) ? rawDesc : markdownToHtml(rawDesc));
 
   return (
     <div className="space-y-12 pb-20">
@@ -78,30 +102,50 @@ export default async function DetailLayananPage({
             {/* Gallery Grid (1 Large + 4 Small Layout) */}
             <div className="grid grid-cols-1 md:grid-cols-12 gap-3 bg-white p-3 rounded-2xl border border-slate-200 shadow-xs">
               {/* 1 Large Preview */}
-              <div className="md:col-span-8 aspect-[4/3] bg-slate-950 rounded-xl overflow-hidden relative flex items-center justify-center text-white p-6">
-                <div className="text-center space-y-2">
-                  <span className="text-xs uppercase tracking-widest text-teal-400 font-bold">PORTFOLIO SHOWCASE</span>
-                  <h3 className="text-2xl font-extrabold">{service.title}</h3>
-                  <div className="inline-block bg-white/10 px-4 py-1.5 rounded-full text-xs text-slate-200">
-                    Swipe to Portfolio
+              <div className="md:col-span-8 aspect-[4/3] bg-slate-950 rounded-xl overflow-hidden relative flex items-center justify-center text-white">
+                {isValidServiceImg(service.thumbnailUrl) ? (
+                  <img
+                    src={service.thumbnailUrl!}
+                    alt={service.title}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="text-center space-y-2 p-6">
+                    <span className="text-xs uppercase tracking-widest text-teal-400 font-bold">PORTFOLIO SHOWCASE</span>
+                    <h3 className="text-2xl font-extrabold">{service.title}</h3>
+                    <div className="inline-block bg-white/10 px-4 py-1.5 rounded-full text-xs text-slate-200">
+                      Swipe to Portfolio
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
 
               {/* 4 Small Thumbnails Grid */}
               <div className="md:col-span-4 grid grid-cols-2 gap-2">
-                <div className="aspect-square bg-slate-900 rounded-lg flex items-center justify-center text-white text-[10px] p-2 text-center border border-slate-800">
-                  <span>Data Preprocessing</span>
-                </div>
-                <div className="aspect-square bg-slate-900 rounded-lg flex items-center justify-center text-white text-[10px] p-2 text-center border border-slate-800">
-                  <span>EDA Graphs</span>
-                </div>
-                <div className="aspect-square bg-slate-900 rounded-lg flex items-center justify-center text-white text-[10px] p-2 text-center border border-slate-800">
-                  <span>Trend Analysis</span>
-                </div>
-                <div className="aspect-square bg-slate-950/90 rounded-lg flex items-center justify-center text-white text-xs font-bold p-2 text-center border border-slate-800 relative">
-                  <span>+5 Gambar</span>
-                </div>
+                {(service.galleries && service.galleries.length > 0
+                  ? service.galleries.slice(0, 4)
+                  : [
+                      { id: "1", imageUrl: "", caption: "Data Preprocessing" },
+                      { id: "2", imageUrl: "", caption: "EDA Graphs" },
+                      { id: "3", imageUrl: "", caption: "Trend Analysis" },
+                      { id: "4", imageUrl: "", caption: "Insight Report" },
+                    ]
+                ).map((gal) => (
+                  <div
+                    key={gal.id}
+                    className="aspect-square bg-slate-900 rounded-lg overflow-hidden flex items-center justify-center text-white text-[10px] text-center border border-slate-800"
+                  >
+                    {gal.imageUrl && !gal.imageUrl.includes("placeholder") ? (
+                      <img
+                        src={gal.imageUrl}
+                        alt={gal.caption || service.title}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <span className="p-2">{gal.caption || "Preview"}</span>
+                    )}
+                  </div>
+                ))}
               </div>
             </div>
 
@@ -120,16 +164,17 @@ export default async function DetailLayananPage({
                 <h2 className="text-lg font-bold text-slate-900">Deskripsi</h2>
               </div>
 
-              <div className="prose prose-slate max-w-none text-xs sm:text-sm text-slate-600 space-y-4 leading-relaxed whitespace-pre-line">
-                {service.fullDescription}
-              </div>
+              <div
+                className="prose prose-slate max-w-none text-xs sm:text-sm text-slate-600 space-y-3 leading-relaxed [&_h2]:text-base [&_h2]:font-bold [&_h2]:text-slate-900 [&_h3]:text-sm [&_h3]:font-bold [&_h3]:text-slate-900 [&_h4]:text-xs [&_h4]:font-bold [&_h4]:text-slate-800 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5"
+                dangerouslySetInnerHTML={{ __html: descHtml }}
+              />
 
               {/* Fitur Layanan */}
-              {service.features && service.features.length > 0 && (
+              {features.length > 0 && (
                 <div className="space-y-3 pt-4 border-t border-slate-100">
                   <h3 className="font-bold text-slate-900 text-sm">Apa Saja yang Anda Dapatkan:</h3>
                   <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-700">
-                    {service.features.map((feat, idx) => (
+                    {features.map((feat, idx) => (
                       <li key={idx} className="flex items-center gap-2">
                         <span className="w-1.5 h-1.5 rounded-full bg-teal-600 shrink-0" />
                         <span>{feat}</span>
@@ -140,11 +185,11 @@ export default async function DetailLayananPage({
               )}
 
               {/* Tools Digunakan */}
-              {service.toolsUsed && service.toolsUsed.length > 0 && (
+              {toolsUsed.length > 0 && (
                 <div className="space-y-3 pt-2">
                   <h3 className="font-bold text-slate-900 text-sm">Tools & Teknologi:</h3>
                   <div className="flex flex-wrap gap-2">
-                    {service.toolsUsed.map((tool, idx) => (
+                    {toolsUsed.map((tool, idx) => (
                       <span
                         key={idx}
                         className="px-3 py-1 bg-slate-100 border border-slate-200 rounded-lg text-xs font-medium text-slate-700"
@@ -153,6 +198,29 @@ export default async function DetailLayananPage({
                       </span>
                     ))}
                   </div>
+                </div>
+              )}
+
+              {/* Output yang Diterima */}
+              {outputsReceived.length > 0 && (
+                <div className="space-y-3 pt-2">
+                  <h3 className="font-bold text-slate-900 text-sm">Output yang Anda Terima:</h3>
+                  <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-700">
+                    {outputsReceived.map((out, idx) => (
+                      <li key={idx} className="flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#1E3A5F] shrink-0" />
+                        <span>{out}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Target Audience */}
+              {targetAudience.length > 0 && (
+                <div className="space-y-2 pt-2 text-xs text-slate-600">
+                  <span className="font-bold text-slate-900">Cocok untuk: </span>
+                  <span>{targetAudience.join(" • ")}</span>
                 </div>
               )}
             </div>
@@ -181,8 +249,18 @@ export default async function DetailLayananPage({
                 </span>
               </div>
 
-              {/* Action Buttons (Using dynamic phone from database) */}
+              {/* Action Buttons (DOKU Checkout + WhatsApp consultation) */}
               <div className="space-y-3 pt-1">
+                {service.priceStartingAt && parseFloat(String(service.priceStartingAt)) > 0 && (
+                  <DokuCheckoutModal
+                    itemType="service"
+                    itemId={service.id}
+                    itemTitle={service.title}
+                    amount={service.priceStartingAt}
+                    buttonLabel="Pesan & Bayar (DOKU)"
+                  />
+                )}
+
                 <a
                   href={`https://wa.me/${contactPhone.replace(/[^0-9]/g, "")}?text=Halo,%20saya%20tertarik%20dengan%20layanan:%20${encodeURIComponent(
                     service.title
@@ -192,7 +270,7 @@ export default async function DetailLayananPage({
                   className="w-full py-3.5 px-4 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-white text-xs font-bold flex items-center justify-center gap-2 shadow-md transition-all"
                 >
                   <WhatsAppIcon className="w-4 h-4 text-white" fill="currentColor" />
-                  <span>Pakai Layanan Ini</span>
+                  <span>Konsultasi via WhatsApp</span>
                 </a>
 
                 <ShareButton
@@ -215,8 +293,16 @@ export default async function DetailLayananPage({
                 className="group bg-white rounded-2xl border border-slate-200 p-3.5 shadow-xs hover:shadow-lg transition-all flex flex-col justify-between"
               >
                 <div>
-                  <div className="aspect-[16/10] bg-slate-900 rounded-xl relative overflow-hidden flex items-center justify-center text-white p-4">
-                    <h4 className="text-xs font-bold text-center group-hover:text-teal-300">{srv.title}</h4>
+                  <div className="aspect-[16/10] bg-slate-900 rounded-xl relative overflow-hidden flex items-center justify-center text-white">
+                    {isValidServiceImg(srv.thumbnailUrl) ? (
+                      <img
+                        src={srv.thumbnailUrl!}
+                        alt={srv.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    ) : (
+                      <h4 className="text-xs font-bold text-center p-4 group-hover:text-teal-300">{srv.title}</h4>
+                    )}
                   </div>
                   <div className="pt-3 pb-1 px-1">
                     <h3 className="font-bold text-slate-900 text-sm group-hover:text-[#1E3A5F] line-clamp-2">

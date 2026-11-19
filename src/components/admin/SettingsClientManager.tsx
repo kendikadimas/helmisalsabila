@@ -69,6 +69,39 @@ export default function SettingsClientManager({ settings }: { settings: any }) {
         )}
 
         <form onSubmit={handleSiteUpdate} className="space-y-6 text-xs sm:text-sm">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div className="space-y-1.5">
+              <label className="font-medium text-slate-700">Nama Website / Brand</label>
+              <input
+                type="text"
+                name="siteName"
+                defaultValue={settings?.siteName || "Helmi Salsabila"}
+                className="w-full p-3 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-teal-600 transition-colors"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="font-medium text-slate-700">Link Resume / CV (Opsional)</label>
+              <input
+                type="text"
+                name="resumeCvUrl"
+                defaultValue={settings?.resumeCvUrl || ""}
+                placeholder="https://drive.google.com/... atau /resume-helmi.pdf"
+                className="w-full p-3 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-teal-600 transition-colors font-mono"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="font-medium text-slate-700">Bio Singkat (Footer & Profil)</label>
+            <input
+              type="text"
+              name="bioDescription"
+              defaultValue={settings?.bioDescription || "Your Reliable Partner for Digital & Data Solutions"}
+              className="w-full p-3 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-teal-600 transition-colors"
+            />
+          </div>
+
           <div className="space-y-1.5">
             <label className="font-medium text-slate-700">Headline Hero Section</label>
             <input
@@ -114,12 +147,39 @@ export default function SettingsClientManager({ settings }: { settings: any }) {
           <div className="space-y-1.5">
             <label className="font-medium text-slate-700">URL Saweria (Donasi Artikel)</label>
             <input
-              type="url"
+              type="text"
               name="saweriaUrl"
               defaultValue={settings?.saweriaUrl || "https://saweria.co/helmisalsabila"}
               placeholder="https://saweria.co/username"
               className="w-full p-3 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-teal-600 transition-colors font-mono"
             />
+          </div>
+
+          {/* SEO Metadata */}
+          <div className="pt-4 border-t border-slate-200 space-y-3">
+            <h3 className="font-semibold text-slate-800 text-sm">SEO Metadata Default</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-slate-600">Meta Title</label>
+                <input
+                  type="text"
+                  name="metaTitle"
+                  defaultValue={settings?.metaTitle || ""}
+                  placeholder="Helmi Salsabila | Data & Digital Solutions"
+                  className="w-full p-3 bg-white border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-teal-600 transition-colors"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-slate-600">Meta Description</label>
+                <input
+                  type="text"
+                  name="metaDescription"
+                  defaultValue={settings?.metaDescription || ""}
+                  placeholder="Deskripsi singkat website untuk mesin pencari"
+                  className="w-full p-3 bg-white border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-teal-600 transition-colors"
+                />
+              </div>
+            </div>
           </div>
 
           {/* Counter Banner Stats */}
@@ -170,7 +230,7 @@ export default function SettingsClientManager({ settings }: { settings: any }) {
               <div className="space-y-1.5">
                 <label className="text-xs font-medium text-slate-600">LinkedIn Profile URL</label>
                 <input
-                  type="url"
+                  type="text"
                   name="linkedin"
                   defaultValue={settings?.socialLinks?.linkedin || "https://linkedin.com"}
                   placeholder="https://linkedin.com/in/username"
@@ -181,7 +241,7 @@ export default function SettingsClientManager({ settings }: { settings: any }) {
               <div className="space-y-1.5">
                 <label className="text-xs font-medium text-slate-600">Instagram Profile URL</label>
                 <input
-                  type="url"
+                  type="text"
                   name="instagram"
                   defaultValue={settings?.socialLinks?.instagram || "https://instagram.com"}
                   placeholder="https://instagram.com/username"
@@ -192,7 +252,7 @@ export default function SettingsClientManager({ settings }: { settings: any }) {
               <div className="space-y-1.5">
                 <label className="text-xs font-medium text-slate-600">Threads Profile URL</label>
                 <input
-                  type="url"
+                  type="text"
                   name="threads"
                   defaultValue={settings?.socialLinks?.threads || "https://threads.net"}
                   placeholder="https://threads.net/@username"
@@ -203,7 +263,7 @@ export default function SettingsClientManager({ settings }: { settings: any }) {
               <div className="space-y-1.5">
                 <label className="text-xs font-medium text-slate-600">Dribbble Portfolio URL</label>
                 <input
-                  type="url"
+                  type="text"
                   name="dribbble"
                   defaultValue={settings?.socialLinks?.dribbble || "https://dribbble.com"}
                   placeholder="https://dribbble.com/username"
@@ -214,7 +274,7 @@ export default function SettingsClientManager({ settings }: { settings: any }) {
               <div className="space-y-1.5">
                 <label className="text-xs font-medium text-slate-600">YouTube Channel URL</label>
                 <input
-                  type="url"
+                  type="text"
                   name="youtube"
                   defaultValue={settings?.socialLinks?.youtube || "https://youtube.com"}
                   placeholder="https://youtube.com/@channel"
@@ -225,7 +285,7 @@ export default function SettingsClientManager({ settings }: { settings: any }) {
               <div className="space-y-1.5">
                 <label className="text-xs font-medium text-slate-600">TikTok Profile URL</label>
                 <input
-                  type="url"
+                  type="text"
                   name="tiktok"
                   defaultValue={settings?.socialLinks?.tiktok || "https://tiktok.com"}
                   placeholder="https://tiktok.com/@username"
@@ -236,7 +296,7 @@ export default function SettingsClientManager({ settings }: { settings: any }) {
               <div className="space-y-1.5 md:col-span-2">
                 <label className="text-xs font-medium text-slate-600">Facebook Page / Profile URL</label>
                 <input
-                  type="url"
+                  type="text"
                   name="facebook"
                   defaultValue={settings?.socialLinks?.facebook || "https://facebook.com"}
                   placeholder="https://facebook.com/profile"

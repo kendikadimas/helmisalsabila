@@ -1,11 +1,12 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { BarChart3, FileText, BookOpen, Star } from "lucide-react";
+import { BarChart3, FileText, BookOpen, Star, ExternalLink } from "lucide-react";
 import { getProductBySlug } from "@/actions/products";
 import { getSiteSettings } from "@/actions/settings";
 import { formatRupiah } from "@/lib/utils";
 import ShareButton from "@/components/ShareButton";
+import DokuCheckoutModal from "@/components/DokuCheckoutModal";
 import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 
 export async function generateMetadata({
@@ -23,7 +24,7 @@ export async function generateMetadata({
   }
 
   return {
-    title: `${product.title} | Produk Digital Helmi Salsabila`,
+    title: `${product.title} | Produk Digital`,
     description:
       product.aboutProduct?.substring(0, 160) ||
       "Dapatkan template dan modul pembelajaran eksklusif dari Helmi Salsabila.",
@@ -69,6 +70,18 @@ export default async function DetailProdukPage({
   const whatYouGet = parseJsonArray(product.whatYouGet);
   const suitableFor = parseJsonArray(product.suitableFor);
 
+  const rawThumb = product.thumbnailUrl || "";
+  const resolvedThumb =
+    !rawThumb || rawThumb.includes("placeholder")
+      ? ""
+      : rawThumb.includes("product-branding-builder")
+        ? "/assets/product.png"
+        : rawThumb.includes("product-150-ideas")
+          ? "/assets/product2.png"
+          : rawThumb.includes("product-digital-ideas")
+            ? "/assets/product3.png"
+            : rawThumb;
+
   return (
     <div className="space-y-12 pb-16 pt-6">
       <div className="max-w-[1440px] mx-auto px-6 sm:px-12 lg:px-[96px] space-y-8">
@@ -91,21 +104,31 @@ export default async function DetailProdukPage({
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
             {/* Left Column: 3D Product Mockup & Thumbnails */}
             <div className="md:col-span-6 space-y-4">
-              <div className="aspect-[4/3] bg-gradient-to-br from-amber-100 via-rose-50 to-teal-50 rounded-2xl border border-slate-100 flex items-center justify-center p-6 shadow-inner">
-                <div className="w-44 h-56 bg-gradient-to-tr from-amber-400 via-rose-300 to-teal-300 rounded-xl shadow-2xl p-4 flex flex-col justify-between text-slate-950 font-extrabold border-2 border-white/80">
-                  <span className="text-[10px] tracking-wider uppercase text-slate-700">Digital Product</span>
-                  <div className="text-center space-y-1">
-                    <div className="w-10 h-10 mx-auto rounded-lg bg-white/80 flex items-center justify-center text-slate-900 shadow-xs">
-                      <BookOpen className="w-5 h-5" />
+              <div className="aspect-[4/3] bg-gradient-to-br from-amber-100 via-rose-50 to-teal-50 rounded-2xl border border-slate-100 flex items-center justify-center overflow-hidden shadow-inner">
+                {resolvedThumb ? (
+                  <img
+                    src={resolvedThumb}
+                    alt={product.title}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="p-6 flex items-center justify-center w-full h-full">
+                    <div className="w-44 h-56 bg-gradient-to-tr from-amber-400 via-rose-300 to-teal-300 rounded-xl shadow-2xl p-4 flex flex-col justify-between text-slate-950 font-extrabold border-2 border-white/80">
+                      <span className="text-[10px] tracking-wider uppercase text-slate-700">Digital Product</span>
+                      <div className="text-center space-y-1">
+                        <div className="w-10 h-10 mx-auto rounded-lg bg-white/80 flex items-center justify-center text-slate-900 shadow-xs">
+                          <BookOpen className="w-5 h-5" />
+                        </div>
+                        <div className="text-sm leading-tight font-extrabold">{product.title}</div>
+                      </div>
+                      <div className="flex items-center justify-end gap-0.5">
+                        {[...Array(5)].map((_, i) => (
+                          <Star key={i} className="w-2 h-2 fill-slate-900 text-slate-900" />
+                        ))}
+                      </div>
                     </div>
-                    <div className="text-sm leading-tight font-extrabold">{product.title}</div>
                   </div>
-                  <div className="flex items-center justify-end gap-0.5">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-2 h-2 fill-slate-900 text-slate-900" />
-                    ))}
-                  </div>
-                </div>
+                )}
               </div>
 
               {/* 4 Small Thumbnails */}
@@ -153,19 +176,51 @@ export default async function DetailProdukPage({
                 </div>
               </div>
 
-              {/* Action Buttons (Using dynamic phone from database) */}
+              {/* Action Buttons (DOKU Checkout / External link + WhatsApp consultation) */}
               <div className="space-y-3 pt-2">
+                {product.purchaseLinkExternal ? (
+                  <a
+                    href={product.purchaseLinkExternal}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="w-full py-3.5 px-4 rounded-xl bg-[#1E3A5F] hover:bg-[#162E4A] text-white text-xs font-bold flex items-center justify-center gap-2 shadow-md transition-all"
+                  >
+                    <ExternalLink className="w-4 h-4 text-white" />
+                    <span>Beli Produk Ini</span>
+                  </a>
+                ) : (
+                  <DokuCheckoutModal
+                    itemType="product"
+                    itemId={product.id}
+                    itemTitle={product.title}
+                    amount={product.discountedPrice || product.originalPrice}
+                    buttonLabel="Beli Sekarang (DOKU)"
+                  />
+                )}
+
                 <a
-                  href={`https://wa.me/${contactPhone.replace(/[^0-9]/g, "")}?text=Halo,%20saya%20ingin%20membeli%20produk:%20${encodeURIComponent(
+                  href={`https://wa.me/${contactPhone.replace(/[^0-9]/g, "")}?text=Halo,%20saya%20ingin%20bertanya%20tentang%20produk:%20${encodeURIComponent(
                     product.title
                   )}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="w-full py-3.5 px-4 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-white text-xs font-bold flex items-center justify-center gap-2 shadow-md transition-all"
+                  className="w-full py-3 px-4 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-white text-xs font-bold flex items-center justify-center gap-2 shadow-xs transition-all"
                 >
                   <WhatsAppIcon className="w-4 h-4 text-white" fill="currentColor" />
-                  <span>Beli Produk Ini</span>
+                  <span>Tanya via WhatsApp</span>
                 </a>
+
+                {product.liveDemoUrl && (
+                  <a
+                    href={product.liveDemoUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="w-full py-3 px-4 rounded-xl bg-[#1E3A5F] hover:bg-[#162E4A] text-white text-xs font-semibold flex items-center justify-center gap-2 transition-colors"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                    <span>Lihat Live Demo</span>
+                  </a>
+                )}
 
                 <ShareButton
                   label="Bagikan"

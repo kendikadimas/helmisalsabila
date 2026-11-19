@@ -1,13 +1,16 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { notFound } from "next/navigation";
-import { Eye, Share2, Facebook, Copy, ChevronDown } from "lucide-react";
+import { Eye, Facebook } from "lucide-react";
+import DOMPurify from "isomorphic-dompurify";
 import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 import { getArticleBySlug, getArticles, getTrendingArticles, getAllTags } from "@/actions/articles";
 import { getSiteSettings } from "@/actions/settings";
-import { formatDateIndo } from "@/lib/utils";
+import { formatDateIndo, markdownToHtml } from "@/lib/utils";
 import SectionHeader from "@/components/SectionHeader";
 import ShareButton from "@/components/ShareButton";
+import TableOfContents, { type TocHeading } from "@/components/TableOfContents";
 
 export async function generateMetadata({
   params,
@@ -24,7 +27,7 @@ export async function generateMetadata({
   }
 
   return {
-    title: `${article.title} | Helmi Salsabila`,
+    title: article.title,
     description: article.excerpt || "Baca artikel selengkapnya di website Helmi Salsabila.",
     openGraph: {
       title: article.title,
@@ -56,6 +59,27 @@ export default async function DetailArtikelPage({
   const relatedArticles = relatedArticlesAll.filter((a) => a.slug !== slug).slice(0, 3);
   const saweriaUrl = settings?.saweriaUrl || "https://saweria.co/helmisalsabila";
   const authorName = article.authorName || settings?.siteName || "Helmi Salsabila";
+  const hdrs = await headers();
+  const host = hdrs.get("x-forwarded-host") || hdrs.get("host");
+  const proto = hdrs.get("x-forwarded-proto") || (host?.includes("localhost") ? "http" : "https");
+  const origin = host ? `${proto}://${host}` : process.env.NEXT_PUBLIC_APP_URL || "https://helsenvi.com";
+  const articleUrl = `${origin}/blog/${article.slug}`;
+
+  const rawContent = article.content || "";
+  const isHtmlContent = /<\/?[a-z][\s\S]*>/i.test(rawContent);
+  const htmlSource = isHtmlContent ? rawContent : markdownToHtml(rawContent);
+  const cleanHtml = DOMPurify.sanitize(htmlSource);
+  const headings: TocHeading[] = [];
+  let headingIdx = 0;
+  const processedHtml = cleanHtml.replace(
+    /<(h[23])([^>]*)>([\s\S]*?)<\/\1>/gi,
+    (_match, tag, attrs, inner) => {
+      const plain = inner.replace(/<[^>]+>/g, "").trim();
+      const id = `heading-${++headingIdx}`;
+      if (plain) headings.push({ id, text: plain });
+      return `<${tag}${attrs} id="${id}" class="scroll-mt-24">${inner}</${tag}>`;
+    }
+  );
 
   const articleJsonLd = {
     "@context": "https://schema.org",
@@ -97,7 +121,7 @@ export default async function DetailArtikelPage({
           </h1>
 
           <div className="text-xs text-slate-500">
-            {formatDateIndo(article.publishedAt)}, 19:26 WIB | {article.readingTimeMin || 3} min read
+            {formatDateIndo(article.publishedAt)} | {article.readingTimeMin || 3} min read
           </div>
 
           <div className="flex items-center justify-between pt-1">
@@ -138,9 +162,11 @@ export default async function DetailArtikelPage({
             </div>
 
             {/* Article Content Typography from DB */}
-            <article className="prose prose-slate max-w-none text-xs sm:text-sm text-slate-700 leading-relaxed whitespace-pre-line">
-              {article.content}
-            </article>
+            <article
+              id="article-start"
+              className="prose prose-slate max-w-none text-xs sm:text-sm text-slate-700 leading-relaxed space-y-3 [&_h2]:text-lg [&_h2]:font-bold [&_h2]:text-slate-900 [&_h2]:pt-3 [&_h3]:text-base [&_h3]:font-bold [&_h3]:text-slate-900 [&_h3]:pt-2 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_a]:text-teal-700 [&_a]:underline"
+              dangerouslySetInnerHTML={{ __html: processedHtml }}
+            />
 
             {/* Saweria / Donation Box (From DB settings) */}
             <div className="bg-[#E6FAF8]/70 border border-[#99F6E4] rounded-2xl p-5 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -173,7 +199,7 @@ export default async function DetailArtikelPage({
               <span className="font-medium">Bagikan</span>
               <div className="flex items-center gap-2">
                 <a
-                  href={`https://api.whatsapp.com/send?text=${encodeURIComponent(article.title)}`}
+                  href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`${article.title} - ${articleUrl}`)}`}
                   target="_blank"
                   rel="noreferrer"
                   className="w-7 h-7 rounded-full bg-[#25D366] text-white flex items-center justify-center hover:opacity-90"
@@ -182,7 +208,7 @@ export default async function DetailArtikelPage({
                   <WhatsAppIcon className="w-4 h-4 text-white" fill="currentColor" />
                 </a>
                 <a
-                  href="https://facebook.com"
+                  href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(articleUrl)}`}
                   target="_blank"
                   rel="noreferrer"
                   className="w-7 h-7 rounded-full bg-blue-600 text-white flex items-center justify-center hover:opacity-90"
@@ -206,18 +232,20 @@ export default async function DetailArtikelPage({
               <span className="font-bold text-slate-900">Bagikan</span>
               <div className="flex items-center gap-2">
                 <a
-                  href={`https://api.whatsapp.com/send?text=${encodeURIComponent(article.title)}`}
+                  href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`${article.title} - ${articleUrl}`)}`}
                   target="_blank"
                   rel="noreferrer"
                   className="w-6 h-6 rounded-full bg-[#25D366] text-white flex items-center justify-center hover:opacity-90"
+                  aria-label="Share ke WhatsApp"
                 >
                   <WhatsAppIcon className="w-3.5 h-3.5 text-white" fill="currentColor" />
                 </a>
                 <a
-                  href="https://facebook.com"
+                  href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(articleUrl)}`}
                   target="_blank"
                   rel="noreferrer"
                   className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center hover:opacity-90"
+                  aria-label="Share ke Facebook"
                 >
                   <Facebook className="w-3.5 h-3.5" />
                 </a>
@@ -230,23 +258,7 @@ export default async function DetailArtikelPage({
             </div>
 
             {/* Table of Content Widget */}
-            <div className="p-5 rounded-2xl border border-slate-200 bg-white space-y-4 shadow-xs">
-              <h3 className="font-bold text-slate-900 text-sm">Table of Content</h3>
-              <div className="space-y-2 text-xs">
-                <div className="p-3 rounded-lg bg-[#1E3A5F] text-white font-medium flex items-center gap-2">
-                  <span className="font-extrabold text-teal-300">01</span>
-                  <span className="truncate">{article.title}</span>
-                </div>
-                <div className="p-3 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50 flex items-center gap-2 transition-colors">
-                  <span className="font-extrabold text-slate-400">02</span>
-                  <span>Mengenal Teknologi yang Sedang Berkembang Saat Ini</span>
-                </div>
-              </div>
-              <button className="w-full flex items-center justify-center gap-1 text-xs text-slate-500 hover:text-slate-900 pt-1">
-                <span>Lihat Lebih Banyak</span>
-                <ChevronDown className="w-3 h-3" />
-              </button>
-            </div>
+            <TableOfContents headings={headings} fallbackTitle={article.title} />
 
             {/* Artikel Populer (Trending Badges) Widget from DB */}
             <div className="p-5 rounded-2xl border border-slate-200 bg-white space-y-4 shadow-xs">
@@ -301,8 +313,18 @@ export default async function DetailArtikelPage({
                 className="group bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs hover:shadow-lg transition-all flex flex-col justify-between"
               >
                 <div>
-                  <div className="aspect-[16/10] bg-slate-900 relative overflow-hidden flex items-center justify-center text-white p-4">
-                    <span className="text-xs font-bold text-teal-400">INSIGHT</span>
+                  <div className="aspect-[16/10] bg-slate-900 relative overflow-hidden flex items-center justify-center text-white">
+                    <img
+                      src={
+                        !art.featuredImage ||
+                        art.featuredImage.includes("placeholder") ||
+                        art.featuredImage.includes("article-")
+                          ? "/assets/artikel.png"
+                          : art.featuredImage
+                      }
+                      alt={art.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
                   </div>
                   <div className="p-5">
                     <h3 className="font-bold text-slate-900 text-xs group-hover:text-[#1E3A5F] line-clamp-2">

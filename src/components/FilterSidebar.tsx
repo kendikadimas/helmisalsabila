@@ -26,9 +26,22 @@ export default function FilterSidebar({
   currentPriceType = "all",
   basePath,
 }: FilterSidebarProps) {
+  const searchParams = useSearchParams();
   const [catOpen, setCatOpen] = useState(true);
   const [priceOpen, setPriceOpen] = useState(true);
   const [sortOpen, setSortOpen] = useState(true);
+
+  const buildFilterUrl = (key: string, value?: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("page");
+    if (!value || params.get(key) === value) {
+      params.delete(key);
+    } else {
+      params.set(key, value);
+    }
+    const qs = params.toString();
+    return qs ? `${basePath}?${qs}` : basePath;
+  };
 
   return (
     <aside className="w-full lg:w-64 shrink-0 space-y-4">
@@ -59,7 +72,7 @@ export default function FilterSidebar({
               {categories.map((cat) => (
                 <Link
                   key={cat.id}
-                  href={`${basePath}?kategori=${cat.slug}`}
+                  href={buildFilterUrl("kategori", cat.slug)}
                   className="flex items-center gap-2 cursor-pointer hover:text-slate-900 transition-colors"
                 >
                   <input
@@ -87,7 +100,22 @@ export default function FilterSidebar({
           {priceOpen && (
             <div className="space-y-2 pt-1 text-xs text-slate-600">
               <Link
-                href={`${basePath}?harga=gratis`}
+                href={buildFilterUrl("harga", "all")}
+                className="flex items-center justify-between cursor-pointer hover:text-slate-900"
+              >
+                <div className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="harga"
+                    readOnly
+                    checked={!currentPriceType || currentPriceType === "all"}
+                    className="w-3.5 h-3.5 text-teal-600 border-slate-300 focus:ring-teal-500 pointer-events-none"
+                  />
+                  <span>Semua Harga</span>
+                </div>
+              </Link>
+              <Link
+                href={buildFilterUrl("harga", "gratis")}
                 className="flex items-center justify-between cursor-pointer hover:text-slate-900"
               >
                 <div className="flex items-center gap-2">
@@ -100,10 +128,9 @@ export default function FilterSidebar({
                   />
                   <span>Gratis</span>
                 </div>
-                <span className="text-slate-400 text-[11px]">(5)</span>
               </Link>
               <Link
-                href={`${basePath}?harga=berbayar`}
+                href={buildFilterUrl("harga", "berbayar")}
                 className="flex items-center justify-between cursor-pointer hover:text-slate-900"
               >
                 <div className="flex items-center gap-2">
@@ -111,12 +138,11 @@ export default function FilterSidebar({
                     type="radio"
                     name="harga"
                     readOnly
-                    checked={currentPriceType === "berbayar" || currentPriceType === "all"}
+                    checked={currentPriceType === "berbayar"}
                     className="w-3.5 h-3.5 text-teal-600 border-slate-300 focus:ring-teal-500 pointer-events-none"
                   />
                   <span>Berbayar</span>
                 </div>
-                <span className="text-slate-400 text-[11px]">(812)</span>
               </Link>
             </div>
           )}
@@ -134,7 +160,7 @@ export default function FilterSidebar({
           {sortOpen && (
             <div className="space-y-2 pt-1 text-xs text-slate-600">
               <Link
-                href={`${basePath}?sort=populer`}
+                href={buildFilterUrl("sort", "populer")}
                 className="flex items-center gap-2 cursor-pointer hover:text-slate-900"
               >
                 <input
@@ -147,7 +173,7 @@ export default function FilterSidebar({
                 <span>Paling Populer</span>
               </Link>
               <Link
-                href={`${basePath}?sort=terbaru`}
+                href={buildFilterUrl("sort", "terbaru")}
                 className="flex items-center gap-2 cursor-pointer hover:text-slate-900"
               >
                 <input

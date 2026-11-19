@@ -51,11 +51,16 @@ export async function updateSiteSettings(formData: FormData) {
     const session = await getSession();
     if (!session) return { success: false, error: "Unauthorized" };
 
+    const siteName = (formData.get("siteName") as string) || "Helmi Salsabila";
     const heroTitle = formData.get("heroTitle") as string;
     const heroSubtitle = formData.get("heroSubtitle") as string;
+    const bioDescription = (formData.get("bioDescription") as string) || "Your Reliable Partner for Digital & Data Solutions";
+    const resumeCvUrl = ((formData.get("resumeCvUrl") as string) || "").trim() || null;
     const contactPhone = formData.get("contactPhone") as string;
     const contactAddress = formData.get("contactAddress") as string;
     const saweriaUrl = formData.get("saweriaUrl") as string;
+    const metaTitle = ((formData.get("metaTitle") as string) || "").trim() || null;
+    const metaDescription = ((formData.get("metaDescription") as string) || "").trim() || null;
 
     const statsYears = (formData.get("statsYears") as string) || "5+";
     const statsClients = (formData.get("statsClients") as string) || "100+";
@@ -88,11 +93,16 @@ export async function updateSiteSettings(formData: FormData) {
     await db
       .update(schema.siteSettings)
       .set({
+        siteName,
         heroTitle,
         heroSubtitle,
+        bioDescription,
+        resumeCvUrl,
         contactPhone,
         contactAddress,
         saweriaUrl,
+        metaTitle,
+        metaDescription,
         statsCounters,
         socialLinks,
       })

@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export const metadata: Metadata = {
-  title: "Artikel & Wawasan Teknologi | Helmi Salsabila",
+  title: "Artikel & Wawasan Teknologi",
   description:
     "Kumpulan tulisan seputar data analytics, tips spreadsheet, automasi kerja, dan studi kasus implementasi teknologi.",
 };
@@ -20,7 +20,7 @@ const PAGE_SIZE = 9;
 export default async function BlogPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; kategori?: string; page?: string }>;
+  searchParams: Promise<{ q?: string; kategori?: string; tag?: string; page?: string }>;
 }) {
   const params = await searchParams;
   const currentPage = Math.max(1, parseInt(params.page || "1", 10));
@@ -37,6 +37,7 @@ export default async function BlogPage({
       getArticles({
         searchQuery: params.q,
         categorySlug: params.kategori,
+        tagSlug: params.tag,
         limit: PAGE_SIZE,
         offset,
       }),
@@ -45,6 +46,7 @@ export default async function BlogPage({
       getArticlesCount({
         searchQuery: params.q,
         categorySlug: params.kategori,
+        tagSlug: params.tag,
       }),
     ]);
 
@@ -109,7 +111,18 @@ export default async function BlogPage({
 
         {/* 2. Semua Artikel Section */}
         <section className="space-y-6">
-          <SectionHeader title="Semua Artikel" />
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <SectionHeader title="Semua Artikel" />
+            {params.tag && (
+              <Link
+                href="/blog"
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-50 border border-teal-200 text-teal-700 text-xs font-semibold hover:bg-teal-100 transition-colors"
+              >
+                <span>Tag: #{params.tag}</span>
+                <span aria-hidden="true">×</span>
+              </Link>
+            )}
+          </div>
 
           {/* Category Filter Pills (Dynamically from Database) */}
           <div className="flex items-center gap-2 overflow-x-auto pb-3 pt-1 no-scrollbar text-xs">

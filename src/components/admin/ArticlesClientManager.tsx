@@ -6,6 +6,7 @@ import { Plus, Trash2, Edit3, ExternalLink } from "lucide-react";
 import Link from "next/link";
 import EditModal from "@/components/EditModal";
 import ImageUploader from "@/components/ImageUploader";
+import RichTextEditor from "@/components/RichTextEditor";
 import { createArticle, updateArticle, deleteArticle } from "@/actions/articles";
 
 interface CategoryItem {
@@ -158,14 +159,8 @@ export default function ArticlesClientManager({
           </div>
 
           <div className="space-y-1.5 md:col-span-2">
-            <label className="text-slate-700 font-medium">Konten Artikel (Markdown Format)</label>
-            <textarea
-              name="content"
-              rows={8}
-              required
-              placeholder="Tulis artikel dengan format markdown (## Sub Bab)..."
-              className="w-full p-3 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-teal-600 transition-colors leading-relaxed font-mono"
-            />
+            <label className="text-slate-700 font-medium">Konten Artikel</label>
+            <RichTextEditor name="content" />
           </div>
 
           <div className="md:col-span-2 flex items-center justify-between pt-2">
@@ -340,14 +335,8 @@ export default function ArticlesClientManager({
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-slate-700 font-medium">Konten Artikel (Markdown Format)</label>
-              <textarea
-                name="content"
-                rows={8}
-                required
-                defaultValue={editingItem.content}
-                className="w-full p-3 bg-white border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-teal-600 transition-colors leading-relaxed font-mono"
-              />
+              <label className="text-slate-700 font-medium">Konten Artikel</label>
+              <RichTextEditor key={editingItem.id} name="content" defaultValue={editingItem.content} />
             </div>
 
             <div className="pt-3 border-t border-slate-100 flex items-center justify-between">

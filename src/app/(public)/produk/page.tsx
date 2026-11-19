@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export const metadata: Metadata = {
-  title: "Produk Digital & E-Course | Helmi Salsabila",
+  title: "Produk Digital & E-Course",
   description:
     "Katalog template spreadsheet, mini course praktis, dan aset digital siap pakai untuk kebutuhan profesional dan bisnis.",
 };
@@ -90,23 +90,45 @@ export default async function ProdukPage({
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                {products.map((prd) => (
+                {products.map((prd, idx) => {
+                  const rawThumb = prd.thumbnailUrl || "";
+                  const resolvedThumb =
+                    !rawThumb || rawThumb.includes("placeholder")
+                      ? ""
+                      : rawThumb.includes("product-branding-builder")
+                        ? "/assets/product.png"
+                        : rawThumb.includes("product-150-ideas")
+                          ? "/assets/product2.png"
+                          : rawThumb.includes("product-digital-ideas")
+                            ? "/assets/product3.png"
+                            : rawThumb;
+                  return (
                   <Link
                     key={prd.id}
                     href={`/produk/${prd.slug}`}
                     className="group bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs hover:shadow-lg transition-all flex flex-col justify-between"
                   >
                     <div>
-                      <div className="aspect-[16/11] bg-gradient-to-br from-slate-800 to-slate-900 relative overflow-hidden flex items-center justify-center text-white p-6">
-                        <div className="w-28 h-36 bg-gradient-to-tr from-amber-500 to-teal-400 rounded-lg shadow-2xl p-3 flex flex-col justify-between text-slate-950 font-extrabold text-xs transform group-hover:scale-105 transition-transform">
-                          <span className="text-[10px] tracking-wider uppercase">DIGITAL PRODUCT</span>
-                          <span className="text-center text-xs leading-tight font-bold">Product Ideas</span>
-                          <div className="flex items-center justify-end gap-0.5">
-                            {[...Array(5)].map((_, i) => (
-                              <Star key={i} className="w-2 h-2 fill-slate-900 text-slate-900" />
-                            ))}
+                      <div className="aspect-[16/11] bg-gradient-to-br from-slate-800 to-slate-900 relative overflow-hidden flex items-center justify-center text-white">
+                        {resolvedThumb ? (
+                          <img
+                            src={resolvedThumb}
+                            alt={prd.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                        ) : (
+                          <div className="p-6 flex items-center justify-center w-full h-full">
+                            <div className="w-28 h-36 bg-gradient-to-tr from-amber-500 to-teal-400 rounded-lg shadow-2xl p-3 flex flex-col justify-between text-slate-950 font-extrabold text-xs transform group-hover:scale-105 transition-transform">
+                              <span className="text-[10px] tracking-wider uppercase">DIGITAL PRODUCT</span>
+                              <span className="text-center text-xs leading-tight font-bold line-clamp-2">{prd.title}</span>
+                              <div className="flex items-center justify-end gap-0.5">
+                                {[...Array(5)].map((_, i) => (
+                                  <Star key={i} className="w-2 h-2 fill-slate-900 text-slate-900" />
+                                ))}
+                              </div>
+                            </div>
                           </div>
-                        </div>
+                        )}
                       </div>
 
                       <div className="p-5">
@@ -121,7 +143,8 @@ export default async function ProdukPage({
                       <span className="text-slate-400">Terjual : {prd.totalSales.toLocaleString("id-ID")}</span>
                     </div>
                   </Link>
-                ))}
+                  );
+                })}
               </div>
             )}
 

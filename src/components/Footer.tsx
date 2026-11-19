@@ -75,6 +75,11 @@ export default async function Footer() {
                   Produk
                 </Link>
               </li>
+              <li>
+                <Link href="/cek-pesanan" className="hover:text-[#1E3A5F] transition-colors">
+                  Cek Status Pesanan
+                </Link>
+              </li>
             </ul>
           </div>
 

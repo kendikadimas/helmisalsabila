@@ -12,6 +12,7 @@ import {
   ListOrdered,
   Award,
   MessageSquareQuote,
+  CreditCard,
   Settings,
   LogOut,
   ExternalLink,
@@ -68,6 +69,11 @@ export default function AdminSidebar({ logoutAction, userEmail = "admin@helmisal
       label: "Testimoni Klien",
       href: "/admin/testimonials",
       icon: MessageSquareQuote,
+    },
+    {
+      label: "Transaksi DOKU",
+      href: "/admin/orders",
+      icon: CreditCard,
     },
     {
       label: "Site Settings",

@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Trash2, Tag } from "lucide-react";
-import { createCategory, deleteCategory } from "@/actions/categories";
+import { useRouter } from "next/navigation";
+import { Plus, Trash2, Tag, Edit3 } from "lucide-react";
+import EditModal from "@/components/EditModal";
+import { createCategory, updateCategory, deleteCategory } from "@/actions/categories";
 
 interface CategoryItem {
   id: string;
@@ -16,19 +18,40 @@ export default function CategoriesClientManager({
 }: {
   initialCategories: CategoryItem[];
 }) {
+  const router = useRouter();
   const [categories, setCategories] = useState<CategoryItem[]>(initialCategories);
+  const [editingItem, setEditingItem] = useState<CategoryItem | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleCreate = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const form = e.currentTarget;
     setIsSubmitting(true);
-    const formData = new FormData(e.currentTarget);
+    const formData = new FormData(form);
     const res = await createCategory(formData);
     setIsSubmitting(false);
-    if (res.success) {
-      window.location.reload();
+    if (res.success && res.category) {
+      setCategories((prev) => [...prev, res.category!]);
+      form.reset();
+      router.refresh();
     } else {
       alert(res.error || "Gagal membuat kategori.");
+    }
+  };
+
+  const handleUpdate = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!editingItem) return;
+    setIsSubmitting(true);
+    const formData = new FormData(e.currentTarget);
+    const res = await updateCategory(editingItem.id, formData);
+    setIsSubmitting(false);
+    if (res.success && res.category) {
+      setCategories((prev) => prev.map((c) => (c.id === editingItem.id ? res.category! : c)));
+      setEditingItem(null);
+      router.refresh();
+    } else {
+      alert(res.error || "Gagal memperbarui kategori.");
     }
   };
 
@@ -126,7 +149,15 @@ export default function CategoriesClientManager({
                       {c.type}
                     </span>
                   </td>
-                  <td className="p-4 pr-6 text-right">
+                  <td className="p-4 pr-6 text-right space-x-2">
+                    <button
+                      type="button"
+                      onClick={() => setEditingItem(c)}
+                      className="inline-flex p-2 rounded-xl bg-amber-50 text-amber-700 hover:bg-amber-100 transition-colors border border-amber-200 cursor-pointer"
+                      title="Edit Kategori"
+                    >
+                      <Edit3 className="w-4 h-4" />
+                    </button>
                     <button
                       type="button"
                       onClick={() => handleDelete(c.id)}
@@ -142,6 +173,59 @@ export default function CategoriesClientManager({
           </table>
         </div>
       </div>
+
+      {/* Edit Modal */}
+      <EditModal
+        isOpen={!!editingItem}
+        onClose={() => setEditingItem(null)}
+        title={`Edit Kategori: ${editingItem?.name || ""}`}
+      >
+        {editingItem && (
+          <form onSubmit={handleUpdate} className="space-y-4 text-xs sm:text-sm">
+            <div className="space-y-1.5">
+              <label className="text-slate-700 font-medium">Nama Kategori</label>
+              <input
+                type="text"
+                name="name"
+                required
+                defaultValue={editingItem.name}
+                className="w-full p-3 bg-white border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-teal-600 transition-colors"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-slate-700 font-medium">Tipe Kategori</label>
+              <select
+                name="type"
+                defaultValue={editingItem.type}
+                className="w-full p-3 bg-white border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-teal-600 transition-colors"
+              >
+                <option value="article">Artikel / Blog</option>
+                <option value="service">Layanan / Portfolio</option>
+                <option value="product">Produk Digital</option>
+                <option value="general">Umum</option>
+              </select>
+            </div>
+
+            <div className="pt-3 border-t border-slate-100 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setEditingItem(null)}
+                className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-xs sm:text-sm transition-colors cursor-pointer"
+              >
+                Batal
+              </button>
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="px-5 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-semibold text-xs sm:text-sm transition-colors shadow-xs disabled:opacity-50 cursor-pointer"
+              >
+                {isSubmitting ? "Menyimpan..." : "Perbarui Kategori"}
+              </button>
+            </div>
+          </form>
+        )}
+      </EditModal>
     </div>
   );
 }
