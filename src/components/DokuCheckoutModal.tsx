@@ -124,8 +124,12 @@ export default function DokuCheckoutModal({
               )}
 
               <div className="space-y-1.5">
-                <label className="font-medium text-slate-700 text-xs">Nama Lengkap</label>
+                <label htmlFor="doku-customer-name" className="font-medium text-slate-700 text-xs">
+                  Nama Lengkap
+                </label>
                 <input
+                  id="doku-customer-name"
+                  name="customerName"
                   type="text"
                   required
                   value={name}
@@ -136,8 +140,12 @@ export default function DokuCheckoutModal({
               </div>
 
               <div className="space-y-1.5">
-                <label className="font-medium text-slate-700 text-xs">Alamat Email</label>
+                <label htmlFor="doku-customer-email" className="font-medium text-slate-700 text-xs">
+                  Alamat Email
+                </label>
                 <input
+                  id="doku-customer-email"
+                  name="customerEmail"
                   type="email"
                   required
                   value={email}
@@ -148,8 +156,12 @@ export default function DokuCheckoutModal({
               </div>
 
               <div className="space-y-1.5">
-                <label className="font-medium text-slate-700 text-xs">Nomor WhatsApp / HP</label>
+                <label htmlFor="doku-customer-phone" className="font-medium text-slate-700 text-xs">
+                  Nomor WhatsApp / HP
+                </label>
                 <input
+                  id="doku-customer-phone"
+                  name="customerPhone"
                   type="tel"
                   required
                   value={phone}

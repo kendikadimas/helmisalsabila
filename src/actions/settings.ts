@@ -8,7 +8,31 @@ import { getSession } from "@/lib/auth";
 export async function getSiteSettings() {
   try {
     const [settings] = await db.select().from(schema.siteSettings).where(eq(schema.siteSettings.id, 1)).limit(1);
-    return settings || null;
+    if (!settings) return null;
+
+    let socialLinks = settings.socialLinks;
+    if (typeof socialLinks === "string") {
+      try {
+        socialLinks = JSON.parse(socialLinks);
+      } catch {
+        socialLinks = {};
+      }
+    }
+
+    let statsCounters = settings.statsCounters;
+    if (typeof statsCounters === "string") {
+      try {
+        statsCounters = JSON.parse(statsCounters);
+      } catch {
+        statsCounters = { years: "5+", clients: "100+", projects: "100%" };
+      }
+    }
+
+    return {
+      ...settings,
+      socialLinks: (socialLinks || {}) as typeof schema.siteSettings.$inferSelect["socialLinks"],
+      statsCounters: (statsCounters || { years: "5+", clients: "100+", projects: "100%" }) as typeof schema.siteSettings.$inferSelect["statsCounters"],
+    };
   } catch (error) {
     console.error("Error fetching site settings:", error);
     return null;
