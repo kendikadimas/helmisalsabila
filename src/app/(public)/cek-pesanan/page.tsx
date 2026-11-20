@@ -33,7 +33,13 @@ export default async function CekPesananPage({
     const rawOrders = await db
       .select()
       .from(schema.orders)
-      .where(or(eq(schema.orders.invoiceNumber, query), eq(schema.orders.customerEmail, query)))
+      .where(
+        or(
+          eq(schema.orders.invoiceNumber, query),
+          eq(schema.orders.customerEmail, query),
+          eq(schema.orders.customerEmail, query.toLowerCase())
+        )
+      )
       .limit(10);
 
     for (const ord of rawOrders) {

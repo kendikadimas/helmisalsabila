@@ -36,6 +36,7 @@ export function calculateReadingTime(content: string): number {
 export function formatDateIndo(dateInput: Date | string | null | undefined): string {
   if (!dateInput) return "-";
   const date = new Date(dateInput);
+  if (isNaN(date.getTime())) return "-";
   const months = [
     "Januari", "Februari", "Maret", "April", "Mei", "Juni",
     "Juli", "Agustus", "September", "Oktober", "November", "Desember"

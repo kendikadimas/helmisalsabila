@@ -48,7 +48,7 @@ export default async function PaymentStatusPage({
         customerPhone: order.customerPhone,
         amount: parseFloat(String(order.amount)),
         status: (isCancelled ? "FAILED" : order.status) as "PENDING" | "PAID" | "FAILED" | "EXPIRED",
-        createdAt: order.createdAt.toISOString(),
+        createdAt: order.createdAt ? new Date(order.createdAt).toISOString() : new Date().toISOString(),
         digitalAccessUrl,
       }
     : null;

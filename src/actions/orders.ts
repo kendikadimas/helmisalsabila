@@ -1,7 +1,7 @@
 "use server";
 
 import { db, schema } from "@/db";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { getSession } from "@/lib/auth";
 
@@ -17,10 +17,10 @@ export async function getAllOrdersAdmin() {
 
     return orders.map((o) => ({
       ...o,
-      amount: parseFloat(String(o.amount)),
-      createdAt: o.createdAt.toISOString(),
-      updatedAt: o.updatedAt.toISOString(),
-      paidAt: o.paidAt ? o.paidAt.toISOString() : null,
+      amount: parseFloat(String(o.amount || 0)),
+      createdAt: o.createdAt ? new Date(o.createdAt).toISOString() : new Date().toISOString(),
+      updatedAt: o.updatedAt ? new Date(o.updatedAt).toISOString() : new Date().toISOString(),
+      paidAt: o.paidAt ? new Date(o.paidAt).toISOString() : null,
     }));
   } catch (error) {
     console.error("Error fetching orders:", error);
@@ -41,6 +41,8 @@ export async function markOrderAsPaidAction(orderId: string) {
 
     if (!order) return { success: false, error: "Order tidak ditemukan" };
 
+    const wasAlreadyPaid = order.status === "PAID";
+
     await db
       .update(schema.orders)
       .set({
@@ -48,6 +50,13 @@ export async function markOrderAsPaidAction(orderId: string) {
         paidAt: new Date(),
       })
       .where(eq(schema.orders.id, orderId));
+
+    if (!wasAlreadyPaid && order.itemType === "product") {
+      await db
+        .update(schema.products)
+        .set({ totalSales: sql`${schema.products.totalSales} + 1` })
+        .where(eq(schema.products.id, order.itemId));
+    }
 
     revalidatePath("/admin/orders");
     revalidatePath("/admin");
