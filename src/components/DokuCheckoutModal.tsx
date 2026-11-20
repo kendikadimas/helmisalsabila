@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { CreditCard, X, Loader2, AlertCircle, ShieldCheck } from "lucide-react";
+import { CreditCard, X, Loader2, AlertCircle, ShieldCheck, Tag, Check } from "lucide-react";
 import { formatRupiah } from "@/lib/utils";
 import { trackBeginCheckout } from "@/lib/analytics";
+import { validatePromoCode, PromoResult } from "@/lib/promo";
 
 interface DokuCheckoutModalProps {
   itemType: "product" | "service";
@@ -26,6 +27,9 @@ export default function DokuCheckoutModal({
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [promoInput, setPromoInput] = useState("");
+  const [appliedPromo, setAppliedPromo] = useState<PromoResult | null>(null);
+  const [promoError, setPromoError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -33,6 +37,27 @@ export default function DokuCheckoutModal({
   if (isNaN(numericAmount) || numericAmount <= 0) {
     return null;
   }
+
+  const effectiveAmount = appliedPromo?.finalAmount || numericAmount;
+
+  const handleApplyPromo = () => {
+    setPromoError(null);
+    if (!promoInput.trim()) return;
+
+    const res = validatePromoCode(promoInput, numericAmount);
+    if (res.valid) {
+      setAppliedPromo(res);
+    } else {
+      setPromoError(res.message);
+      setAppliedPromo(null);
+    }
+  };
+
+  const handleRemovePromo = () => {
+    setAppliedPromo(null);
+    setPromoInput("");
+    setPromoError(null);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,6 +74,7 @@ export default function DokuCheckoutModal({
           customerName: name,
           customerEmail: email,
           customerPhone: phone,
+          promoCode: appliedPromo?.code || undefined,
         }),
       });
       const data = await res.json();
@@ -71,7 +97,7 @@ export default function DokuCheckoutModal({
       itemId,
       itemTitle,
       itemType,
-      amount: numericAmount,
+      amount: effectiveAmount,
     });
   };
 
@@ -83,9 +109,10 @@ export default function DokuCheckoutModal({
       </button>
 
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs">
-          <div className="w-full max-w-md bg-white rounded-2xl border border-slate-200 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/60">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs animate-in fade-in duration-150">
+          <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden animate-in zoom-in-95 duration-200">
+            {/* Header */}
+            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
               <div className="flex items-center gap-2">
                 <CreditCard className="w-4 h-4 text-teal-600" />
                 <h3 className="font-bold text-slate-900 text-sm">Checkout Pembayaran DOKU</h3>
@@ -101,6 +128,7 @@ export default function DokuCheckoutModal({
             </div>
 
             <form onSubmit={handleSubmit} className="p-6 space-y-4 text-xs sm:text-sm">
+              {/* Item & Price Box */}
               <div className="p-3.5 rounded-xl bg-[#E6FAF8] border border-[#99F6E4] flex items-center justify-between gap-3">
                 <div className="min-w-0">
                   <div className="text-[11px] text-slate-500 uppercase font-semibold">
@@ -110,10 +138,62 @@ export default function DokuCheckoutModal({
                 </div>
                 <div className="text-right shrink-0">
                   <div className="text-[11px] text-slate-500">Total</div>
-                  <div className="font-extrabold text-emerald-700 text-sm sm:text-base">
-                    {formatRupiah(numericAmount)}
-                  </div>
+                  {appliedPromo ? (
+                    <div>
+                      <span className="text-[11px] text-slate-400 line-through mr-1.5">
+                        {formatRupiah(numericAmount)}
+                      </span>
+                      <span className="font-extrabold text-emerald-700 text-sm sm:text-base">
+                        {formatRupiah(effectiveAmount)}
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="font-extrabold text-emerald-700 text-sm sm:text-base">
+                      {formatRupiah(numericAmount)}
+                    </div>
+                  )}
                 </div>
+              </div>
+
+              {/* Promo Code Section */}
+              <div className="space-y-1.5 pt-0.5">
+                <label className="font-medium text-slate-700 text-xs flex items-center gap-1.5">
+                  <Tag className="w-3.5 h-3.5 text-teal-600" />
+                  <span>Punya Kode Kupon / Promo?</span>
+                </label>
+                {appliedPromo ? (
+                  <div className="p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-xs text-emerald-800 font-medium">
+                      <Check className="w-4 h-4 text-emerald-600" />
+                      <span>{appliedPromo.message}</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleRemovePromo}
+                      className="text-xs text-rose-600 hover:text-rose-700 font-semibold cursor-pointer"
+                    >
+                      Hapus
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={promoInput}
+                      onChange={(e) => setPromoInput(e.target.value.toUpperCase())}
+                      placeholder="Contoh: HELMI20 / DISKON10"
+                      className="flex-1 p-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-mono text-xs uppercase focus:outline-none focus:border-teal-600"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleApplyPromo}
+                      className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold cursor-pointer transition-colors"
+                    >
+                      Terapkan
+                    </button>
+                  </div>
+                )}
+                {promoError && <p className="text-[11px] text-rose-600">{promoError}</p>}
               </div>
 
               {error && (
@@ -195,7 +275,7 @@ export default function DokuCheckoutModal({
                       <span>Memproses...</span>
                     </>
                   ) : (
-                    <span>Lanjut ke Pembayaran</span>
+                    <span>Lanjut ke Pembayaran ({formatRupiah(effectiveAmount)})</span>
                   )}
                 </button>
               </div>
@@ -206,4 +286,3 @@ export default function DokuCheckoutModal({
     </>
   );
 }
-

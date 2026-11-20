@@ -132,3 +132,60 @@ export async function sendOrderPaidEmail(data: OrderEmailData): Promise<boolean>
   }
 }
 
+export async function sendAdminNewOrderNotification(data: OrderEmailData): Promise<boolean> {
+  const transporter = getTransporter();
+  if (!transporter) return false;
+
+  const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL || process.env.SMTP_USER || "admin@helmisalsabila.com";
+  const fromEmail = process.env.SMTP_FROM || process.env.SMTP_USER || "noreply@helsenvi.com";
+  const siteName = process.env.NEXT_PUBLIC_SITE_NAME || "Helmi Salsabila";
+  const formattedAmount = formatRupiah(data.amount);
+
+  const html = `
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background-color: #f8fafc; padding: 24px; color: #1e293b; }
+    .card { max-width: 560px; margin: 0 auto; background: #ffffff; border-radius: 16px; border: 1px solid #e2e8f0; padding: 24px; }
+    .header { font-size: 18px; font-weight: 700; color: #0f172a; margin-bottom: 16px; }
+    .amount { font-size: 24px; font-weight: 800; color: #059669; margin: 12px 0; }
+    .table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .table td { padding: 8px 0; border-bottom: 1px solid #f1f5f9; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="header">💰 Pesanan Baru Berhasil Lunas!</div>
+    <div class="amount">${formattedAmount}</div>
+    <table class="table">
+      <tr><td>No. Invoice</td><td><strong>${data.invoiceNumber}</strong></td></tr>
+      <tr><td>Item</td><td>${data.itemTitle} (${data.itemType})</td></tr>
+      <tr><td>Pembeli</td><td>${data.customerName}</td></tr>
+      <tr><td>Email</td><td>${data.customerEmail}</td></tr>
+      <tr><td>Waktu</td><td>${new Date().toLocaleString("id-ID", { timeZone: "Asia/Jakarta" })}</td></tr>
+    </table>
+    <p style="font-size: 12px; color: #64748b; margin-top: 20px;">
+      Buka panel admin untuk detail: <a href="${process.env.NEXT_PUBLIC_APP_URL || "https://helsenvi.com"}/admin/orders">Dashboard Orders</a>
+    </p>
+  </div>
+</body>
+</html>
+  `;
+
+  try {
+    await transporter.sendMail({
+      from: `"${siteName} System" <${fromEmail}>`,
+      to: adminEmail,
+      subject: `[PENJUALAN BARU] ${data.itemTitle} - ${formattedAmount} (${data.invoiceNumber})`,
+      html,
+    });
+    return true;
+  } catch (error: any) {
+    console.error("[Email Service] Failed to notify admin:", error.message);
+    return false;
+  }
+}
+
+

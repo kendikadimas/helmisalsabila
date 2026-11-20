@@ -3,7 +3,7 @@ import crypto from "crypto";
 import { eq, sql } from "drizzle-orm";
 import { db, schema } from "@/db";
 import { getDokuConfig, verifyDokuSignature } from "@/lib/doku";
-import { sendOrderPaidEmail } from "@/lib/email";
+import { sendOrderPaidEmail, sendAdminNewOrderNotification } from "@/lib/email";
 import { getClientIp } from "@/lib/rate-limit";
 
 export async function POST(req: Request) {
@@ -107,19 +107,24 @@ export async function POST(req: Request) {
 
     // Trigger automated email confirmation on successful payment
     if (newStatus === "PAID" && !wasAlreadyPaid) {
+      const emailPayload = {
+        invoiceNumber: order.invoiceNumber,
+        customerName: order.customerName,
+        customerEmail: order.customerEmail,
+        itemTitle: order.itemTitle,
+        itemType: order.itemType as "product" | "service",
+        amount: parseFloat(String(order.amount)),
+        paidAt: new Date(),
+        digitalAccessUrl,
+      };
+
       try {
-        await sendOrderPaidEmail({
-          invoiceNumber: order.invoiceNumber,
-          customerName: order.customerName,
-          customerEmail: order.customerEmail,
-          itemTitle: order.itemTitle,
-          itemType: order.itemType as "product" | "service",
-          amount: parseFloat(String(order.amount)),
-          paidAt: new Date(),
-          digitalAccessUrl,
-        });
+        await Promise.allSettled([
+          sendOrderPaidEmail(emailPayload),
+          sendAdminNewOrderNotification(emailPayload),
+        ]);
       } catch (mailErr: any) {
-        console.error("Failed to send order email:", mailErr.message);
+        console.error("Failed to send order emails:", mailErr.message);
       }
     }
 

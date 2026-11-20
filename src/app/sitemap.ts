@@ -4,7 +4,7 @@ import { getServices } from "@/actions/services";
 import { getProducts } from "@/actions/products";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://helmisalsabila.com";
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://helsenvi.com";
 
   // Static routes
   const staticRoutes: MetadataRoute.Sitemap = [
@@ -31,6 +31,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date(),
       changeFrequency: "daily",
       priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/cek-pesanan`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.7,
     },
   ];
 

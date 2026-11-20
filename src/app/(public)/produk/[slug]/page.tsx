@@ -7,6 +7,7 @@ import { getSiteSettings } from "@/actions/settings";
 import { formatRupiah } from "@/lib/utils";
 import ShareButton from "@/components/ShareButton";
 import DokuCheckoutModal from "@/components/DokuCheckoutModal";
+import ProductFaqAccordion from "@/components/ProductFaqAccordion";
 import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 
 export async function generateMetadata({
@@ -296,6 +297,11 @@ export default async function DetailProdukPage({
               )}
             </div>
           </div>
+
+          <hr className="border-slate-200" />
+
+          {/* Section: FAQ Produk */}
+          <ProductFaqAccordion />
         </div>
       </div>
     </div>

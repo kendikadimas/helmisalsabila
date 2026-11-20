@@ -5,6 +5,7 @@ import { eq } from "drizzle-orm";
 import { db, schema } from "@/db";
 import { createDokuCheckoutPayment, getDokuConfig } from "@/lib/doku";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { validatePromoCode } from "@/lib/promo";
 
 const CheckoutSchema = z.object({
   itemType: z.enum(["product", "service"]).default("product"),
@@ -12,6 +13,7 @@ const CheckoutSchema = z.object({
   customerName: z.string().trim().min(2, "Nama lengkap minimal 2 karakter"),
   customerEmail: z.string().trim().email("Format email tidak valid"),
   customerPhone: z.string().trim().min(8, "Nomor HP/WhatsApp minimal 8 digit"),
+  promoCode: z.string().trim().optional(),
 });
 
 export async function POST(req: Request) {
@@ -48,7 +50,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const { itemType, itemId, customerName, customerEmail, customerPhone } = parsed.data;
+    const { itemType, itemId, customerName, customerEmail, customerPhone, promoCode } = parsed.data;
 
     let itemTitle = "";
     let amount = 0;
@@ -82,6 +84,15 @@ export async function POST(req: Request) {
         { success: false, error: "Item gratis tidak memerlukan checkout pembayaran." },
         { status: 400 }
       );
+    }
+
+    // Apply promo code discount if provided
+    if (promoCode) {
+      const promoRes = validatePromoCode(promoCode, amount);
+      if (promoRes.valid && promoRes.finalAmount) {
+        amount = promoRes.finalAmount;
+        itemTitle = `${itemTitle} [Kupon ${promoRes.code}]`;
+      }
     }
 
     const host = req.headers.get("x-forwarded-host") || req.headers.get("host");
