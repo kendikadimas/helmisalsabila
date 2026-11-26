@@ -29,6 +29,7 @@ interface ProductItem {
   thumbnailUrl?: string | null;
   liveDemoUrl?: string | null;
   purchaseLinkExternal?: string | null;
+  digitalAccessUrl?: string | null;
   totalSales: number;
 }
 
@@ -174,11 +175,23 @@ export default function ProductsClientManager({ initialProducts }: { initialProd
           </div>
 
           <div className="space-y-1.5 md:col-span-2">
-            <label className="text-slate-700 font-medium">Link Pembelian Eksternal (Opsional - default via WhatsApp)</label>
+            <label className="text-slate-700 font-medium">Link Pembelian Eksternal (Kosongkan jika pakai DOKU)</label>
             <input
               type="url"
               name="purchaseLinkExternal"
-              placeholder="https://lynk.id/... atau https://mayar.id/..."
+              placeholder="https://lynk.id/... (kosongkan agar tombol membuka DOKU)"
+              className="w-full p-3 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-teal-600 transition-colors"
+            />
+          </div>
+
+          <div className="space-y-1.5 md:col-span-3">
+            <label className="text-slate-700 font-medium">
+              Link Akses Materi / File Digital (Diterima Pembeli Setelah Bayar Lunas via DOKU)
+            </label>
+            <input
+              type="url"
+              name="digitalAccessUrl"
+              placeholder="https://drive.google.com/... atau https://notion.so/..."
               className="w-full p-3 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-teal-600 transition-colors"
             />
           </div>
@@ -360,7 +373,7 @@ export default function ProductsClientManager({ initialProducts }: { initialProd
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-slate-700 font-medium">Link Pembelian Eksternal (Opsional)</label>
+                <label className="text-slate-700 font-medium">Link Pembelian Eksternal (Kosongkan utk DOKU)</label>
                 <input
                   type="url"
                   name="purchaseLinkExternal"
@@ -369,6 +382,19 @@ export default function ProductsClientManager({ initialProducts }: { initialProd
                   className="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-teal-600"
                 />
               </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-slate-700 font-medium">
+                Link Akses Materi / File Digital (Setelah Lunas DOKU)
+              </label>
+              <input
+                type="url"
+                name="digitalAccessUrl"
+                defaultValue={editingItem.digitalAccessUrl || ""}
+                placeholder="https://drive.google.com/... atau https://notion.so/..."
+                className="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-teal-600"
+              />
             </div>
 
             <div className="space-y-1.5">

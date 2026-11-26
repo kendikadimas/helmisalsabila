@@ -79,6 +79,11 @@ export default async function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/dashboard" className="hover:text-[#1E3A5F] transition-colors">
+                  Dashboard Produk Saya
+                </Link>
+              </li>
+              <li>
                 <Link href="/cek-pesanan" className="hover:text-[#1E3A5F] transition-colors">
                   Cek Status Pesanan
                 </Link>

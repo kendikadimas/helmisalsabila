@@ -283,11 +283,11 @@ export default function PaymentStatusLiveManager({
           </Link>
           {order && (
             <Link
-              href={`/cek-pesanan?q=${encodeURIComponent(order.invoiceNumber)}`}
+              href="/dashboard"
               className="text-teal-700 hover:text-teal-800 flex items-center gap-1 font-semibold"
             >
               <Search className="w-3.5 h-3.5" />
-              <span>Lacak di Cek Pesanan</span>
+              <span>Buka Dashboard Produk Saya</span>
             </Link>
           )}
         </div>

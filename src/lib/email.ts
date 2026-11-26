@@ -108,6 +108,14 @@ export async function sendOrderPaidEmail(data: OrderEmailData): Promise<boolean>
       </div>`
           : ""
       }
+      <div style="text-align: center; margin-top: 20px; padding-top: 16px; border-top: 1px solid #f1f5f9;">
+        <p style="font-size: 12px; color: #475569; margin: 0 0 8px;">
+          Anda dapat mengakses seluruh produk yang dimiliki kapan saja melalui Dashboard Produk Saya:
+        </p>
+        <a href="${process.env.NEXT_PUBLIC_APP_URL || "https://helsenvi.com"}/dashboard" style="color: #0284c7; font-weight: 600; font-size: 12px;">
+          Buka Dashboard Produk Saya (${process.env.NEXT_PUBLIC_APP_URL || "https://helsenvi.com"}/dashboard)
+        </a>
+      </div>
     </div>
     <div class="footer">
       <p style="margin: 0;">Email ini dikirim otomatis oleh sistem ${siteName}. Jika ada pertanyaan, hubungi via WhatsApp resmi kami.</p>

@@ -34,6 +34,7 @@ export async function GET(req: Request) {
     if (order.status === "PAID" && order.itemType === "product") {
       const [prod] = await db
         .select({
+          digitalAccessUrl: schema.products.digitalAccessUrl,
           purchaseLinkExternal: schema.products.purchaseLinkExternal,
           liveDemoUrl: schema.products.liveDemoUrl,
         })
@@ -41,7 +42,7 @@ export async function GET(req: Request) {
         .where(eq(schema.products.id, order.itemId))
         .limit(1);
       if (prod) {
-        digitalAccessUrl = prod.purchaseLinkExternal || prod.liveDemoUrl || null;
+        digitalAccessUrl = prod.digitalAccessUrl || prod.purchaseLinkExternal || prod.liveDemoUrl || null;
       }
     }
 

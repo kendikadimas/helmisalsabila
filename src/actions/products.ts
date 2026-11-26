@@ -193,6 +193,7 @@ export async function createProduct(formData: FormData) {
     const aboutProduct = (formData.get("aboutProduct") as string) || title;
     const liveDemoUrl = ((formData.get("liveDemoUrl") as string) || "").trim() || null;
     const purchaseLinkExternal = ((formData.get("purchaseLinkExternal") as string) || "").trim() || null;
+    const digitalAccessUrl = ((formData.get("digitalAccessUrl") as string) || "").trim() || null;
     const isFeatured = formData.get("isFeatured") === "true";
     const isPublished = formData.get("isPublished") !== "false";
 
@@ -211,6 +212,7 @@ export async function createProduct(formData: FormData) {
       aboutProduct,
       liveDemoUrl,
       purchaseLinkExternal,
+      digitalAccessUrl,
       isFeatured,
       isPublished,
       orderIndex: 0,
@@ -257,6 +259,7 @@ export async function updateProduct(id: string, formData: FormData) {
     const thumbnailUrl = (formData.get("thumbnailUrl") as string) || null;
     const liveDemoUrl = ((formData.get("liveDemoUrl") as string) || "").trim() || null;
     const purchaseLinkExternal = ((formData.get("purchaseLinkExternal") as string) || "").trim() || null;
+    const digitalAccessUrl = ((formData.get("digitalAccessUrl") as string) || "").trim() || null;
 
     await db
       .update(schema.products)
@@ -270,6 +273,7 @@ export async function updateProduct(id: string, formData: FormData) {
         thumbnailUrl: thumbnailUrl || undefined,
         liveDemoUrl,
         purchaseLinkExternal,
+        digitalAccessUrl,
       })
       .where(eq(schema.products.id, id));
 

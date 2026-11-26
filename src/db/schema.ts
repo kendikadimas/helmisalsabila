@@ -92,6 +92,7 @@ export const products = mysqlTable("products", {
   suitableFor: json("suitable_for").$type<string[]>(),
   liveDemoUrl: varchar("live_demo_url", { length: 500 }),
   purchaseLinkExternal: varchar("purchase_link_external", { length: 500 }),
+  digitalAccessUrl: varchar("digital_access_url", { length: 500 }),
   isFeatured: boolean("is_featured").default(false).notNull(),
   isPublished: boolean("is_published").default(true).notNull(),
   orderIndex: int("order_index").default(0).notNull(),

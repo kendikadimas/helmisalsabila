@@ -83,7 +83,7 @@ export async function POST(req: Request) {
         .limit(1);
 
       if (product) {
-        digitalAccessUrl = product.purchaseLinkExternal || product.liveDemoUrl || null;
+        digitalAccessUrl = product.digitalAccessUrl || product.purchaseLinkExternal || product.liveDemoUrl || null;
         await db
           .update(schema.products)
           .set({ totalSales: sql`${schema.products.totalSales} + 1` })

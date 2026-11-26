@@ -24,6 +24,7 @@ export default async function CekPesananPage({
   let ordersList: (typeof schema.orders.$inferSelect & {
     productDetails?: {
       purchaseLinkExternal: string | null;
+      digitalAccessUrl: string | null;
       liveDemoUrl: string | null;
       thumbnailUrl: string;
     } | null;
@@ -47,6 +48,7 @@ export default async function CekPesananPage({
       if (ord.itemType === "product") {
         const [prod] = await db
           .select({
+            digitalAccessUrl: schema.products.digitalAccessUrl,
             purchaseLinkExternal: schema.products.purchaseLinkExternal,
             liveDemoUrl: schema.products.liveDemoUrl,
             thumbnailUrl: schema.products.thumbnailUrl,
@@ -132,7 +134,10 @@ export default async function CekPesananPage({
               const isPaid = order.status === "PAID";
               const isPending = order.status === "PENDING";
               const accessUrl =
-                order.productDetails?.purchaseLinkExternal || order.productDetails?.liveDemoUrl || null;
+                order.productDetails?.digitalAccessUrl ||
+                order.productDetails?.purchaseLinkExternal ||
+                order.productDetails?.liveDemoUrl ||
+                null;
 
               return (
                 <div

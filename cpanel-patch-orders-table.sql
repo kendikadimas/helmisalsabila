@@ -39,3 +39,6 @@ CREATE TABLE IF NOT EXISTS `webhook_logs` (
   KEY `webhook_logs_invoice_idx` (`invoice_number`),
   KEY `webhook_logs_status_idx` (`status`)
 );
+
+-- Tambahkan kolom khusus link akses materi/file digital setelah bayar DOKU
+ALTER TABLE `products` ADD COLUMN IF NOT EXISTS `digital_access_url` varchar(500) DEFAULT NULL AFTER `purchase_link_external`;

@@ -22,6 +22,7 @@ export default async function PaymentStatusPage({
   if (order && order.status === "PAID" && order.itemType === "product") {
     const [prod] = await db
       .select({
+        digitalAccessUrl: schema.products.digitalAccessUrl,
         purchaseLinkExternal: schema.products.purchaseLinkExternal,
         liveDemoUrl: schema.products.liveDemoUrl,
       })
@@ -30,7 +31,7 @@ export default async function PaymentStatusPage({
       .limit(1);
 
     if (prod) {
-      digitalAccessUrl = prod.purchaseLinkExternal || prod.liveDemoUrl || null;
+      digitalAccessUrl = prod.digitalAccessUrl || prod.purchaseLinkExternal || prod.liveDemoUrl || null;
     }
   }
 

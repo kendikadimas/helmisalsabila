@@ -15,7 +15,7 @@ export default function Navbar() {
     { name: "Layanan & Portfolio", href: "/layanan" },
     { name: "Produk", href: "/produk" },
     { name: "Artikel", href: "/blog" },
-    { name: "Cek Pesanan", href: "/cek-pesanan" },
+    { name: "Dashboard Saya", href: "/dashboard" },
   ];
 
   const isActive = (href: string) => {
