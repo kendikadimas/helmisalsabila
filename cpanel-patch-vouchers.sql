@@ -1,4 +1,4 @@
-﻿-- ==========================================================
+-- ==========================================================
 -- PATCH VOUCHER (jalankan di phpMyAdmin cPanel SEBELUM/SESUDAH deploy)
 -- Membuat tabel voucher + catatan pemakaian, dan memindahkan
 -- 5 kode promo lama (yang sebelumnya hardcode) ke database.

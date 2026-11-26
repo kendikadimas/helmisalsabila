@@ -1,4 +1,4 @@
-﻿// Konfigurasi situs terpusat. Nilai dapat diubah lewat environment variable, bukan hardcode tersebar.
+// Konfigurasi situs terpusat. Nilai dapat diubah lewat environment variable, bukan hardcode tersebar.
 export const SITE_URL = (process.env.NEXT_PUBLIC_APP_URL?.trim() || "https://helsenvi.com").replace(/\/$/, "");
 
 // Email kontak/pengirim di sisi server (invoice, notifikasi). Isi CONTACT_EMAIL di .env.

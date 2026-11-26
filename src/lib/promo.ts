@@ -86,7 +86,7 @@ export async function validatePromoCode(rawCode: string, originalAmount: number)
     if (voucher.type === "percent" && voucher.maxDiscount) discount = Math.min(discount, voucher.maxDiscount);
 
     const finalAmount = Math.max(MIN_DOKU_AMOUNT, originalAmount - discount);
-    const label = voucher.type === "percent" ? `${voucher.value}%` : formatIdr(voucher.value);
+    const label = voucher.type === "percent" ? `${voucher.value}%` : formatIdr(originalAmount - finalAmount);
 
     return {
       valid: true,
