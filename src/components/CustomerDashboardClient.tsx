@@ -54,12 +54,12 @@ export default function CustomerDashboardClient({
       const res = await customerLoginAction(formData);
       if (!res.success) {
         setError(res.error || "Gagal masuk ke dashboard.");
-        setIsSubmitting(false);
         return;
       }
       router.refresh();
     } catch (err: any) {
       setError(err.message || "Terjadi kesalahan jaringan.");
+    } finally {
       setIsSubmitting(false);
     }
   };

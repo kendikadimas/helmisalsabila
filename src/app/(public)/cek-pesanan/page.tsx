@@ -37,6 +37,7 @@ export default async function CekPesananPage({
       .where(
         or(
           eq(schema.orders.invoiceNumber, query),
+          eq(schema.orders.invoiceNumber, query.toUpperCase()),
           eq(schema.orders.customerEmail, query),
           eq(schema.orders.customerEmail, query.toLowerCase())
         )

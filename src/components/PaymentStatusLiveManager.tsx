@@ -43,6 +43,37 @@ export default function PaymentStatusLiveManager({
   const [isChecking, setIsChecking] = useState(false);
   const [pollCount, setPollCount] = useState(0);
 
+  const firePurchaseOnce = useCallback((ord: OrderData) => {
+    try {
+      const key = `ga_purchased_${ord.invoiceNumber}`;
+      if (typeof window !== "undefined" && !window.localStorage.getItem(key)) {
+        window.localStorage.setItem(key, "1");
+        trackPurchase({
+          invoiceNumber: ord.invoiceNumber,
+          itemId: ord.itemId,
+          itemTitle: ord.itemTitle,
+          itemType: ord.itemType,
+          amount: ord.amount,
+        });
+      }
+    } catch {
+      trackPurchase({
+        invoiceNumber: ord.invoiceNumber,
+        itemId: ord.itemId,
+        itemTitle: ord.itemTitle,
+        itemType: ord.itemType,
+        amount: ord.amount,
+      });
+    }
+  }, []);
+
+  // Fire purchase event if initial status on page load is already PAID
+  useEffect(() => {
+    if (status === "PAID" && order?.invoiceNumber) {
+      firePurchaseOnce(order);
+    }
+  }, [status, order, firePurchaseOnce]);
+
   const checkStatus = useCallback(async () => {
     if (!order?.invoiceNumber) return;
     setIsChecking(true);
@@ -54,13 +85,7 @@ export default function PaymentStatusLiveManager({
           setStatus(data.status);
           if (data.status === "PAID") {
             setDigitalUrl(data.digitalAccessUrl || null);
-            trackPurchase({
-              invoiceNumber: order.invoiceNumber,
-              itemId: order.itemId,
-              itemTitle: order.itemTitle,
-              itemType: order.itemType,
-              amount: order.amount,
-            });
+            firePurchaseOnce(order);
           }
         }
       }
@@ -69,7 +94,7 @@ export default function PaymentStatusLiveManager({
     } finally {
       setIsChecking(false);
     }
-  }, [order, status]);
+  }, [order, status, firePurchaseOnce]);
 
   // Auto-poll every 3.5 seconds if status is PENDING (up to 15 cycles)
   useEffect(() => {
