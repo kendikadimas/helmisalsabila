@@ -9,6 +9,8 @@ import { randomUUID } from "crypto";
 // --- WORK STEPS ACTIONS ---
 export async function getAllWorkStepsAdmin() {
   try {
+    const session = await getSession();
+    if (!session) return [];
     return await db.select().from(schema.workSteps).orderBy(asc(schema.workSteps.orderIndex));
   } catch (error) {
     console.error("Error fetching work steps:", error);
@@ -83,6 +85,8 @@ export async function deleteWorkStep(id: string) {
 // --- VALUE PROPOSITIONS ACTIONS ---
 export async function getAllValuePropsAdmin() {
   try {
+    const session = await getSession();
+    if (!session) return [];
     return await db.select().from(schema.valuePropositions).orderBy(asc(schema.valuePropositions.orderIndex));
   } catch (error) {
     console.error("Error fetching value props:", error);

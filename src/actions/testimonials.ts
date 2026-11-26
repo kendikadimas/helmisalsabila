@@ -8,6 +8,8 @@ import { randomUUID } from "crypto";
 
 export async function getAllTestimonialsAdmin() {
   try {
+    const session = await getSession();
+    if (!session) return [];
     return await db.select().from(schema.testimonials).orderBy(asc(schema.testimonials.orderIndex), desc(schema.testimonials.createdAt));
   } catch (error) {
     console.error("Error fetching testimonials for admin:", error);

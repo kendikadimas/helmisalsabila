@@ -115,6 +115,8 @@ export async function getServicesCount(options: ServiceFilterOptions = {}) {
 
 export async function getAllServicesAdmin() {
   try {
+    const session = await getSession();
+    if (!session) return [];
     return await db
       .select()
       .from(schema.services)

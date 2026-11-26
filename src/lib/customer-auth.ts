@@ -1,8 +1,10 @@
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET || "helmi_salsabila_super_secure_jwt_secret_key_2026_cpanel"
+// Separate derived secret so customer tokens can NEVER be replayed as admin tokens
+const CUSTOMER_JWT_SECRET = new TextEncoder().encode(
+  (process.env.JWT_SECRET || "helmi_salsabila_super_secure_jwt_secret_key_2026_cpanel") +
+    "__customer_portal_v1"
 );
 
 const CUSTOMER_COOKIE_NAME = "helmi_customer_token";
@@ -10,17 +12,22 @@ const CUSTOMER_COOKIE_NAME = "helmi_customer_token";
 export interface CustomerSession {
   email: string;
   name: string;
+  verifiedPaid: boolean;
+  verifiedInvoice: string;
 }
 
 export async function createCustomerSession(customer: CustomerSession): Promise<string> {
   const token = await new SignJWT({
     email: customer.email.toLowerCase().trim(),
     name: customer.name,
+    verifiedPaid: customer.verifiedPaid,
+    verifiedInvoice: customer.verifiedInvoice,
+    tokenType: "customer",
   })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime("7d")
-    .sign(JWT_SECRET);
+    .sign(CUSTOMER_JWT_SECRET);
 
   const cookieStore = await cookies();
   cookieStore.set(CUSTOMER_COOKIE_NAME, token, {
@@ -40,11 +47,13 @@ export async function getCustomerSession(): Promise<CustomerSession | null> {
     const token = cookieStore.get(CUSTOMER_COOKIE_NAME)?.value;
     if (!token) return null;
 
-    const { payload } = await jwtVerify(token, JWT_SECRET);
-    if (!payload?.email) return null;
+    const { payload } = await jwtVerify(token, CUSTOMER_JWT_SECRET);
+    if (!payload?.email || payload.tokenType !== "customer") return null;
     return {
       email: String(payload.email),
       name: String(payload.name || "Pelanggan"),
+      verifiedPaid: Boolean(payload.verifiedPaid),
+      verifiedInvoice: String(payload.verifiedInvoice || ""),
     };
   } catch {
     return null;

@@ -13,6 +13,13 @@ export const metadata = {
   description: "Lacak status transaksi dan akses produk digital Anda dengan nomor invoice atau email.",
 };
 
+function maskEmail(email: string): string {
+  const [user, domain] = (email || "").split("@");
+  if (!user || !domain) return "***";
+  const visible = user.slice(0, Math.min(2, user.length));
+  return `${visible}***@${domain}`;
+}
+
 export default async function CekPesananPage({
   searchParams,
 }: {
@@ -21,46 +28,20 @@ export default async function CekPesananPage({
   const params = await searchParams;
   const query = (params.q || "").trim();
 
-  let ordersList: (typeof schema.orders.$inferSelect & {
-    productDetails?: {
-      purchaseLinkExternal: string | null;
-      digitalAccessUrl: string | null;
-      liveDemoUrl: string | null;
-      thumbnailUrl: string;
-    } | null;
-  })[] = [];
+  let ordersList: (typeof schema.orders.$inferSelect)[] = [];
 
+  // Security: Only lookup by exact Invoice Number on public /cek-pesanan to prevent email enumeration & download theft
   if (query) {
-    const rawOrders = await db
+    ordersList = await db
       .select()
       .from(schema.orders)
       .where(
         or(
           eq(schema.orders.invoiceNumber, query),
-          eq(schema.orders.invoiceNumber, query.toUpperCase()),
-          eq(schema.orders.customerEmail, query),
-          eq(schema.orders.customerEmail, query.toLowerCase())
+          eq(schema.orders.invoiceNumber, query.toUpperCase())
         )
       )
-      .limit(10);
-
-    for (const ord of rawOrders) {
-      let productDetails: any = null;
-      if (ord.itemType === "product") {
-        const [prod] = await db
-          .select({
-            digitalAccessUrl: schema.products.digitalAccessUrl,
-            purchaseLinkExternal: schema.products.purchaseLinkExternal,
-            liveDemoUrl: schema.products.liveDemoUrl,
-            thumbnailUrl: schema.products.thumbnailUrl,
-          })
-          .from(schema.products)
-          .where(eq(schema.products.id, ord.itemId))
-          .limit(1);
-        if (prod) productDetails = prod;
-      }
-      ordersList.push({ ...ord, productDetails });
-    }
+      .limit(5);
   }
 
   const settings = await getSiteSettings();
@@ -77,7 +58,11 @@ export default async function CekPesananPage({
         <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Cek Status Pesanan</h1>
         <p className="text-sm text-slate-500">
           Masukkan nomor invoice (contoh: <code className="text-teal-600 bg-slate-100 px-1 py-0.5 rounded">INV-...</code>)
-          atau alamat email yang digunakan saat checkout.
+          untuk melacak status pembayaran. Untuk mengunduh materi produk, silakan masuk ke{" "}
+          <Link href="/dashboard" className="text-teal-700 font-semibold underline">
+            Dashboard Produk Saya
+          </Link>
+          .
         </p>
       </div>
 
@@ -88,9 +73,9 @@ export default async function CekPesananPage({
             type="text"
             name="q"
             defaultValue={query}
-            placeholder="Cari nomor invoice / email..."
+            placeholder="Masukkan nomor invoice (INV-...)..."
             required
-            className="w-full pl-12 pr-28 py-3.5 rounded-2xl border border-slate-200 bg-white text-sm text-slate-900 shadow-xs focus:outline-hidden focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all"
+            className="w-full pl-12 pr-28 py-3.5 rounded-2xl border border-slate-200 bg-white text-sm text-slate-900 shadow-xs focus:outline-hidden focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all font-mono"
           />
           <Search className="w-5 h-5 text-slate-400 absolute left-4 pointer-events-none" />
           <button
@@ -134,11 +119,6 @@ export default async function CekPesananPage({
             {ordersList.map((order) => {
               const isPaid = order.status === "PAID";
               const isPending = order.status === "PENDING";
-              const accessUrl =
-                order.productDetails?.digitalAccessUrl ||
-                order.productDetails?.purchaseLinkExternal ||
-                order.productDetails?.liveDemoUrl ||
-                null;
 
               return (
                 <div
@@ -191,7 +171,7 @@ export default async function CekPesananPage({
                     <div>
                       <div className="text-slate-400 mb-0.5">Pembeli</div>
                       <div className="font-medium text-slate-700 truncate">{order.customerName}</div>
-                      <div className="text-[11px] text-slate-400 truncate">{order.customerEmail}</div>
+                      <div className="text-[11px] text-slate-400 truncate">{maskEmail(order.customerEmail)}</div>
                     </div>
                     <div>
                       <div className="text-slate-400 mb-0.5">Waktu Transaksi</div>
@@ -201,16 +181,14 @@ export default async function CekPesananPage({
 
                   {/* Action buttons */}
                   <div className="flex flex-wrap items-center justify-end gap-2.5 pt-2">
-                    {isPaid && accessUrl && (
-                      <a
-                        href={accessUrl}
-                        target="_blank"
-                        rel="noreferrer"
+                    {isPaid && (
+                      <Link
+                        href="/dashboard"
                         className="px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold flex items-center gap-1.5 transition-colors shadow-xs"
                       >
                         <ExternalLink className="w-3.5 h-3.5" />
-                        <span>Akses / Unduh Produk</span>
-                      </a>
+                        <span>Masuk Dashboard untuk Akses Produk</span>
+                      </Link>
                     )}
 
                     {isPending && order.paymentUrl && (

@@ -115,6 +115,9 @@ export async function getProductsCount(options: ProductFilterOptions = {}) {
 }
 
 export async function getAllProductsAdmin() {
+  const session = await getSession();
+  if (!session) return [];
+
   try {
     return await db
       .select()

@@ -57,6 +57,8 @@ export async function customerLoginAction(formData: FormData) {
     await createCustomerSession({
       email: matchedOrder.customerEmail.toLowerCase(),
       name: matchedOrder.customerName,
+      verifiedPaid: matchedOrder.status === "PAID",
+      verifiedInvoice: matchedOrder.invoiceNumber,
     });
 
     revalidatePath("/dashboard");
@@ -103,16 +105,32 @@ export async function getCustomerDashboardData() {
     return { session: null, orders: [] as CustomerOwnedOrder[] };
   }
 
-  const rawOrders = await db
-    .select()
-    .from(schema.orders)
-    .where(
-      or(
-        eq(schema.orders.customerEmail, session.email),
-        eq(schema.orders.customerEmail, session.email.toLowerCase())
-      )
-    )
-    .orderBy(desc(schema.orders.createdAt));
+  // Security: If user logged in using an unpaid/pending invoice, ONLY return that specific invoice
+  // to prevent an attacker from creating a free PENDING order with someone else's email to view their PAID products.
+  const rawOrders = session.verifiedPaid
+    ? await db
+        .select()
+        .from(schema.orders)
+        .where(
+          or(
+            eq(schema.orders.customerEmail, session.email),
+            eq(schema.orders.customerEmail, session.email.toLowerCase())
+          )
+        )
+        .orderBy(desc(schema.orders.createdAt))
+    : await db
+        .select()
+        .from(schema.orders)
+        .where(
+          and(
+            eq(schema.orders.invoiceNumber, session.verifiedInvoice),
+            or(
+              eq(schema.orders.customerEmail, session.email),
+              eq(schema.orders.customerEmail, session.email.toLowerCase())
+            )
+          )
+        )
+        .limit(1);
 
   const enriched: CustomerOwnedOrder[] = [];
 

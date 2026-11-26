@@ -95,12 +95,19 @@ export async function POST(req: Request) {
       }
     }
 
-    const host = req.headers.get("x-forwarded-host") || req.headers.get("host");
-    const proto = req.headers.get("x-forwarded-proto") || (host?.includes("localhost") ? "http" : "https");
-    const origin = host ? `${proto}://${host}` : process.env.NEXT_PUBLIC_APP_URL || "https://helsenvi.com";
+    const configuredOrigin = process.env.NEXT_PUBLIC_APP_URL?.trim();
+    const rawHost = req.headers.get("host") || "helsenvi.com";
+    const isAllowedLocal = rawHost.startsWith("localhost:") || rawHost.startsWith("127.0.0.1:");
+    const origin = isAllowedLocal
+      ? `http://${rawHost}`
+      : configuredOrigin && configuredOrigin.startsWith("http")
+        ? configuredOrigin.replace(/\/$/, "")
+        : "https://helsenvi.com";
 
     const orderId = `ord-${crypto.randomUUID().slice(0, 12)}`;
-    const invoiceNumber = `INV-${Date.now()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
+    // Cryptographically random 10-hex-char suffix (40 bits entropy) to prevent invoice guessing/enumeration
+    const randomSuffix = crypto.randomBytes(5).toString("hex").toUpperCase();
+    const invoiceNumber = `INV-${Date.now()}-${randomSuffix}`;
     const digitsOnly = customerPhone.replace(/[^0-9]/g, "");
     const normalizedPhone = digitsOnly.startsWith("0")
       ? `62${digitsOnly.slice(1)}`

@@ -9,6 +9,8 @@ import { randomUUID } from "crypto";
 
 export async function getAllCategoriesAdmin() {
   try {
+    const session = await getSession();
+    if (!session) return [];
     return await db.select().from(schema.categories).orderBy(asc(schema.categories.orderIndex), asc(schema.categories.name));
   } catch (error) {
     console.error("Error fetching categories for admin:", error);

@@ -30,6 +30,7 @@ export async function createSession(user: SessionUser): Promise<string> {
     name: user.name,
     email: user.email,
     role: user.role,
+    tokenType: "admin",
   })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
@@ -55,6 +56,13 @@ export async function getSession(): Promise<SessionUser | null> {
     if (!token) return null;
 
     const { payload } = await jwtVerify(token, JWT_SECRET);
+    if (
+      !payload?.id ||
+      !payload?.email ||
+      (payload.role !== "admin" && payload.role !== "superadmin")
+    ) {
+      return null;
+    }
     return payload as unknown as SessionUser;
   } catch {
     return null;

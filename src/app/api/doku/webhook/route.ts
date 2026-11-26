@@ -64,12 +64,25 @@ export async function POST(req: Request) {
 
     const wasAlreadyPaid = order.status === "PAID";
 
+    // Security: Verify paid amount matches order amount in DB
+    const webhookAmount = Number(payload?.order?.amount || 0);
+    const expectedAmount = Math.round(parseFloat(String(order.amount || 0)));
+    if (newStatus === "PAID" && webhookAmount > 0 && webhookAmount !== expectedAmount) {
+      console.error(
+        `[DOKU Webhook] Amount mismatch for ${invoiceNumber}: expected ${expectedAmount}, got ${webhookAmount}`
+      );
+      return NextResponse.json({ error: "Amount mismatch" }, { status: 400 });
+    }
+
+    // Security: Never downgrade an already PAID order if a late EXPIRED/FAILED webhook arrives
+    const effectiveStatus = wasAlreadyPaid ? "PAID" : newStatus;
+
     await db
       .update(schema.orders)
       .set({
-        status: newStatus,
+        status: effectiveStatus,
         dokuTransactionId: dokuTxId,
-        paidAt: newStatus === "PAID" ? new Date() : order.paidAt,
+        paidAt: effectiveStatus === "PAID" && !wasAlreadyPaid ? new Date() : order.paidAt,
       })
       .where(eq(schema.orders.id, order.id));
 

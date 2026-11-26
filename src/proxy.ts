@@ -21,7 +21,16 @@ export async function proxy(req: NextRequest) {
     }
 
     try {
-      await jwtVerify(token, JWT_SECRET);
+      const { payload } = await jwtVerify(token, JWT_SECRET);
+      if (
+        !payload?.id ||
+        !payload?.email ||
+        (payload.role !== "admin" && payload.role !== "superadmin")
+      ) {
+        const loginUrl = new URL("/admin/login", req.url);
+        loginUrl.searchParams.set("callbackUrl", pathname);
+        return NextResponse.redirect(loginUrl);
+      }
       return NextResponse.next();
     } catch {
       const loginUrl = new URL("/admin/login", req.url);
@@ -35,8 +44,14 @@ export async function proxy(req: NextRequest) {
     const token = req.cookies.get(COOKIE_NAME)?.value;
     if (token) {
       try {
-        await jwtVerify(token, JWT_SECRET);
-        return NextResponse.redirect(new URL("/admin", req.url));
+        const { payload } = await jwtVerify(token, JWT_SECRET);
+        if (
+          payload?.id &&
+          payload?.email &&
+          (payload.role === "admin" || payload.role === "superadmin")
+        ) {
+          return NextResponse.redirect(new URL("/admin", req.url));
+        }
       } catch {
         // Token invalid, allow accessing login page
       }
