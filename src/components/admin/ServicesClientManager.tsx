@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { formatRupiah } from "@/lib/utils";
+import { formatRupiah, markdownToHtml } from "@/lib/utils";
+import RichTextEditor from "@/components/RichTextEditor";
 import { Plus, Trash2, Edit3, ExternalLink } from "lucide-react";
 import Link from "next/link";
 import EditModal from "@/components/EditModal";
@@ -155,14 +156,8 @@ export default function ServicesClientManager({
           </div>
 
           <div className="space-y-1.5 md:col-span-2">
-            <label className="text-slate-700 font-medium">Deskripsi Lengkap (Markdown)</label>
-            <textarea
-              name="fullDescription"
-              rows={4}
-              required
-              placeholder="Jelaskan detail layanan, tools yang digunakan, output yang didapatkan..."
-              className="w-full p-3 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-teal-600 transition-colors leading-relaxed"
-            />
+            <label className="text-slate-700 font-medium">Deskripsi Lengkap</label>
+            <RichTextEditor name="fullDescription" />
           </div>
 
           <div className="space-y-1.5">
@@ -323,13 +318,7 @@ export default function ServicesClientManager({
 
             <div className="space-y-1.5">
               <label className="text-slate-700 font-medium">Deskripsi Lengkap</label>
-              <textarea
-                name="fullDescription"
-                rows={5}
-                required
-                defaultValue={editingItem.fullDescription}
-                className="w-full p-3 bg-white border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-teal-600 transition-colors leading-relaxed"
-              />
+              <RichTextEditor key={editingItem.id} name="fullDescription" defaultValue={/<\/?[a-z][\s\S]*>/i.test(editingItem.fullDescription) ? editingItem.fullDescription : markdownToHtml(editingItem.fullDescription)} />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
