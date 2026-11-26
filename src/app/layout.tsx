@@ -20,8 +20,8 @@ export const metadata: Metadata = {
   description:
     "Solusi profesional untuk kebutuhan data analytics, digital marketing, IT solutions, dan produk digital berstandar tinggi.",
   icons: {
-    icon: "/icon.svg",
-    apple: "/icon.svg",
+    icon: "/logoku-1.png",
+    apple: "/logoku-1.png",
   },
   openGraph: {
     title: "Helmi Salsabila | Data & Digital Solutions",

@@ -87,9 +87,7 @@ export default function AdminSidebar({ logoutAction, userEmail = "admin@helmisal
       {/* Mobile Top Header Bar */}
       <div className="md:hidden flex items-center justify-between px-6 py-4 bg-[#0F172A] border-b border-slate-800 sticky top-0 z-40">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-teal-500/20 border border-teal-500/30 flex items-center justify-center font-bold text-teal-400 text-sm">
-            H
-          </div>
+          <img src="/logoku-1.png" alt="Logo" className="w-9 h-9 rounded-full ring-2 ring-white/80" />
           <div>
             <h2 className="font-semibold text-sm text-white">helsenvi.com</h2>
             <p className="text-xs text-slate-400">Admin Dashboard</p>
@@ -123,11 +121,7 @@ export default function AdminSidebar({ logoutAction, userEmail = "admin@helmisal
           {/* Brand Header */}
           <div className="flex items-center justify-between px-1">
             <div className="flex items-center gap-3.5">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-teal-500 to-emerald-400 p-[1.5px] shadow-sm">
-                <div className="w-full h-full bg-[#0F172A] rounded-[10px] flex items-center justify-center font-bold text-teal-400 text-base">
-                  H
-                </div>
-              </div>
+              <img src="/logoku-1.png" alt="Logo" className="w-10 h-10 rounded-full ring-2 ring-white/80 shadow-sm" />
               <div>
                 <h2 className="font-bold text-base text-white tracking-tight">helsenvi.com</h2>
                 <p className="text-xs text-slate-400">Admin Dashboard</p>

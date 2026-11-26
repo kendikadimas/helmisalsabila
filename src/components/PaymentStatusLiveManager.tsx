@@ -136,11 +136,14 @@ export default function PaymentStatusLiveManager({
             `}</style>
             <div className="mx-auto w-[210mm] min-h-[297mm] px-[18mm] py-[16mm] flex flex-col">
               <header className="flex justify-between items-start pb-6 border-b-2 border-slate-900">
-                <div>
+                <div className="flex items-start gap-3">
+                  <img src="/logoku-1.png" alt="Helmi Salsabila" className="w-12 h-12 rounded-full" />
+                  <div>
                   <h1 className="text-2xl font-extrabold tracking-tight">Helmi Salsabila</h1>
                   <p className="text-[11px] text-slate-500 mt-1">Data &amp; Digital Solutions</p>
                   <p className="text-[11px] text-slate-500">helsenvi.com &middot; admin@helsenvi.com</p>
                   {contactPhone && <p className="text-[11px] text-slate-500">WhatsApp: {contactPhone}</p>}
+                  </div>
                 </div>
                 <div className="text-right">
                   <p className="text-3xl font-extrabold tracking-widest text-slate-900">INVOICE</p>

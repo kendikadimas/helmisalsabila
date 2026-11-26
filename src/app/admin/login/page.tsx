@@ -31,9 +31,7 @@ export default function AdminLoginPage() {
     <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
       <div className="max-w-md w-full bg-slate-800 border border-slate-700 rounded-3xl p-8 space-y-6 shadow-2xl text-white">
         <div className="text-center space-y-2">
-          <div className="w-14 h-14 mx-auto rounded-full bg-white text-slate-900 flex items-center justify-center font-serif font-bold text-3xl shadow-md">
-            H
-          </div>
+          <img src="/logoku-1.png" alt="Helmi Salsabila" className="w-14 h-14 mx-auto rounded-full ring-2 ring-white/80 shadow-md" />
           <h1 className="text-2xl font-bold tracking-tight">CMS Admin Login</h1>
           <p className="text-xs text-slate-400">Masuk untuk mengelola portofolio, layanan, dan artikel</p>
         </div>
