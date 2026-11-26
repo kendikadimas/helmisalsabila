@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { createPortal } from "react-dom";
 import {
   CheckCircle2,
   Clock,
@@ -42,6 +43,8 @@ export default function PaymentStatusLiveManager({
   const [digitalUrl, setDigitalUrl] = useState<string | null>(initialOrder?.digitalAccessUrl || null);
   const [isChecking, setIsChecking] = useState(false);
   const [pollCount, setPollCount] = useState(0);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   const firePurchaseOnce = useCallback((ord: OrderData) => {
     try {
@@ -119,61 +122,112 @@ export default function PaymentStatusLiveManager({
 
   return (
     <>
-      {/* Printable Invoice Sheet (Only visible when printing) */}
-      {order && (
-        <div className="hidden print:block fixed inset-0 bg-white p-8 z-[99999] text-slate-900 font-sans">
-          <div className="max-w-xl mx-auto border border-slate-300 rounded-2xl p-8 space-y-6">
-            <div className="flex justify-between items-start border-b border-slate-200 pb-6">
-              <div>
-                <h1 className="text-xl font-bold text-slate-900">Helmi Salsabila</h1>
-                <p className="text-xs text-slate-500">Bukti Pembayaran Resmi</p>
+      {/* Printable Invoice (portal ke body agar hanya invoice yang tercetak, 1 halaman A4) */}
+      {order && mounted &&
+        createPortal(
+          <div id="invoice-print-root" className="hidden print:block bg-white text-slate-900 font-sans">
+            <style>{`
+              @page { size: A4; margin: 0; }
+              @media print {
+                body > *:not(#invoice-print-root) { display: none !important; }
+                html, body { background: #fff !important; }
+                #invoice-print-root { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+              }
+            `}</style>
+            <div className="mx-auto w-[210mm] min-h-[297mm] px-[18mm] py-[16mm] flex flex-col">
+              <header className="flex justify-between items-start pb-6 border-b-2 border-slate-900">
+                <div>
+                  <h1 className="text-2xl font-extrabold tracking-tight">Helmi Salsabila</h1>
+                  <p className="text-[11px] text-slate-500 mt-1">Data &amp; Digital Solutions</p>
+                  <p className="text-[11px] text-slate-500">helsenvi.com &middot; admin@helsenvi.com</p>
+                  {contactPhone && <p className="text-[11px] text-slate-500">WhatsApp: {contactPhone}</p>}
+                </div>
+                <div className="text-right">
+                  <p className="text-3xl font-extrabold tracking-widest text-slate-900">INVOICE</p>
+                  <p className="text-xs font-mono mt-1">{order.invoiceNumber}</p>
+                  <span
+                    className={`inline-block mt-2 px-3 py-1 rounded text-[11px] font-bold tracking-wide border ${
+                      isPaid
+                        ? "bg-emerald-50 text-emerald-800 border-emerald-300"
+                        : isPending
+                          ? "bg-amber-50 text-amber-800 border-amber-300"
+                          : "bg-rose-50 text-rose-800 border-rose-300"
+                    }`}
+                  >
+                    {isPaid ? "LUNAS" : isPending ? "MENUNGGU PEMBAYARAN" : status === "EXPIRED" ? "KEDALUWARSA" : "GAGAL"}
+                  </span>
+                </div>
+              </header>
+
+              <section className="grid grid-cols-2 gap-8 py-6 text-xs">
+                <div>
+                  <p className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold mb-1.5">Ditagihkan Kepada</p>
+                  <p className="font-bold text-sm">{order.customerName}</p>
+                  <p className="text-slate-600">{order.customerEmail}</p>
+                  {order.customerPhone && <p className="text-slate-600">{order.customerPhone}</p>}
+                </div>
+                <div className="text-right space-y-1">
+                  <p>
+                    <span className="text-slate-400">Tanggal Terbit: </span>
+                    <span className="font-semibold">{formatDateIndo(order.createdAt)}</span>
+                  </p>
+                  <p>
+                    <span className="text-slate-400">Metode Pembayaran: </span>
+                    <span className="font-semibold">DOKU Payment Gateway</span>
+                  </p>
+                </div>
+              </section>
+
+              <table className="w-full text-xs border-collapse">
+                <thead>
+                  <tr className="bg-slate-100 text-slate-600 text-[10px] uppercase tracking-wider">
+                    <th className="text-left py-2.5 px-3 font-semibold">Deskripsi</th>
+                    <th className="text-center py-2.5 px-3 font-semibold w-14">Qty</th>
+                    <th className="text-right py-2.5 px-3 font-semibold w-32">Harga</th>
+                    <th className="text-right py-2.5 px-3 font-semibold w-32">Jumlah</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className="border-b border-slate-200">
+                    <td className="py-3.5 px-3">
+                      <p className="font-semibold">{order.itemTitle}</p>
+                      <p className="text-[10px] text-slate-400 mt-0.5">
+                        {order.itemType === "product" ? "Produk Digital" : "Layanan Jasa"}
+                      </p>
+                    </td>
+                    <td className="py-3.5 px-3 text-center">1</td>
+                    <td className="py-3.5 px-3 text-right">{formatRupiah(order.amount)}</td>
+                    <td className="py-3.5 px-3 text-right font-semibold">{formatRupiah(order.amount)}</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <div className="flex justify-end pt-4">
+                <div className="w-64 text-xs space-y-1.5">
+                  <div className="flex justify-between text-slate-600">
+                    <span>Subtotal</span>
+                    <span>{formatRupiah(order.amount)}</span>
+                  </div>
+                  <div className="flex justify-between items-center border-t-2 border-slate-900 pt-2 mt-2 text-sm font-extrabold">
+                    <span>Total</span>
+                    <span>{formatRupiah(order.amount)}</span>
+                  </div>
+                  <div className="flex justify-between text-[11px] text-slate-500 pt-1">
+                    <span>Status Pembayaran</span>
+                    <span className="font-semibold">{isPaid ? "Dibayar" : "Belum dibayar"}</span>
+                  </div>
+                </div>
               </div>
-              <div className="text-right">
-                <span
-                  className={`inline-block px-3 py-1 rounded-full text-xs font-bold ${
-                    isPaid ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800"
-                  }`}
-                >
-                  {isPaid ? "LUNAS / BERHASIL" : status}
-                </span>
-                <p className="text-xs text-slate-400 font-mono mt-1">{order.invoiceNumber}</p>
-              </div>
+
+              <footer className="mt-auto pt-8 border-t border-slate-200 text-[10px] text-slate-400 text-center space-y-0.5">
+                <p>Terima kasih atas kepercayaan Anda.</p>
+                <p>Dokumen ini diterbitkan secara elektronik dan sah tanpa tanda tangan.</p>
+                <p>Pertanyaan terkait invoice? Hubungi kami via WhatsApp dengan menyebutkan nomor invoice.</p>
+              </footer>
             </div>
-
-            <table className="w-full text-xs border-collapse">
-              <tbody>
-                <tr className="border-b border-slate-100">
-                  <td className="py-2.5 text-slate-500">Nama Pembeli</td>
-                  <td className="py-2.5 font-semibold text-right">{order.customerName}</td>
-                </tr>
-                <tr className="border-b border-slate-100">
-                  <td className="py-2.5 text-slate-500">Email</td>
-                  <td className="py-2.5 text-right">{order.customerEmail}</td>
-                </tr>
-                <tr className="border-b border-slate-100">
-                  <td className="py-2.5 text-slate-500">Item Pesanan</td>
-                  <td className="py-2.5 font-bold text-right">{order.itemTitle}</td>
-                </tr>
-                <tr className="border-b border-slate-100">
-                  <td className="py-2.5 text-slate-500">Metode Pembayaran</td>
-                  <td className="py-2.5 text-right">DOKU Payment Gateway</td>
-                </tr>
-                <tr className="border-b border-slate-200 text-sm">
-                  <td className="py-3 font-bold text-slate-900">Total Pembayaran</td>
-                  <td className="py-3 font-extrabold text-emerald-700 text-right">
-                    {formatRupiah(order.amount)}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-
-            <div className="text-center text-[11px] text-slate-400 pt-4 border-t border-slate-100">
-              Terima kasih atas pesanan Anda. Disimpan secara elektronik oleh sistem Helmi Salsabila.
-            </div>
-          </div>
-        </div>
-      )}
-
+          </div>,
+          document.body
+        )}
       {/* Screen Card View */}
       <div className="print:hidden w-full max-w-lg bg-white rounded-3xl border border-slate-200 p-8 shadow-sm space-y-6 text-center">
         {isPaid ? (
