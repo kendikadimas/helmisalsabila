@@ -6,9 +6,13 @@ on:
       - master
   workflow_dispatch:
 
+concurrency:
+  group: cpanel-production-deploy
+  cancel-in-progress: false
+
 jobs:
   build-and-deploy:
-    name: Build & Deploy via FTP
+    name: Build & Deploy via FTP (Disk-Safe)
     runs-on: ubuntu-latest
 
     steps:
@@ -27,28 +31,26 @@ jobs:
       - name: 🏗️ Build Next.js Application
         run: npm run build
 
-      - name: 🧹 Clean Build & Source Maps
+      - name: 🧹 Clean Build Cache & Source Maps (Save Shared Hosting Disk)
         run: |
           rm -rf .next/cache
           find .next -name "*.map" -type f -delete
-
-      - name: 🔄 Trigger Phusion Passenger Restart Marker
-        run: |
-          mkdir -p tmp
-          echo "$(date)" > tmp/restart.txt
+          du -sh .next public
 
       - name: 🛠️ Install lftp
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq lftp
 
-      - name: 🚀 Sync Files to cPanel via FTP
+      - name: 🚀 Sync Runtime Files & Clean Old .next Chunks on cPanel
         env:
           FTP_HOST: ${{ secrets.CPANEL_SERVER }}
           FTP_USER: ${{ secrets.CPANEL_USERNAME }}
           FTP_PASS: ${{ secrets.CPANEL_PASSWORD }}
-          FTP_DIR: ${{ secrets.CPANEL_APP_PATH }}
         run: |
+          mkdir -p tmp
+          date -u +"%Y-%m-%dT%H:%M:%SZ" > tmp/restart.txt
+
           lftp -u "$FTP_USER","$FTP_PASS" "$FTP_HOST" <<'SCRIPT'
             set ftp:ssl-allow no
             set ftp:passive-mode on
@@ -61,27 +63,35 @@ jobs:
             set net:reconnect-interval-max 60
             set net:timeout 40
             set mirror:use-utc off
-            mirror -R --no-perms --no-umask --continue --verbose=1 \
-              --exclude '^\.git' \
-              --exclude '^\.github/' \
-              --exclude '^node_modules/' \
-              --exclude '^\.next/cache/' \
+
+            # 1. Sync .next WITH --delete so stale build chunks never fill up shared hosting disk/inodes
+            mirror -R --delete --parallel=4 --no-perms --no-umask --continue --verbose=1 \
+              --exclude '^cache/' \
               --exclude '\.map$' \
-              --exclude '\.sql$' \
-              --exclude '\.zip$' \
-              --exclude '\.md$' \
-              --exclude '^\.env' \
-              --exclude '^tsconfig\.tsbuildinfo$' \
-              --exclude '^stderr\.log$' \
-              . helmisalsabila/
+              .next helmisalsabila/.next
+
+            # 2. Sync public assets WITHOUT --delete (protects user-uploaded files in public/uploads/)
+            mirror -R --parallel=4 --no-perms --no-umask --continue --verbose=1 \
+              --exclude '^uploads/' \
+              public helmisalsabila/public
+
+            # 3. Upload essential root runtime files only (skips src/, docs/, *.zip, *.sql, *.md)
+            put -O helmisalsabila/ app.js
+            put -O helmisalsabila/ next.config.js
+            put -O helmisalsabila/ package.json
+            put -O helmisalsabila/ package-lock.json
+
+            # 4. Trigger Phusion Passenger restart STRICTLY LAST after all .next/static chunks exist
+            mkdir -p helmisalsabila/tmp
+            put -O helmisalsabila/tmp/ tmp/restart.txt
             bye
           SCRIPT
 
-      - name: ✅ Verify Website is Up
+      - name: ✅ Verify Website & CSS Asset Are Up
         run: |
-          sleep 5
-          code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 30 https://helsenvi.com)
-          echo "HTTP status from https://helsenvi.com => $code"
-          if [ "$code" = "000" ]; then
-            echo "::warning::Site unreachable right now (Passenger may still be restarting)."
+          sleep 8
+          code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 30 https://helsenvi.com/api/health)
+          echo "HTTP status from https://helsenvi.com/api/health => $code"
+          if [ "$code" != "200" ]; then
+            echo "::warning::Site healthcheck returned $code (Passenger may still be restarting)."
           fi
