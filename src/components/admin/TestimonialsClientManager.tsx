@@ -111,7 +111,6 @@ export default function TestimonialsClientManager({
               type="text"
               name="clientCompany"
               required
-              defaultValue="FOOM"
               placeholder="Contoh: FOOM, PT Solusi Data..."
               className="w-full p-3 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-teal-600 transition-colors"
             />
@@ -121,8 +120,7 @@ export default function TestimonialsClientManager({
             <ImageUploader
               name="avatarUrl"
               label="Foto Profil (Avatar Kiri Bawah)"
-              defaultValue="/profile-talent.png"
-              placeholder="Upload foto profil klien"
+              placeholder="Upload foto profil klien (opsional)"
             />
           </div>
 
@@ -130,8 +128,7 @@ export default function TestimonialsClientManager({
             <ImageUploader
               name="companyLogoUrl"
               label="Logo Perusahaan (Kanan Bawah)"
-              defaultValue="/foom-logo.svg"
-              placeholder="Upload logo perusahaan"
+              placeholder="Upload logo perusahaan (opsional)"
             />
           </div>
 

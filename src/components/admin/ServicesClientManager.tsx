@@ -10,6 +10,7 @@ import { createService, updateService, deleteService } from "@/actions/services"
 
 interface ServiceItem {
   id: string;
+  categoryId?: string | null;
   title: string;
   slug: string;
   priceStartingAt: string | null;
@@ -21,7 +22,18 @@ interface ServiceItem {
   outputsReceived?: string[] | null;
 }
 
-export default function ServicesClientManager({ initialServices }: { initialServices: ServiceItem[] }) {
+interface CategoryItem {
+  id: string;
+  name: string;
+}
+
+export default function ServicesClientManager({
+  initialServices,
+  categories = [],
+}: {
+  initialServices: ServiceItem[];
+  categories?: CategoryItem[];
+}) {
   const [services, setServices] = useState<ServiceItem[]>(initialServices);
   const [editingItem, setEditingItem] = useState<ServiceItem | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -105,6 +117,22 @@ export default function ServicesClientManager({ initialServices }: { initialServ
               placeholder="200000"
               className="w-full p-3 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-teal-600 transition-colors font-mono"
             />
+          </div>
+
+          <div className="space-y-1.5 md:col-span-2">
+            <label className="text-slate-700 font-medium">Kategori Layanan</label>
+            <select
+              name="categoryId"
+              defaultValue=""
+              className="w-full p-3 bg-white border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-teal-600 transition-colors"
+            >
+              <option value="">-- Pilih Kategori (Opsional) --</option>
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.name}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="space-y-1.5 md:col-span-2">
@@ -248,15 +276,32 @@ export default function ServicesClientManager({ initialServices }: { initialServ
               />
             </div>
 
-            <div className="space-y-1.5">
-              <label className="text-slate-700 font-medium">Harga Mulai (Rp)</label>
-              <input
-                type="number"
-                name="priceStartingAt"
-                required
-                defaultValue={editingItem.priceStartingAt || "0"}
-                className="w-full p-3 bg-white border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-teal-600 transition-colors font-mono"
-              />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <label className="text-slate-700 font-medium">Harga Mulai (Rp)</label>
+                <input
+                  type="number"
+                  name="priceStartingAt"
+                  required
+                  defaultValue={editingItem.priceStartingAt || "0"}
+                  className="w-full p-3 bg-white border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-teal-600 transition-colors font-mono"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-slate-700 font-medium">Kategori Layanan</label>
+                <select
+                  name="categoryId"
+                  defaultValue={editingItem.categoryId || ""}
+                  className="w-full p-3 bg-white border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-teal-600 transition-colors"
+                >
+                  <option value="">-- Tanpa Kategori --</option>
+                  {categories.map((cat) => (
+                    <option key={cat.id} value={cat.id}>
+                      {cat.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
 
             <div className="space-y-1.5">

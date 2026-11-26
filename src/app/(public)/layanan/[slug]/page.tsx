@@ -2,10 +2,9 @@ import Link from "next/link";
 import Image from "next/image";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import DOMPurify from "isomorphic-dompurify";
 import { getServiceBySlug, getServices } from "@/actions/services";
 import { getSiteSettings } from "@/actions/settings";
-import { formatRupiah, markdownToHtml } from "@/lib/utils";
+import { formatRupiah, markdownToHtml, sanitizeHtml } from "@/lib/utils";
 import SectionHeader from "@/components/SectionHeader";
 import ShareButton from "@/components/ShareButton";
 import DokuCheckoutModal from "@/components/DokuCheckoutModal";
@@ -76,7 +75,7 @@ export default async function DetailLayananPage({
   const isValidServiceImg = (url?: string | null) =>
     !!url && !url.includes("placeholder") && !url.includes("/assets/service-");
   const rawDesc = service.fullDescription || "";
-  const descHtml = DOMPurify.sanitize(/<\/?[a-z][\s\S]*>/i.test(rawDesc) ? rawDesc : markdownToHtml(rawDesc));
+  const descHtml = sanitizeHtml(/<\/?[a-z][\s\S]*>/i.test(rawDesc) ? rawDesc : markdownToHtml(rawDesc));
 
   const hasPaidPrice = service.priceStartingAt && parseFloat(String(service.priceStartingAt)) > 0;
   const galleryItems =

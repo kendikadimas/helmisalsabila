@@ -102,3 +102,15 @@ export function markdownToHtml(md: string): string {
   closeLists();
   return out.join("\n");
 }
+
+/**
+ * Lightweight pure-JS HTML sanitizer (no jsdom dependency, 100% compatible with cPanel Passenger).
+ */
+export function sanitizeHtml(html: string): string {
+  if (!html) return "";
+  return html
+    .replace(/<(script|style|iframe|object|embed|form|input|button)[^>]*>[\s\S]*?<\/\1>/gi, "")
+    .replace(/<(script|style|iframe|object|embed|form|input|button)[^>]*\/?>/gi, "")
+    .replace(/\son[a-z]+\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+)/gi, "")
+    .replace(/(href|src)\s*=\s*(?:"\s*(?:javascript|vbscript|data:text\/html)[^"]*"|'\s*(?:javascript|vbscript|data:text\/html)[^']*')/gi, '$1="#"');
+}

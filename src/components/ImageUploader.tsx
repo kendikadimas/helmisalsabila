@@ -18,9 +18,15 @@ export default function ImageUploader({
   placeholder = "https://... atau pilih upload file",
 }: ImageUploaderProps) {
   const [url, setUrl] = useState<string>(defaultValue || "");
+  const [imgBroken, setImgBroken] = useState<boolean>(false);
   const [uploading, setUploading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const isLegacyMissingAsset =
+    url.includes("/assets/placeholder") ||
+    url.includes("/assets/article-") ||
+    url.includes("/assets/client-");
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -57,7 +63,10 @@ export default function ImageUploader({
           type="text"
           name={name}
           value={url}
-          onChange={(e) => setUrl(e.target.value)}
+          onChange={(e) => {
+            setUrl(e.target.value);
+            setImgBroken(false);
+          }}
           placeholder={placeholder}
           className="flex-1 p-2.5 sm:p-3 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-teal-600 focus:ring-1 focus:ring-teal-600 text-xs sm:text-sm transition-colors"
         />
@@ -92,9 +101,13 @@ export default function ImageUploader({
         {url && (
           <button
             type="button"
-            onClick={() => setUrl("")}
-            className="p-2.5 sm:p-3 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl border border-slate-200 transition-colors"
+            onClick={() => {
+              setUrl("");
+              setImgBroken(false);
+            }}
+            className="p-2.5 sm:p-3 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl border border-slate-200 transition-colors cursor-pointer"
             title="Hapus gambar"
+            aria-label="Hapus gambar"
           >
             <X className="w-4 h-4" />
           </button>
@@ -106,19 +119,28 @@ export default function ImageUploader({
       {url && (
         <div className="mt-2 flex items-center gap-3 p-2 bg-slate-50 border border-slate-200 rounded-xl">
           <div className="w-12 h-12 rounded-lg bg-white border border-slate-200 overflow-hidden flex items-center justify-center shrink-0">
-            <img
-              src={url}
-              alt="Preview"
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                (e.target as HTMLImageElement).style.display = "none";
-              }}
-            />
+            {!imgBroken && !isLegacyMissingAsset ? (
+              <img
+                src={url}
+                alt="Preview"
+                className="w-full h-full object-cover"
+                onError={() => setImgBroken(true)}
+              />
+            ) : (
+              <ImageIcon className="w-5 h-5 text-slate-400" />
+            )}
           </div>
           <div className="overflow-hidden">
             <span className="text-[11px] font-mono text-slate-500 truncate block">{url}</span>
-            <span className="text-[10px] text-emerald-600 font-semibold flex items-center gap-1">
-              <Check className="w-3 h-3" /> Gambar terpasang
+            <span
+              className={`text-[10px] font-semibold flex items-center gap-1 ${
+                imgBroken || isLegacyMissingAsset ? "text-amber-600" : "text-emerald-600"
+              }`}
+            >
+              <Check className="w-3 h-3" />{" "}
+              {imgBroken || isLegacyMissingAsset
+                ? "Placeholder lama (silakan upload gambar baru)"
+                : "Gambar terpasang"}
             </span>
           </div>
         </div>

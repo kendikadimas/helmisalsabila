@@ -1,8 +1,17 @@
+import type { Metadata } from "next";
 import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { logoutAction } from "@/actions/auth";
 import AdminSidebar from "@/components/AdminSidebar";
 import AdminHeaderBreadcrumb from "@/components/AdminHeaderBreadcrumb";
+
+export const metadata: Metadata = {
+  title: {
+    default: "Admin Dashboard | Helmi Salsabila",
+    template: "%s | Admin CMS",
+  },
+  robots: { index: false, follow: false },
+};
 
 export default async function AdminDashboardLayout({
   children,

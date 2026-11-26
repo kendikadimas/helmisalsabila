@@ -143,7 +143,8 @@ export default function OrdersClientManager({ initialOrders }: { initialOrders: 
         <button
           type="button"
           onClick={handleExportCSV}
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-700 hover:text-slate-900 transition-colors shadow-xs cursor-pointer self-start sm:self-auto"
+          disabled={filteredOrders.length === 0}
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-700 hover:text-slate-900 transition-colors shadow-xs cursor-pointer self-start sm:self-auto disabled:opacity-40 disabled:cursor-not-allowed"
         >
           <Download className="w-4 h-4 text-slate-500" />
           <span>Export CSV</span>
@@ -261,7 +262,9 @@ export default function OrdersClientManager({ initialOrders }: { initialOrders: 
               {filteredOrders.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="p-8 text-center text-slate-400">
-                    Tidak ada transaksi yang cocok dengan pencarian / filter.
+                    {orders.length === 0
+                      ? "Belum ada transaksi DOKU yang masuk."
+                      : "Tidak ada transaksi yang cocok dengan pencarian / filter."}
                   </td>
                 </tr>
               ) : (

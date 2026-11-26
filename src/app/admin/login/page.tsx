@@ -46,13 +46,16 @@ export default function AdminLoginPage() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-slate-300">Email Administrator</label>
+            <label htmlFor="admin-email" className="text-xs font-medium text-slate-300">
+              Email Administrator
+            </label>
             <div className="relative">
               <input
+                id="admin-email"
                 type="email"
                 name="email"
+                autoComplete="email"
                 required
-                defaultValue="admin@helmisalsabila.com"
                 placeholder="admin@helmisalsabila.com"
                 className="w-full pl-10 pr-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-hidden focus:ring-2 focus:ring-teal-500"
               />
@@ -61,13 +64,17 @@ export default function AdminLoginPage() {
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-medium text-slate-300">Password</label>
+            <label htmlFor="admin-password" className="text-xs font-medium text-slate-300">
+              Password
+            </label>
             <div className="relative">
               <input
+                id="admin-password"
                 type="password"
                 name="password"
+                autoComplete="current-password"
                 required
-                placeholder="••••••••"
+                placeholder="Masukkan password"
                 className="w-full pl-10 pr-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-500 focus:outline-hidden focus:ring-2 focus:ring-teal-500"
               />
               <Lock className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />

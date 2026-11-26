@@ -4,11 +4,10 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { Eye, Facebook } from "lucide-react";
-import DOMPurify from "isomorphic-dompurify";
 import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 import { getArticleBySlug, getArticles, getTrendingArticles, getAllTags } from "@/actions/articles";
 import { getSiteSettings } from "@/actions/settings";
-import { formatDateIndo, markdownToHtml } from "@/lib/utils";
+import { formatDateIndo, markdownToHtml, sanitizeHtml } from "@/lib/utils";
 import SectionHeader from "@/components/SectionHeader";
 import ShareButton from "@/components/ShareButton";
 import TableOfContents, { type TocHeading } from "@/components/TableOfContents";
@@ -69,7 +68,7 @@ export default async function DetailArtikelPage({
   const rawContent = article.content || "";
   const isHtmlContent = /<\/?[a-z][\s\S]*>/i.test(rawContent);
   const htmlSource = isHtmlContent ? rawContent : markdownToHtml(rawContent);
-  const cleanHtml = DOMPurify.sanitize(htmlSource);
+  const cleanHtml = sanitizeHtml(htmlSource);
   const headings: TocHeading[] = [];
   let headingIdx = 0;
   const processedHtml = cleanHtml.replace(

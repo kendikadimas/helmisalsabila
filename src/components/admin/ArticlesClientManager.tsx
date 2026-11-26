@@ -282,6 +282,7 @@ export default function ArticlesClientManager({
                   defaultValue={editingItem.categoryId || ""}
                   className="w-full p-3 bg-white border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-teal-600 transition-colors"
                 >
+                  <option value="">-- Tanpa Kategori --</option>
                   {categories.map((c) => (
                     <option key={c.id} value={c.id}>
                       {c.name}

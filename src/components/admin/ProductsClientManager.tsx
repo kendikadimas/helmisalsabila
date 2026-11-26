@@ -19,6 +19,7 @@ import {
 
 interface ProductItem {
   id: string;
+  categoryId?: string | null;
   title: string;
   slug: string;
   levelBadge: string;
@@ -33,7 +34,18 @@ interface ProductItem {
   totalSales: number;
 }
 
-export default function ProductsClientManager({ initialProducts }: { initialProducts: ProductItem[] }) {
+interface CategoryItem {
+  id: string;
+  name: string;
+}
+
+export default function ProductsClientManager({
+  initialProducts,
+  categories = [],
+}: {
+  initialProducts: ProductItem[];
+  categories?: CategoryItem[];
+}) {
   const [products, setProducts] = useState<ProductItem[]>(initialProducts);
   const [editingItem, setEditingItem] = useState<ProductItem | null>(null);
   const [curriculumItem, setCurriculumItem] = useState<ProductItem | null>(null);
@@ -151,9 +163,25 @@ export default function ProductsClientManager({ initialProducts }: { initialProd
             <input
               type="number"
               name="discountedPrice"
-              defaultValue="200000"
+              defaultValue="315000"
               className="w-full p-3 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-teal-600 transition-colors font-mono"
             />
+          </div>
+
+          <div className="space-y-1.5 md:col-span-3">
+            <label className="text-slate-700 font-medium">Kategori Produk</label>
+            <select
+              name="categoryId"
+              defaultValue=""
+              className="w-full p-3 bg-white border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-teal-600 transition-colors"
+            >
+              <option value="">-- Pilih Kategori (Opsional) --</option>
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.name}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="space-y-1.5 md:col-span-3">
@@ -345,14 +373,31 @@ export default function ProductsClientManager({ initialProducts }: { initialProd
               </div>
             </div>
 
-            <div className="space-y-1.5">
-              <label className="text-slate-700 font-medium">Level Badge</label>
-              <input
-                type="text"
-                name="levelBadge"
-                defaultValue={editingItem.levelBadge}
-                className="w-full p-3 bg-white border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-teal-600 transition-colors"
-              />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <label className="text-slate-700 font-medium">Level Badge</label>
+                <input
+                  type="text"
+                  name="levelBadge"
+                  defaultValue={editingItem.levelBadge}
+                  className="w-full p-3 bg-white border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-teal-600 transition-colors"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-slate-700 font-medium">Kategori Produk</label>
+                <select
+                  name="categoryId"
+                  defaultValue={editingItem.categoryId || ""}
+                  className="w-full p-3 bg-white border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-teal-600 transition-colors"
+                >
+                  <option value="">-- Tanpa Kategori --</option>
+                  {categories.map((cat) => (
+                    <option key={cat.id} value={cat.id}>
+                      {cat.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
 
             <ImageUploader

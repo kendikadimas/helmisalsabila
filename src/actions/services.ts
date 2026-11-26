@@ -228,6 +228,7 @@ export async function updateService(id: string, formData: FormData) {
     const shortDescription = formData.get("shortDescription") as string;
     const fullDescription = formData.get("fullDescription") as string;
     const thumbnailUrl = formData.get("thumbnailUrl") as string;
+    const categoryId = ((formData.get("categoryId") as string) || "").trim() || null;
     const priceStartingAt = formData.get("priceStartingAt") as string;
     const isFeatured = formData.get("isFeatured") === "true";
     const isActive = formData.get("isActive") !== "false";
@@ -247,6 +248,7 @@ export async function updateService(id: string, formData: FormData) {
         ...(slug ? { slug } : {}),
         shortDescription,
         fullDescription,
+        categoryId,
         ...(thumbnailUrl ? { thumbnailUrl } : {}),
         priceStartingAt: priceStartingAt ? priceStartingAt : null,
         features: features.length > 0 ? features : null,

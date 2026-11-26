@@ -121,18 +121,80 @@ export async function getAllProductsAdmin() {
       .from(schema.products)
       .orderBy(asc(schema.products.orderIndex), desc(schema.products.createdAt));
   } catch (error) {
-    console.error("Error fetching admin products:", error);
-    return [];
+    console.warn("Primary getAllProductsAdmin failed (possibly missing digital_access_url column), falling back:", error);
+    try {
+      const rows = await db
+        .select({
+          id: schema.products.id,
+          categoryId: schema.products.categoryId,
+          title: schema.products.title,
+          slug: schema.products.slug,
+          thumbnailUrl: schema.products.thumbnailUrl,
+          levelBadge: schema.products.levelBadge,
+          originalPrice: schema.products.originalPrice,
+          discountPercent: schema.products.discountPercent,
+          discountedPrice: schema.products.discountedPrice,
+          totalSales: schema.products.totalSales,
+          aboutProduct: schema.products.aboutProduct,
+          whatYouGet: schema.products.whatYouGet,
+          suitableFor: schema.products.suitableFor,
+          liveDemoUrl: schema.products.liveDemoUrl,
+          purchaseLinkExternal: schema.products.purchaseLinkExternal,
+          isFeatured: schema.products.isFeatured,
+          isPublished: schema.products.isPublished,
+          orderIndex: schema.products.orderIndex,
+          createdAt: schema.products.createdAt,
+          updatedAt: schema.products.updatedAt,
+        })
+        .from(schema.products)
+        .orderBy(asc(schema.products.orderIndex), desc(schema.products.createdAt));
+      return rows.map((r) => ({ ...r, digitalAccessUrl: null as string | null }));
+    } catch (fallbackErr) {
+      console.error("Error fetching admin products:", fallbackErr);
+      return [];
+    }
   }
 }
 
 export async function getProductBySlug(slug: string) {
   try {
-    const [product] = await db
-      .select()
-      .from(schema.products)
-      .where(eq(schema.products.slug, slug))
-      .limit(1);
+    let product: typeof schema.products.$inferSelect | null = null;
+    try {
+      const [row] = await db
+        .select()
+        .from(schema.products)
+        .where(eq(schema.products.slug, slug))
+        .limit(1);
+      product = row || null;
+    } catch {
+      const [row] = await db
+        .select({
+          id: schema.products.id,
+          categoryId: schema.products.categoryId,
+          title: schema.products.title,
+          slug: schema.products.slug,
+          thumbnailUrl: schema.products.thumbnailUrl,
+          levelBadge: schema.products.levelBadge,
+          originalPrice: schema.products.originalPrice,
+          discountPercent: schema.products.discountPercent,
+          discountedPrice: schema.products.discountedPrice,
+          totalSales: schema.products.totalSales,
+          aboutProduct: schema.products.aboutProduct,
+          whatYouGet: schema.products.whatYouGet,
+          suitableFor: schema.products.suitableFor,
+          liveDemoUrl: schema.products.liveDemoUrl,
+          purchaseLinkExternal: schema.products.purchaseLinkExternal,
+          isFeatured: schema.products.isFeatured,
+          isPublished: schema.products.isPublished,
+          orderIndex: schema.products.orderIndex,
+          createdAt: schema.products.createdAt,
+          updatedAt: schema.products.updatedAt,
+        })
+        .from(schema.products)
+        .where(eq(schema.products.slug, slug))
+        .limit(1);
+      product = row ? { ...row, digitalAccessUrl: null } : null;
+    }
 
     if (!product) return null;
 
@@ -185,6 +247,7 @@ export async function createProduct(formData: FormData) {
     const slug = existing.length > 0 ? `${baseSlug}-${Date.now().toString(36)}` : baseSlug;
 
     const levelBadge = (formData.get("levelBadge") as string) || "Semua Level";
+    const categoryId = ((formData.get("categoryId") as string) || "").trim() || null;
     const originalPrice = (formData.get("originalPrice") as string) || "0";
     const discountPercent = parseInt((formData.get("discountPercent") as string) || "0", 10);
     const discountedPrice = (formData.get("discountedPrice") as string) || originalPrice;
@@ -201,6 +264,7 @@ export async function createProduct(formData: FormData) {
 
     await db.insert(schema.products).values({
       id,
+      categoryId,
       title,
       slug,
       levelBadge,
@@ -249,6 +313,7 @@ export async function updateProduct(id: string, formData: FormData) {
     if (!session) return { success: false, error: "Unauthorized" };
 
     const title = formData.get("title") as string;
+    const categoryId = ((formData.get("categoryId") as string) || "").trim() || null;
     const levelBadge = (formData.get("levelBadge") as string) || "Semua Level";
     const originalPrice = (formData.get("originalPrice") as string) || "0";
     const discountedPrice = (formData.get("discountedPrice") as string) || originalPrice;
@@ -265,6 +330,7 @@ export async function updateProduct(id: string, formData: FormData) {
       .update(schema.products)
       .set({
         title,
+        categoryId,
         levelBadge,
         originalPrice,
         discountedPrice,
