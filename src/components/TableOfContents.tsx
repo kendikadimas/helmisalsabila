@@ -24,37 +24,46 @@ export default function TableOfContents({
   const hasMore = items.length > 4;
 
   return (
-    <div className="p-5 rounded-2xl border border-slate-200 bg-white space-y-4 shadow-xs">
-      <h3 className="font-bold text-slate-900 text-sm">Table of Content</h3>
-      <div className="space-y-2 text-xs">
-        {visibleItems.map((item, idx) => (
-          <a
-            key={item.id}
-            href={`#${item.id}`}
-            className={`p-3 rounded-lg flex items-center gap-2 transition-colors ${
-              idx === 0
-                ? "bg-[#1E3A5F] text-white font-medium"
-                : "border border-slate-200 text-slate-700 hover:bg-slate-50"
-            }`}
-          >
-            <span className={`font-extrabold ${idx === 0 ? "text-teal-300" : "text-slate-400"}`}>
-              {String(idx + 1).padStart(2, "0")}
-            </span>
-            <span className="truncate">{item.text}</span>
-          </a>
-        ))}
+    <div className="space-y-3.5">
+      <div className="flex items-center gap-2">
+        <div className="w-1 h-5 bg-[#26A69A] rounded-full shrink-0" />
+        <h3 className="font-bold text-slate-900 text-sm">Table of Content</h3>
       </div>
-      {hasMore && (
-        <button
-          type="button"
-          onClick={() => setExpanded(!expanded)}
-          className="w-full flex items-center justify-center gap-1 text-xs text-slate-500 hover:text-slate-900 pt-1 cursor-pointer"
-        >
-          <span>{expanded ? "Tampilkan Lebih Sedikit" : "Lihat Lebih Banyak"}</span>
-          {expanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-        </button>
-      )}
+
+      <div className="p-4 rounded-2xl border border-[#99F6E4] bg-white space-y-2.5 shadow-2xs">
+        <div className="space-y-2 text-xs">
+          {visibleItems.map((item, idx) => (
+            <a
+              key={item.id}
+              href={`#${item.id}`}
+              className={`p-3 rounded-xl flex items-start gap-2.5 transition-colors ${
+                idx === 0
+                  ? "bg-[#1E3A5F] text-white font-semibold"
+                  : "border border-[#38BDF8]/60 bg-[#F8FDFF] text-slate-700 hover:bg-[#E6FAF8]/60"
+              }`}
+            >
+              <span
+                className={`font-extrabold shrink-0 ${
+                  idx === 0 ? "text-[#F59E0B]" : "text-[#2A5D69]"
+                }`}
+              >
+                {String(idx + 1).padStart(2, "0")}
+              </span>
+              <span className="line-clamp-2 leading-snug">{item.text}</span>
+            </a>
+          ))}
+        </div>
+        {hasMore && (
+          <button
+            type="button"
+            onClick={() => setExpanded(!expanded)}
+            className="w-full flex items-center justify-start gap-1 text-xs font-semibold text-slate-700 hover:text-[#1E3A5F] pt-1 px-1 cursor-pointer"
+          >
+            <span>{expanded ? "Tampilkan Lebih Sedikit" : "Lihat Lebih Banyak"}</span>
+            {expanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+          </button>
+        )}
+      </div>
     </div>
   );
 }
-

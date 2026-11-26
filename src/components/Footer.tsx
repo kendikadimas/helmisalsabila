@@ -1,7 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { MapPin, Linkedin, Youtube, Facebook, Instagram, Music2 } from "lucide-react";
-import { WhatsAppIcon } from "@/components/WhatsAppIcon";
+import { MapPin, PhoneCall } from "lucide-react";
 import { getSiteSettings } from "@/actions/settings";
 
 export default async function Footer() {
@@ -14,11 +13,11 @@ export default async function Footer() {
   const socials = settings?.socialLinks || {};
 
   return (
-    <footer className="bg-white border-t border-slate-100 mt-20 pt-16 pb-12 text-slate-600">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 pb-12 border-b border-slate-100">
+    <footer className="bg-white border-t border-slate-100 mt-16 pt-14 pb-10 text-slate-600">
+      <div className="max-w-[1440px] mx-auto px-6 sm:px-12 lg:px-[96px]">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-10 pb-12 border-b border-slate-100">
           {/* Col 1: Identity from DB */}
-          <div className="space-y-4">
+          <div className="lg:col-span-4 space-y-3.5">
             <div className="w-12 h-12 relative rounded-full overflow-hidden flex items-center justify-center">
               <Image
                 src="/logoku-1.png"
@@ -29,37 +28,41 @@ export default async function Footer() {
               />
             </div>
             <div>
-              <h3 className="font-bold text-slate-900 text-lg">{siteName}</h3>
-              <p className="text-xs text-slate-500 mt-1 leading-relaxed">{bio}</p>
+              <h3 className="font-bold text-slate-900 text-base">{siteName}</h3>
+              <p className="text-xs text-slate-500 mt-1.5 leading-relaxed max-w-xs">{bio}</p>
             </div>
           </div>
 
           {/* Col 2: Kontak Resmi from DB */}
-          <div className="space-y-3">
+          <div className="lg:col-span-3 space-y-3.5">
             <h4 className="font-bold text-slate-900 text-sm">Kontak Resmi</h4>
-            <ul className="space-y-2.5 text-xs text-slate-600">
+            <ul className="space-y-3 text-xs text-slate-600">
               <li className="flex items-center gap-2.5">
                 <a
                   href={`https://wa.me/${phone.replace(/[^0-9]/g, "")}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex items-center gap-2.5 hover:text-emerald-600 transition-colors"
+                  className="flex items-center gap-2.5 hover:text-[#1E3A5F] transition-colors"
                 >
-                  <WhatsAppIcon className="w-4 h-4 text-emerald-600 shrink-0" fill="currentColor" />
+                  <span className="w-6 h-6 rounded-full bg-[#E6FAF8] text-[#2A5D69] flex items-center justify-center shrink-0">
+                    <PhoneCall className="w-3.5 h-3.5" />
+                  </span>
                   <span>{phone}</span>
                 </a>
               </li>
               <li className="flex items-start gap-2.5">
-                <MapPin className="w-4 h-4 text-teal-600 shrink-0 mt-0.5" />
-                <span>{address}</span>
+                <span className="w-6 h-6 rounded-full bg-[#E6FAF8] text-[#2A5D69] flex items-center justify-center shrink-0">
+                  <MapPin className="w-3.5 h-3.5" />
+                </span>
+                <span className="pt-0.5 leading-relaxed">{address}</span>
               </li>
             </ul>
           </div>
 
           {/* Col 3: Navigasi Perusahaan */}
-          <div className="space-y-3">
+          <div className="lg:col-span-2 space-y-3.5">
             <h4 className="font-bold text-slate-900 text-sm">Navigasi Perusahaan</h4>
-            <ul className="space-y-2 text-xs">
+            <ul className="space-y-2.5 text-xs text-slate-600">
               <li>
                 <Link href="/layanan" className="hover:text-[#1E3A5F] transition-colors">
                   Layanan & Portfolio
@@ -84,18 +87,18 @@ export default async function Footer() {
           </div>
 
           {/* Col 4: Kontak & Sosial Media from DB */}
-          <div className="space-y-3">
+          <div className="lg:col-span-3 space-y-3.5">
             <h4 className="font-bold text-slate-900 text-sm">Kontak & Sosial Media</h4>
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-3">
               {socials.linkedin && (
                 <a
                   href={socials.linkedin}
                   target="_blank"
                   rel="noreferrer"
-                  className="w-7 h-7 rounded bg-[#0A66C2] text-white flex items-center justify-center hover:opacity-90 transition-opacity"
+                  className="w-7 h-7 flex items-center justify-center hover:scale-110 transition-transform"
                   aria-label="LinkedIn"
                 >
-                  <Linkedin className="w-4 h-4" />
+                  <img src="/assets/thesvg-color_linkedin.png" alt="LinkedIn" className="w-6 h-6 object-contain" />
                 </a>
               )}
               {socials.youtube && (
@@ -103,10 +106,10 @@ export default async function Footer() {
                   href={socials.youtube}
                   target="_blank"
                   rel="noreferrer"
-                  className="w-7 h-7 rounded bg-[#FF0000] text-white flex items-center justify-center hover:opacity-90 transition-opacity"
+                  className="w-7 h-7 flex items-center justify-center hover:scale-110 transition-transform"
                   aria-label="YouTube"
                 >
-                  <Youtube className="w-4 h-4" />
+                  <img src="/assets/thesvg-color_youtube.png" alt="YouTube" className="w-6 h-6 object-contain" />
                 </a>
               )}
               {socials.facebook && (
@@ -114,10 +117,10 @@ export default async function Footer() {
                   href={socials.facebook}
                   target="_blank"
                   rel="noreferrer"
-                  className="w-7 h-7 rounded bg-[#1877F2] text-white flex items-center justify-center hover:opacity-90 transition-opacity"
+                  className="w-7 h-7 flex items-center justify-center hover:scale-110 transition-transform"
                   aria-label="Facebook"
                 >
-                  <Facebook className="w-4 h-4" />
+                  <img src="/assets/logos_facebook.png" alt="Facebook" className="w-6 h-6 object-contain" />
                 </a>
               )}
               {socials.instagram && (
@@ -125,10 +128,10 @@ export default async function Footer() {
                   href={socials.instagram}
                   target="_blank"
                   rel="noreferrer"
-                  className="w-7 h-7 rounded bg-gradient-to-tr from-[#F58529] via-[#DD2A7B] to-[#8134AF] text-white flex items-center justify-center hover:opacity-90 transition-opacity"
+                  className="w-7 h-7 flex items-center justify-center hover:scale-110 transition-transform"
                   aria-label="Instagram"
                 >
-                  <Instagram className="w-4 h-4" />
+                  <img src="/assets/skill-icons_instagram.png" alt="Instagram" className="w-6 h-6 object-contain" />
                 </a>
               )}
               {socials.threads && (
@@ -136,10 +139,10 @@ export default async function Footer() {
                   href={socials.threads}
                   target="_blank"
                   rel="noreferrer"
-                  className="w-7 h-7 rounded bg-black text-white flex items-center justify-center hover:opacity-90 transition-opacity"
+                  className="w-7 h-7 flex items-center justify-center hover:scale-110 transition-transform"
                   aria-label="Threads"
                 >
-                  <span className="text-xs font-bold font-mono">@</span>
+                  <img src="/assets/mingcute_threads-line.png" alt="Threads" className="w-6 h-6 object-contain" />
                 </a>
               )}
               {socials.tiktok && (
@@ -147,10 +150,10 @@ export default async function Footer() {
                   href={socials.tiktok}
                   target="_blank"
                   rel="noreferrer"
-                  className="w-7 h-7 rounded bg-black text-white flex items-center justify-center hover:opacity-90 transition-opacity"
+                  className="w-7 h-7 flex items-center justify-center hover:scale-110 transition-transform"
                   aria-label="TikTok"
                 >
-                  <Music2 className="w-4 h-4" />
+                  <img src="/assets/ic_baseline-tiktok.png" alt="TikTok" className="w-6 h-6 object-contain" />
                 </a>
               )}
             </div>

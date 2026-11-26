@@ -240,7 +240,11 @@ export async function getAllCategories(type?: "service" | "product" | "article" 
   try {
     let query = db.select().from(schema.categories);
     if (type) {
-      query = query.where(eq(schema.categories.type, type)) as any;
+      if (type === "general") {
+        query = query.where(eq(schema.categories.type, "general")) as any;
+      } else {
+        query = query.where(or(eq(schema.categories.type, type), eq(schema.categories.type, "general"))) as any;
+      }
     }
     return await query.orderBy(asc(schema.categories.orderIndex));
   } catch (error) {

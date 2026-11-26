@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     "Eksplorasi layanan konsultasi data, automasi bisnis, perancangan dashboard, dan portofolio implementasi solusi digital.",
 };
 
-const PAGE_SIZE = 9;
+const PAGE_SIZE = 15;
 
 export default async function LayananPage({
   searchParams,
@@ -31,6 +31,8 @@ export default async function LayananPage({
   let services: any[] = [];
   let categories: any[] = [];
   let totalCount = 0;
+  let freeCount = 0;
+  let paidCount = 0;
   let totalPages = 1;
 
   try {
@@ -49,15 +51,30 @@ export default async function LayananPage({
         categorySlug: params.kategori,
         priceType: params.harga,
       }),
+      getServicesCount({
+        searchQuery: params.q,
+        categorySlug: params.kategori,
+        priceType: "gratis",
+      }),
+      getServicesCount({
+        searchQuery: params.q,
+        categorySlug: params.kategori,
+        priceType: "berbayar",
+      }),
     ]);
 
     services = res[0] || [];
     categories = res[1] || [];
     totalCount = res[2] || 0;
+    freeCount = res[3] || 0;
+    paidCount = res[4] || 0;
     totalPages = Math.ceil(totalCount / PAGE_SIZE);
   } catch (error) {
     console.error("Error loading services page:", error);
   }
+
+  const isValidServiceImg = (url?: string | null) =>
+    !!url && !url.includes("placeholder") && !url.includes("/assets/service-");
 
   return (
     <div className="space-y-10 pb-16">
@@ -78,6 +95,8 @@ export default async function LayananPage({
               currentCategory={params.kategori}
               currentSort={params.sort}
               currentPriceType={params.harga}
+              freeCount={freeCount}
+              paidCount={paidCount}
               basePath="/layanan"
             />
           </div>
@@ -89,7 +108,7 @@ export default async function LayananPage({
                 Tidak ada layanan yang sesuai dengan filter atau pencarian Anda.
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
                 {services.map((srv) => (
                   <Link
                     key={srv.id}
@@ -97,12 +116,17 @@ export default async function LayananPage({
                     className="group bg-white rounded-2xl border border-slate-200 p-3.5 shadow-xs hover:shadow-lg transition-all flex flex-col justify-between"
                   >
                     <div>
-                      <div className="aspect-[16/10] bg-slate-950 rounded-xl relative overflow-hidden flex items-center justify-center p-3">
-                        {srv.slug.includes("data-analyst") ? (
+                      <div className="aspect-[16/10] bg-slate-950 rounded-xl relative overflow-hidden flex items-center justify-center">
+                        {isValidServiceImg(srv.thumbnailUrl) ? (
+                          <img
+                            src={srv.thumbnailUrl!}
+                            alt={srv.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                        ) : srv.slug.includes("data-analyst") ? (
                           <div className="w-full h-full bg-[#020B14] rounded-lg flex flex-col items-center justify-center text-center p-3 relative overflow-hidden">
                             <div className="absolute -top-6 -left-6 w-24 h-24 bg-blue-600/30 rounded-full blur-xl pointer-events-none" />
                             <div className="absolute -bottom-6 -right-6 w-24 h-24 bg-cyan-600/20 rounded-full blur-xl pointer-events-none" />
-
                             <span className="absolute top-2 left-2.5 text-[8px] sm:text-[9px] tracking-wider text-cyan-200 font-bold uppercase">
                               WITHHELS
                             </span>
@@ -150,7 +174,7 @@ export default async function LayananPage({
                           </div>
                         )}
                       </div>
-                      <div className="pt-3 pb-1 px-1">
+                      <div className="pt-3.5 pb-1 px-1">
                         <h3 className="font-bold text-slate-900 text-sm sm:text-base group-hover:text-[#1E3A5F] transition-colors line-clamp-2">
                           {srv.title}
                         </h3>
@@ -161,7 +185,9 @@ export default async function LayananPage({
                       <div className="border-t border-slate-100 my-2.5" />
                       <div className="px-1 pb-1 flex items-center gap-2 text-xs">
                         <span className="text-slate-500 font-normal">Harga Mulai</span>
-                        <span className="font-bold text-[#059669] text-xs sm:text-sm">{formatRupiah(srv.priceStartingAt)}</span>
+                        <span className="font-bold text-[#059669] text-xs sm:text-sm">
+                          {formatRupiah(srv.priceStartingAt)}
+                        </span>
                       </div>
                     </div>
                   </Link>

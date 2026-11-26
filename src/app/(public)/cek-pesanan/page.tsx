@@ -9,7 +9,7 @@ import { WhatsAppIcon } from "@/components/WhatsAppIcon";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Cek Status Pesanan | Helmi Salsabila",
+  title: "Cek Status Pesanan",
   description: "Lacak status transaksi dan akses produk digital Anda dengan nomor invoice atau email.",
 };
 

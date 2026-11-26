@@ -31,66 +31,87 @@ export default function Pagination({
   const startItem = totalDataCount === 0 ? 0 : (currentPage - 1) * pageSize + 1;
   const endItem = Math.min(currentPage * pageSize, totalDataCount);
 
+  // Generate smart page numbers with ellipsis when totalPages > 6
+  const getVisiblePages = (): (number | "...")[] => {
+    if (totalPages <= 6) {
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+    if (currentPage <= 3) {
+      return [1, 2, 3, "...", totalPages - 1, totalPages];
+    }
+    if (currentPage >= totalPages - 2) {
+      return [1, 2, "...", totalPages - 2, totalPages - 1, totalPages];
+    }
+    return [1, "...", currentPage - 1, currentPage, currentPage + 1, "...", totalPages];
+  };
+
+  const visiblePages = getVisiblePages();
+
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-slate-100 text-xs text-slate-500 font-medium">
+    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 text-xs text-slate-600 font-medium">
       <div>
-        Menampilkan <span className="font-bold text-slate-800">{startItem}-{endItem}</span> dari{" "}
-        <span className="font-bold text-slate-800">{totalDataCount}</span> data
+        Menampilkan <span className="font-semibold text-slate-900">{startItem}-{endItem}</span> dari{" "}
+        <span className="font-semibold text-slate-900">{totalDataCount.toLocaleString("id-ID")}</span> data
       </div>
 
       {totalPages > 1 && (
-        <div className="flex items-center gap-1.5">
+        <div className="flex flex-wrap items-center justify-center gap-1.5">
           {/* Previous Button */}
           {currentPage > 1 ? (
             <Link
               href={createPageUrl(currentPage - 1)}
-              className="p-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 transition-colors shadow-2xs flex items-center justify-center"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-slate-700 hover:bg-slate-100 transition-colors font-medium"
               aria-label="Previous Page"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Previous</span>
             </Link>
           ) : (
-            <div className="p-2 rounded-lg border border-slate-100 bg-slate-50 text-slate-300 opacity-50 cursor-not-allowed flex items-center justify-center">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-slate-300 cursor-not-allowed">
               <ArrowLeft className="w-3.5 h-3.5" />
-            </div>
+              <span>Previous</span>
+            </span>
           )}
 
           {/* Page Numbers */}
-          {Array.from({ length: totalPages }).map((_, idx) => {
-            const pageNum = idx + 1;
-            const isCurrent = pageNum === currentPage;
-
-            return isCurrent ? (
+          {visiblePages.map((item, idx) =>
+            item === "..." ? (
+              <span key={`ellipsis-${idx}`} className="w-8 h-8 flex items-center justify-center text-slate-400">
+                ...
+              </span>
+            ) : item === currentPage ? (
               <span
-                key={pageNum}
+                key={item}
                 className="w-8 h-8 rounded-lg bg-[#1E3A5F] text-white font-bold flex items-center justify-center text-xs shadow-xs"
               >
-                {pageNum}
+                {item}
               </span>
             ) : (
               <Link
-                key={pageNum}
-                href={createPageUrl(pageNum)}
-                className="w-8 h-8 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-medium flex items-center justify-center text-xs transition-colors shadow-2xs"
+                key={item}
+                href={createPageUrl(item)}
+                className="w-8 h-8 rounded-lg hover:bg-slate-100 text-slate-700 font-medium flex items-center justify-center text-xs transition-colors"
               >
-                {pageNum}
+                {item}
               </Link>
-            );
-          })}
+            )
+          )}
 
           {/* Next Button */}
           {currentPage < totalPages ? (
             <Link
               href={createPageUrl(currentPage + 1)}
-              className="p-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 transition-colors shadow-2xs flex items-center justify-center"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-slate-900 hover:bg-slate-100 transition-colors font-semibold"
               aria-label="Next Page"
             >
+              <span>Next</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           ) : (
-            <div className="p-2 rounded-lg border border-slate-100 bg-slate-50 text-slate-300 opacity-50 cursor-not-allowed flex items-center justify-center">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-slate-300 cursor-not-allowed">
+              <span>Next</span>
               <ArrowRight className="w-3.5 h-3.5" />
-            </div>
+            </span>
           )}
         </div>
       )}

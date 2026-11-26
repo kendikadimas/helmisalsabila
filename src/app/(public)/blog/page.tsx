@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     "Kumpulan tulisan seputar data analytics, tips spreadsheet, automasi kerja, dan studi kasus implementasi teknologi.",
 };
 
-const PAGE_SIZE = 9;
+const PAGE_SIZE = 15;
 
 export default async function BlogPage({
   searchParams,
@@ -80,7 +80,7 @@ export default async function BlogPage({
       <div className="max-w-[1440px] mx-auto px-6 sm:px-12 lg:px-[96px] space-y-12">
         {/* 1. Artikel Populer (Top 2 Featured Large Cards from DB) */}
         {popularArticles.length > 0 && (
-          <section className="space-y-6">
+          <section className="space-y-5">
             <SectionHeader title="Artikel Populer" />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -88,20 +88,20 @@ export default async function BlogPage({
                 <Link
                   key={art.id}
                   href={`/blog/${art.slug}`}
-                  className="group relative aspect-[16/9] rounded-3xl overflow-hidden shadow-sm hover:shadow-lg transition-all flex flex-col justify-end p-6 sm:p-8 bg-slate-900"
+                  className="group relative aspect-[16/9] rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all flex flex-col justify-end p-6 sm:p-7 bg-slate-900"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent z-10" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent z-10" />
                   <img
                     src={getValidArticleImg(art.featuredImage, idx)}
                     alt={art.title}
                     className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
 
-                  <div className="relative z-20 space-y-2">
-                    <h3 className="text-lg sm:text-xl font-bold text-white leading-snug group-hover:text-teal-300 transition-colors">
+                  <div className="relative z-20 space-y-1.5">
+                    <h3 className="text-base sm:text-xl font-bold text-white leading-snug group-hover:text-teal-300 transition-colors line-clamp-2">
                       {art.title}
                     </h3>
-                    <div className="text-xs text-slate-300">{formatDateIndo(art.publishedAt)}</div>
+                    <div className="text-xs text-slate-200/90">{formatDateIndo(art.publishedAt)}</div>
                   </div>
                 </Link>
               ))}
@@ -110,7 +110,7 @@ export default async function BlogPage({
         )}
 
         {/* 2. Semua Artikel Section */}
-        <section className="space-y-6">
+        <section className="space-y-5">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <SectionHeader title="Semua Artikel" />
             {params.tag && (
@@ -124,14 +124,14 @@ export default async function BlogPage({
             )}
           </div>
 
-          {/* Category Filter Pills (Dynamically from Database) */}
+          {/* Category Filter Pills matching Artikel.png */}
           <div className="flex items-center gap-2 overflow-x-auto pb-3 pt-1 no-scrollbar text-xs">
             <Link
               href="/blog"
               className={`px-4 py-2 rounded-lg border shrink-0 transition-colors ${
                 !params.kategori || params.kategori === "all"
-                  ? "border-[#1E3A5F] bg-[#1E3A5F] text-white font-bold"
-                  : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                  ? "border-[#1E3A5F] bg-[#E6FAF8] text-[#1E3A5F] font-bold"
+                  : "border-slate-200 bg-white text-slate-400 hover:text-slate-700 hover:bg-slate-50"
               }`}
             >
               Semua Kategori
@@ -142,8 +142,8 @@ export default async function BlogPage({
                 href={`/blog?kategori=${cat.slug}`}
                 className={`px-4 py-2 rounded-lg border shrink-0 transition-colors ${
                   params.kategori === cat.slug
-                    ? "border-[#1E3A5F] bg-[#1E3A5F] text-white font-bold"
-                    : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                    ? "border-[#1E3A5F] bg-[#E6FAF8] text-[#1E3A5F] font-bold"
+                    : "border-slate-200 bg-white text-slate-400 hover:text-slate-700 hover:bg-slate-50"
                 }`}
               >
                 {cat.name}
@@ -151,37 +151,28 @@ export default async function BlogPage({
             ))}
           </div>
 
-          {/* Articles Grid (3 Columns) */}
+          {/* Clean Borderless Editorial Articles Grid (3 Columns) matching Artikel.png */}
           {articles.length === 0 ? (
             <div className="text-center py-16 bg-white rounded-2xl border border-slate-200 text-slate-500 text-xs">
               Tidak ada artikel yang sesuai dengan filter atau pencarian Anda.
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-8 pt-2">
               {articles.map((art, idx) => (
-                <Link
-                  key={art.id}
-                  href={`/blog/${art.slug}`}
-                  className="group bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs hover:shadow-lg transition-all flex flex-col justify-between"
-                >
-                  <div>
-                    <div className="aspect-[16/10] bg-slate-900 relative overflow-hidden flex items-center justify-center text-white">
-                      <img
-                        src={getValidArticleImg(art.featuredImage, idx)}
-                        alt={art.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                    </div>
-
-                    <div className="p-5 space-y-2">
-                      <h3 className="font-bold text-slate-900 text-xs sm:text-sm group-hover:text-[#1E3A5F] transition-colors line-clamp-2">
-                        {art.title}
-                      </h3>
-                    </div>
+                <Link key={art.id} href={`/blog/${art.slug}`} className="group flex flex-col space-y-3">
+                  <div className="aspect-[16/10] bg-slate-900 rounded-2xl relative overflow-hidden shadow-xs">
+                    <img
+                      src={getValidArticleImg(art.featuredImage, idx)}
+                      alt={art.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
                   </div>
 
-                  <div className="px-5 pb-5 text-[11px] text-slate-400 border-t border-slate-100">
-                    {formatDateIndo(art.publishedAt)}
+                  <div className="space-y-1.5 px-0.5">
+                    <h3 className="font-bold text-slate-900 text-sm sm:text-[15px] group-hover:text-[#1E3A5F] transition-colors line-clamp-2 leading-snug">
+                      {art.title}
+                    </h3>
+                    <div className="text-xs text-slate-400">{formatDateIndo(art.publishedAt)}</div>
                   </div>
                 </Link>
               ))}

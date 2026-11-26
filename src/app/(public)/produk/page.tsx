@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     "Katalog template spreadsheet, mini course praktis, dan aset digital siap pakai untuk kebutuhan profesional dan bisnis.",
 };
 
-const PAGE_SIZE = 9;
+const PAGE_SIZE = 15;
 
 export default async function ProdukPage({
   searchParams,
@@ -31,6 +31,8 @@ export default async function ProdukPage({
   let products: any[] = [];
   let categories: any[] = [];
   let totalCount = 0;
+  let freeCount = 0;
+  let paidCount = 0;
   let totalPages = 1;
 
   try {
@@ -49,11 +51,23 @@ export default async function ProdukPage({
         categorySlug: params.kategori,
         priceType: params.harga,
       }),
+      getProductsCount({
+        searchQuery: params.q,
+        categorySlug: params.kategori,
+        priceType: "gratis",
+      }),
+      getProductsCount({
+        searchQuery: params.q,
+        categorySlug: params.kategori,
+        priceType: "berbayar",
+      }),
     ]);
 
     products = res[0] || [];
     categories = res[1] || [];
     totalCount = res[2] || 0;
+    freeCount = res[3] || 0;
+    paidCount = res[4] || 0;
     totalPages = Math.ceil(totalCount / PAGE_SIZE);
   } catch (error) {
     console.error("Error loading products page:", error);
@@ -71,26 +85,28 @@ export default async function ProdukPage({
 
       <div className="max-w-[1440px] mx-auto px-6 sm:px-12 lg:px-[96px]">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Sidebar Filter (Categories from DB) */}
+          {/* Sidebar Filter (Categories & real DB price counts) */}
           <div className="lg:col-span-1">
             <FilterSidebar
               categories={categories}
               currentCategory={params.kategori}
               currentSort={params.sort}
               currentPriceType={params.harga}
+              freeCount={freeCount}
+              paidCount={paidCount}
               basePath="/produk"
             />
           </div>
 
-          {/* Product Cards Grid (3 Columns) */}
+          {/* Product Cards Grid (3 Columns, padded rounded thumbnails matching Produk.png) */}
           <div className="lg:col-span-3 space-y-8">
             {products.length === 0 ? (
               <div className="text-center py-16 bg-white rounded-2xl border border-slate-200 text-slate-500 text-xs">
                 Tidak ada produk digital yang sesuai dengan filter atau pencarian Anda.
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                {products.map((prd, idx) => {
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                {products.map((prd) => {
                   const rawThumb = prd.thumbnailUrl || "";
                   const resolvedThumb =
                     !rawThumb || rawThumb.includes("placeholder")
@@ -103,46 +119,53 @@ export default async function ProdukPage({
                             ? "/assets/product3.png"
                             : rawThumb;
                   return (
-                  <Link
-                    key={prd.id}
-                    href={`/produk/${prd.slug}`}
-                    className="group bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs hover:shadow-lg transition-all flex flex-col justify-between"
-                  >
-                    <div>
-                      <div className="aspect-[16/11] bg-gradient-to-br from-slate-800 to-slate-900 relative overflow-hidden flex items-center justify-center text-white">
-                        {resolvedThumb ? (
-                          <img
-                            src={resolvedThumb}
-                            alt={prd.title}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                          />
-                        ) : (
-                          <div className="p-6 flex items-center justify-center w-full h-full">
-                            <div className="w-28 h-36 bg-gradient-to-tr from-amber-500 to-teal-400 rounded-lg shadow-2xl p-3 flex flex-col justify-between text-slate-950 font-extrabold text-xs transform group-hover:scale-105 transition-transform">
-                              <span className="text-[10px] tracking-wider uppercase">DIGITAL PRODUCT</span>
-                              <span className="text-center text-xs leading-tight font-bold line-clamp-2">{prd.title}</span>
-                              <div className="flex items-center justify-end gap-0.5">
-                                {[...Array(5)].map((_, i) => (
-                                  <Star key={i} className="w-2 h-2 fill-slate-900 text-slate-900" />
-                                ))}
+                    <Link
+                      key={prd.id}
+                      href={`/produk/${prd.slug}`}
+                      className="group bg-white rounded-2xl border border-slate-200 p-3.5 shadow-xs hover:shadow-lg transition-all flex flex-col justify-between"
+                    >
+                      <div>
+                        <div className="aspect-[16/11] bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl relative overflow-hidden flex items-center justify-center text-white">
+                          {resolvedThumb ? (
+                            <img
+                              src={resolvedThumb}
+                              alt={prd.title}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            />
+                          ) : (
+                            <div className="p-6 flex items-center justify-center w-full h-full">
+                              <div className="w-28 h-36 bg-gradient-to-tr from-amber-500 to-teal-400 rounded-lg shadow-2xl p-3 flex flex-col justify-between text-slate-950 font-extrabold text-xs transform group-hover:scale-105 transition-transform">
+                                <span className="text-[10px] tracking-wider uppercase">DIGITAL PRODUCT</span>
+                                <span className="text-center text-xs leading-tight font-bold line-clamp-2">
+                                  {prd.title}
+                                </span>
+                                <div className="flex items-center justify-end gap-0.5">
+                                  {[...Array(5)].map((_, i) => (
+                                    <Star key={i} className="w-2 h-2 fill-slate-900 text-slate-900" />
+                                  ))}
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        )}
+                          )}
+                        </div>
+
+                        <div className="pt-3.5 pb-1 px-1">
+                          <h3 className="font-bold text-slate-900 text-xs sm:text-sm group-hover:text-[#1E3A5F] transition-colors line-clamp-2 leading-snug">
+                            {prd.title}
+                          </h3>
+                        </div>
                       </div>
 
-                      <div className="p-5">
-                        <h3 className="font-bold text-slate-900 text-xs sm:text-sm group-hover:text-[#1E3A5F] transition-colors line-clamp-2">
-                          {prd.title}
-                        </h3>
+                      <div>
+                        <div className="border-t border-slate-100 my-2.5" />
+                        <div className="px-1 pb-1 flex items-center justify-between text-xs">
+                          <span className="font-bold text-[#059669] text-sm">{formatRupiah(prd.discountedPrice)}</span>
+                          <span className="text-slate-500 text-[11px]">
+                            Terjual : {(prd.totalSales || 0).toLocaleString("id-ID")}
+                          </span>
+                        </div>
                       </div>
-                    </div>
-
-                    <div className="px-5 pb-5 flex items-center justify-between border-t border-slate-100 text-xs">
-                      <span className="font-bold text-emerald-600 text-sm">{formatRupiah(prd.discountedPrice)}</span>
-                      <span className="text-slate-400">Terjual : {prd.totalSales.toLocaleString("id-ID")}</span>
-                    </div>
-                  </Link>
+                    </Link>
                   );
                 })}
               </div>

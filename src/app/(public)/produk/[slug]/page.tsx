@@ -83,11 +83,18 @@ export default async function DetailProdukPage({
             ? "/assets/product3.png"
             : rawThumb;
 
+  const galleryThumbs =
+    product.galleries && product.galleries.length > 0
+      ? product.galleries.slice(0, 4).map((g) => g.imageUrl)
+      : resolvedThumb
+        ? [resolvedThumb, "/assets/product.png", "/assets/product2.png", "/assets/product3.png"]
+        : [];
+
   return (
     <div className="space-y-12 pb-16 pt-6">
-      <div className="max-w-[1440px] mx-auto px-6 sm:px-12 lg:px-[96px] space-y-8">
-        {/* Breadcrumb */}
-        <nav className="flex items-center gap-2 text-xs text-slate-500">
+      <div className="max-w-[1440px] mx-auto px-6 sm:px-12 lg:px-[96px] space-y-6">
+        {/* Clean Breadcrumb */}
+        <nav className="flex items-center gap-2 text-xs text-slate-400">
           <Link href="/" className="hover:text-slate-900 transition-colors">
             Beranda
           </Link>
@@ -96,15 +103,15 @@ export default async function DetailProdukPage({
             Produk
           </Link>
           <span>/</span>
-          <span className="text-slate-900 font-medium truncate">Detail</span>
+          <span className="text-slate-900 font-semibold truncate">Detail</span>
         </nav>
 
-        {/* Top Product Container Box (Bordered) */}
-        <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-10 space-y-8 shadow-xs">
+        {/* Top Product Container Box (Cyan Border matching Detail Produk.png) */}
+        <div className="bg-white rounded-3xl border border-[#38BDF8] p-5 sm:p-8 lg:p-10 space-y-8 shadow-xs">
           {/* Top Half: Cover + Pricing & Buy */}
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
-            {/* Left Column: 3D Product Mockup & Thumbnails */}
-            <div className="md:col-span-6 space-y-4">
+            {/* Left Column: 3D Product Cover & 4 Small Preview Thumbnails */}
+            <div className="md:col-span-5 space-y-3">
               <div className="aspect-[4/3] bg-gradient-to-br from-amber-100 via-rose-50 to-teal-50 rounded-2xl border border-slate-100 flex items-center justify-center overflow-hidden shadow-inner">
                 {resolvedThumb ? (
                   <img
@@ -132,61 +139,70 @@ export default async function DetailProdukPage({
                 )}
               </div>
 
-              {/* 4 Small Thumbnails */}
-              <div className="grid grid-cols-4 gap-2.5">
-                <div className="aspect-square bg-slate-900 rounded-lg flex items-center justify-center text-[10px] text-white p-1 text-center font-bold">
-                  Overview
+              {/* 4 Small Preview Thumbnails */}
+              {galleryThumbs.length > 0 && (
+                <div className="grid grid-cols-4 gap-2.5">
+                  {galleryThumbs.map((imgUrl, idx) => (
+                    <div
+                      key={idx}
+                      className="aspect-[4/3] bg-slate-100 rounded-xl overflow-hidden border border-slate-200"
+                    >
+                      <img
+                        src={imgUrl}
+                        alt={`${product.title} preview ${idx + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  ))}
                 </div>
-                <div className="aspect-square bg-slate-900 rounded-lg flex items-center justify-center text-[10px] text-white p-1 text-center font-bold">
-                  Module 1
-                </div>
-                <div className="aspect-square bg-slate-900 rounded-lg flex items-center justify-center text-[10px] text-white p-1 text-center font-bold">
-                  Module 2
-                </div>
-                <div className="aspect-square bg-slate-900 rounded-lg flex items-center justify-center text-[10px] text-white p-1 text-center font-bold">
-                  Templates
-                </div>
-              </div>
+              )}
             </div>
 
-            {/* Right Column: Title, Pricing & CTA */}
-            <div className="md:col-span-6 space-y-6">
-              {/* Level Badge */}
-              <div className="inline-flex items-center gap-1.5 text-teal-600 text-xs font-semibold">
-                <BarChart3 className="w-4 h-4" />
-                <span>{product.levelBadge || "Semua Level"}</span>
-              </div>
+            {/* Right Column: Level Badge, Title, Compact Stacked Pricing Box & Clean CTA */}
+            <div className="md:col-span-7 flex flex-col justify-between space-y-5">
+              <div className="space-y-4">
+                {/* Level Badge inside Soft Aqua Pill matching Detail Produk.png */}
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-[#E6FAF8] border border-[#99F6E4] text-[#2A5D69] text-xs font-semibold">
+                  <BarChart3 className="w-3.5 h-3.5" />
+                  <span>{product.levelBadge || "Semua Level"}</span>
+                </div>
 
-              {/* Product Title */}
-              <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight leading-snug">
-                {product.title}
-              </h1>
+                {/* Product Title */}
+                <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight leading-snug">
+                  {product.title}
+                </h1>
 
-              {/* Pricing Box (Soft Aqua Bg) */}
-              <div className="bg-[#E6FAF8] border border-[#99F6E4] rounded-2xl p-5 flex items-center gap-4">
-                <span className="px-2.5 py-1 rounded-md bg-[#0D9488] text-white font-bold text-xs">
-                  Diskon {product.discountPercent}%
-                </span>
-                <div className="flex items-baseline gap-3">
-                  <span className="line-through text-slate-400 text-xs sm:text-sm">
-                    {formatRupiah(product.originalPrice)}
-                  </span>
-                  <span className="text-xl sm:text-2xl font-extrabold text-emerald-600">
-                    {formatRupiah(product.discountedPrice)}
-                  </span>
+                {/* Compact Stacked Pricing Box matching Detail Produk.png */}
+                <div className="inline-flex flex-col gap-2 bg-[#E6FAF8] rounded-xl px-4 py-3.5 min-w-[210px]">
+                  {product.discountPercent > 0 && (
+                    <div>
+                      <span className="inline-block px-2.5 py-0.5 rounded bg-[#2A5D69] text-white font-bold text-[11px]">
+                        Diskon {product.discountPercent}%
+                      </span>
+                    </div>
+                  )}
+                  <div className="flex items-baseline gap-2.5">
+                    {product.discountPercent > 0 && (
+                      <span className="line-through text-slate-400 text-xs sm:text-sm">
+                        {formatRupiah(product.originalPrice)}
+                      </span>
+                    )}
+                    <span className="text-lg sm:text-xl font-extrabold text-[#059669]">
+                      {formatRupiah(product.discountedPrice)}
+                    </span>
+                  </div>
                 </div>
               </div>
 
-              {/* Action Buttons (DOKU Checkout / External link + WhatsApp consultation) */}
-              <div className="space-y-3 pt-2">
+              {/* Clean Action Buttons matching Detail Produk.png + preserving DOKU, WA, & Live Demo */}
+              <div className="space-y-3 pt-4 max-w-md">
                 {product.purchaseLinkExternal ? (
                   <a
                     href={product.purchaseLinkExternal}
                     target="_blank"
                     rel="noreferrer"
-                    className="w-full py-3.5 px-4 rounded-xl bg-[#1E3A5F] hover:bg-[#162E4A] text-white text-xs font-bold flex items-center justify-center gap-2 shadow-md transition-all"
+                    className="w-full py-3 px-4 rounded-xl bg-[#1E3A5F] hover:bg-[#162E4A] text-white text-xs sm:text-sm font-bold flex items-center justify-center gap-2 shadow-sm transition-all"
                   >
-                    <ExternalLink className="w-4 h-4 text-white" />
                     <span>Beli Produk Ini</span>
                   </a>
                 ) : (
@@ -195,38 +211,42 @@ export default async function DetailProdukPage({
                     itemId={product.id}
                     itemTitle={product.title}
                     amount={product.discountedPrice || product.originalPrice}
-                    buttonLabel="Beli Sekarang (DOKU)"
+                    buttonLabel="Beli Produk Ini"
+                    className="w-full py-3 px-4 rounded-xl bg-[#1E3A5F] hover:bg-[#162E4A] text-white text-xs sm:text-sm font-bold flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer"
                   />
-                )}
-
-                <a
-                  href={`https://wa.me/${contactPhone.replace(/[^0-9]/g, "")}?text=Halo,%20saya%20ingin%20bertanya%20tentang%20produk:%20${encodeURIComponent(
-                    product.title
-                  )}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="w-full py-3 px-4 rounded-xl bg-[#25D366] hover:bg-[#20bd5a] text-white text-xs font-bold flex items-center justify-center gap-2 shadow-xs transition-all"
-                >
-                  <WhatsAppIcon className="w-4 h-4 text-white" fill="currentColor" />
-                  <span>Tanya via WhatsApp</span>
-                </a>
-
-                {product.liveDemoUrl && (
-                  <a
-                    href={product.liveDemoUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="w-full py-3 px-4 rounded-xl bg-[#1E3A5F] hover:bg-[#162E4A] text-white text-xs font-semibold flex items-center justify-center gap-2 transition-colors"
-                  >
-                    <ExternalLink className="w-4 h-4" />
-                    <span>Lihat Live Demo</span>
-                  </a>
                 )}
 
                 <ShareButton
                   label="Bagikan"
-                  className="w-full py-3 px-4 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                  className="w-full py-3 px-4 rounded-xl bg-white border border-[#1E3A5F]/40 hover:bg-slate-50 text-slate-800 text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer"
                 />
+
+                {/* Secondary subtle utility row for WhatsApp & Live Demo */}
+                <div className="flex flex-wrap items-center justify-center gap-4 pt-1 text-xs">
+                  <a
+                    href={`https://wa.me/${contactPhone.replace(/[^0-9]/g, "")}?text=Halo,%20saya%20ingin%20bertanya%20tentang%20produk:%20${encodeURIComponent(
+                      product.title
+                    )}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1.5 text-slate-500 hover:text-emerald-700 font-medium transition-colors"
+                  >
+                    <WhatsAppIcon className="w-3.5 h-3.5 text-emerald-600" fill="currentColor" />
+                    <span>Tanya via WhatsApp</span>
+                  </a>
+
+                  {product.liveDemoUrl && (
+                    <a
+                      href={product.liveDemoUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1.5 text-slate-500 hover:text-[#1E3A5F] font-medium transition-colors"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                      <span>Lihat Live Demo</span>
+                    </a>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -236,7 +256,7 @@ export default async function DetailProdukPage({
           {/* Section: Tentang Produk */}
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <div className="w-1 h-5 bg-teal-500 rounded-full" />
+              <div className="w-1 h-5 bg-[#26A69A] rounded-full" />
               <h2 className="text-base sm:text-lg font-bold text-slate-900">Tentang Produk</h2>
             </div>
 
@@ -247,7 +267,7 @@ export default async function DetailProdukPage({
             {whatYouGet.length > 0 && (
               <div className="space-y-2 pt-2">
                 <h4 className="font-bold text-xs sm:text-sm text-slate-900">Yang Anda dapatkan:</h4>
-                <ul className="space-y-1.5 text-xs text-slate-600">
+                <ul className="space-y-1.5 text-xs sm:text-sm text-slate-600">
                   {whatYouGet.map((item, i) => (
                     <li key={i} className="flex items-start gap-2">
                       <span className="text-slate-400">•</span>
@@ -259,7 +279,7 @@ export default async function DetailProdukPage({
             )}
 
             {suitableFor.length > 0 && (
-              <div className="pt-2 text-xs text-slate-600">
+              <div className="pt-2 text-xs sm:text-sm text-slate-600">
                 <span className="font-bold text-slate-900">Cocok untuk: </span>
                 <span>{suitableFor.join(" • ")}</span>
               </div>
@@ -268,34 +288,48 @@ export default async function DetailProdukPage({
 
           <hr className="border-slate-200" />
 
-          {/* Section: List Materi (Curriculum Modules from DB) */}
-          <div className="space-y-4">
+          {/* Section: List Materi (Vertical Timeline with Dots + Cyan Bordered Cards matching Detail Produk.png) */}
+          <div className="space-y-5">
             <div className="flex items-center gap-2">
-              <div className="w-1 h-5 bg-teal-500 rounded-full" />
+              <div className="w-1 h-5 bg-[#26A69A] rounded-full" />
               <h2 className="text-base sm:text-lg font-bold text-slate-900">List Materi</h2>
             </div>
 
-            <div className="space-y-4">
-              {product.modules && product.modules.length > 0 ? (
-                product.modules.map((mod) => (
-                  <div key={mod.id} className="border border-slate-200 rounded-2xl p-5 space-y-3 bg-white">
-                    <h3 className="font-bold text-xs sm:text-sm text-slate-900">
-                      {mod.moduleNumber} — {mod.title}
-                    </h3>
-                    <div className="space-y-2 pl-2">
-                      {mod.lessons.map((lsn) => (
-                        <div key={lsn.id} className="flex items-center gap-2.5 text-xs text-slate-600">
-                          <FileText className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                          <span>{lsn.title}</span>
-                        </div>
-                      ))}
+            {product.modules && product.modules.length > 0 ? (
+              <div className="relative pl-6 sm:pl-8 space-y-4">
+                {/* Vertical Timeline Connector Line */}
+                <div
+                  className="absolute left-[5px] sm:left-[7px] top-3 bottom-6 w-[1.5px] bg-slate-200"
+                  aria-hidden="true"
+                />
+
+                {product.modules.map((mod) => (
+                  <div key={mod.id} className="relative">
+                    {/* Circular Timeline Node Dot */}
+                    <span
+                      className="absolute -left-6 sm:-left-8 top-3 w-3 h-3 rounded-full bg-slate-300 ring-4 ring-white"
+                      aria-hidden="true"
+                    />
+
+                    <div className="border border-[#38BDF8]/80 rounded-2xl p-5 space-y-3 bg-white shadow-2xs">
+                      <h3 className="font-bold text-xs sm:text-sm text-slate-900">
+                        {mod.moduleNumber} — {mod.title}
+                      </h3>
+                      <div className="space-y-2 pl-2">
+                        {mod.lessons.map((lsn) => (
+                          <div key={lsn.id} className="flex items-center gap-2.5 text-xs text-slate-600">
+                            <FileText className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                            <span>{lsn.title}</span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
-                ))
-              ) : (
-                <div className="text-xs text-slate-400 italic">Materi sedang disiapkan.</div>
-              )}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-xs text-slate-400 italic">Materi sedang disiapkan.</div>
+            )}
           </div>
 
           <hr className="border-slate-200" />

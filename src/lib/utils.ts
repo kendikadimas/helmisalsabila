@@ -83,6 +83,9 @@ export function markdownToHtml(md: string): string {
     } else if (line.startsWith("# ")) {
       closeLists();
       out.push(`<h2>${inlineFormat(line.slice(2))}</h2>`);
+    } else if (line.startsWith("> ")) {
+      closeLists();
+      out.push(`<blockquote class="border-l-4 border-teal-500 pl-3 italic text-slate-600">${inlineFormat(line.slice(2))}</blockquote>`);
     } else if (/^[-*]\s+/.test(line)) {
       if (inOl) { out.push("</ol>"); inOl = false; }
       if (!inUl) { out.push("<ul>"); inUl = true; }
