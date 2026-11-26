@@ -9,6 +9,7 @@ import ShareButton from "@/components/ShareButton";
 import DokuCheckoutModal from "@/components/DokuCheckoutModal";
 import ProductFaqAccordion from "@/components/ProductFaqAccordion";
 import { WhatsAppIcon } from "@/components/WhatsAppIcon";
+import { FALLBACK_PHONE } from "@/lib/site-config";
 
 export async function generateMetadata({
   params,
@@ -67,7 +68,7 @@ export default async function DetailProdukPage({
     notFound();
   }
 
-  const contactPhone = settings?.contactPhone || "+6269233221";
+  const contactPhone = settings?.contactPhone || FALLBACK_PHONE;
   const whatYouGet = parseJsonArray(product.whatYouGet);
   const suitableFor = parseJsonArray(product.suitableFor);
 

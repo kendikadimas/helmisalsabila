@@ -11,6 +11,7 @@ import { formatDateIndo, markdownToHtml, sanitizeHtml } from "@/lib/utils";
 import SectionHeader from "@/components/SectionHeader";
 import ShareButton from "@/components/ShareButton";
 import TableOfContents, { type TocHeading } from "@/components/TableOfContents";
+import { SITE_URL } from "@/lib/site-config";
 
 export async function generateMetadata({
   params,
@@ -62,7 +63,7 @@ export default async function DetailArtikelPage({
   const hdrs = await headers();
   const host = hdrs.get("x-forwarded-host") || hdrs.get("host");
   const proto = hdrs.get("x-forwarded-proto") || (host?.includes("localhost") ? "http" : "https");
-  const origin = host ? `${proto}://${host}` : process.env.NEXT_PUBLIC_APP_URL || "https://helsenvi.com";
+  const origin = host ? `${proto}://${host}` : SITE_URL;
   const articleUrl = `${origin}/blog/${article.slug}`;
 
   const rawContent = article.content || "";

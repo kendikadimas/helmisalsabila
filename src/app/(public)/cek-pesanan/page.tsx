@@ -5,6 +5,7 @@ import { db, schema } from "@/db";
 import { formatRupiah, formatDateIndo } from "@/lib/utils";
 import { getSiteSettings } from "@/actions/settings";
 import { WhatsAppIcon } from "@/components/WhatsAppIcon";
+import { FALLBACK_PHONE } from "@/lib/site-config";
 
 export const dynamic = "force-dynamic";
 
@@ -45,7 +46,7 @@ export default async function CekPesananPage({
   }
 
   const settings = await getSiteSettings();
-  const contactPhone = settings?.contactPhone || "+6269233221";
+  const contactPhone = settings?.contactPhone || FALLBACK_PHONE;
 
   return (
     <div className="min-h-[75vh] py-14 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">

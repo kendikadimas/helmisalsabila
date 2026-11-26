@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
+import { SITE_URL } from "@/lib/site-config";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -9,7 +10,7 @@ const plusJakartaSans = Plus_Jakarta_Sans({
   variable: "--font-sans",
 });
 
-const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://helsenvi.com";
+const baseUrl = SITE_URL;
 
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),

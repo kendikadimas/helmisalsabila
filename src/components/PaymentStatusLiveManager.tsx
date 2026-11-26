@@ -29,14 +29,20 @@ interface OrderData {
   status: "PENDING" | "PAID" | "FAILED" | "EXPIRED";
   createdAt: string;
   digitalAccessUrl?: string | null;
+  voucherCode?: string | null;
+  discountAmount?: number;
 }
 
 export default function PaymentStatusLiveManager({
   initialOrder,
   contactPhone,
+  contactEmail,
+  siteName,
 }: {
   initialOrder: OrderData | null;
   contactPhone: string;
+  contactEmail: string;
+  siteName: string;
 }) {
   const [order, setOrder] = useState<OrderData | null>(initialOrder);
   const [status, setStatus] = useState<string>(initialOrder?.status || "PENDING");
@@ -137,11 +143,10 @@ export default function PaymentStatusLiveManager({
             <div className="mx-auto w-[210mm] min-h-[297mm] px-[18mm] py-[16mm] flex flex-col">
               <header className="flex justify-between items-start pb-6 border-b-2 border-slate-900">
                 <div className="flex items-start gap-3">
-                  <img src="/logoku-1.png" alt="Helmi Salsabila" className="w-12 h-12 rounded-full" />
+                  <img src="/logoku-1.png" alt={siteName} className="w-12 h-12 rounded-full" />
                   <div>
-                  <h1 className="text-2xl font-extrabold tracking-tight">Helmi Salsabila</h1>
-                  <p className="text-[11px] text-slate-500 mt-1">Data &amp; Digital Solutions</p>
-                  <p className="text-[11px] text-slate-500">helsenvi.com &middot; admin@helsenvi.com</p>
+                  <h1 className="text-2xl font-extrabold tracking-tight">{siteName}</h1>
+                                    <p className="text-[11px] text-slate-500">{contactEmail}</p>
                   {contactPhone && <p className="text-[11px] text-slate-500">WhatsApp: {contactPhone}</p>}
                   </div>
                 </div>
@@ -199,8 +204,8 @@ export default function PaymentStatusLiveManager({
                       </p>
                     </td>
                     <td className="py-3.5 px-3 text-center">1</td>
-                    <td className="py-3.5 px-3 text-right">{formatRupiah(order.amount)}</td>
-                    <td className="py-3.5 px-3 text-right font-semibold">{formatRupiah(order.amount)}</td>
+                    <td className="py-3.5 px-3 text-right">{formatRupiah(order.amount + (order.discountAmount || 0))}</td>
+                    <td className="py-3.5 px-3 text-right font-semibold">{formatRupiah(order.amount + (order.discountAmount || 0))}</td>
                   </tr>
                 </tbody>
               </table>
@@ -209,8 +214,14 @@ export default function PaymentStatusLiveManager({
                 <div className="w-64 text-xs space-y-1.5">
                   <div className="flex justify-between text-slate-600">
                     <span>Subtotal</span>
-                    <span>{formatRupiah(order.amount)}</span>
+                    <span>{formatRupiah(order.amount + (order.discountAmount || 0))}</span>
                   </div>
+                  {!!order.discountAmount && (
+                    <div className="flex justify-between text-emerald-700">
+                      <span>Diskon{order.voucherCode ? ` (${order.voucherCode})` : ""}</span>
+                      <span>-{formatRupiah(order.discountAmount)}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between items-center border-t-2 border-slate-900 pt-2 mt-2 text-sm font-extrabold">
                     <span>Total</span>
                     <span>{formatRupiah(order.amount)}</span>

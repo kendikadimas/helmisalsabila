@@ -9,6 +9,7 @@ import { getProducts } from "@/actions/products";
 import { getArticles, getAllCategories } from "@/actions/articles";
 import { getTestimonials, getWorkSteps, getValuePropositions, getSiteSettings } from "@/actions/settings";
 import { formatRupiah, formatDateIndo } from "@/lib/utils";
+import { SITE_URL, FALLBACK_PHONE } from "@/lib/site-config";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -70,7 +71,7 @@ export default async function HomePage() {
 
   const heroTitle = settings?.heroTitle || "Data & Digital Solutions.";
   const heroSubtitle = settings?.heroSubtitle || "Masalah ditemukan. Solusi diarahkan. Pilihan terbaik direkomendasikan.";
-  const contactPhone = settings?.contactPhone || "+6269233221";
+  const contactPhone = settings?.contactPhone || FALLBACK_PHONE;
   const stats = settings?.statsCounters || { years: "5+", clients: "100+", projects: "100%" };
   const socials = {
     linkedin: settings?.socialLinks?.linkedin || "https://linkedin.com",
@@ -171,8 +172,8 @@ export default async function HomePage() {
     "@type": "Person",
     name: settings?.siteName || "Helmi Salsabila",
     jobTitle: "Data Analyst & Digital Solution Specialist",
-    url: process.env.NEXT_PUBLIC_APP_URL || "https://helsenvi.com",
-    image: `${process.env.NEXT_PUBLIC_APP_URL || "https://helsenvi.com"}/profile-talent.png`,
+    url: SITE_URL,
+    image: `${SITE_URL}/profile-talent.png`,
     sameAs: [socials.linkedin, socials.instagram, socials.threads].filter(Boolean),
     knowsAbout: ["Data Analytics", "Python", "Tableau", "SQL", "Spreadsheet Automation"],
   };

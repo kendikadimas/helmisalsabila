@@ -5,7 +5,8 @@ import { eq } from "drizzle-orm";
 import { db, schema } from "@/db";
 import { createDokuCheckoutPayment, getDokuConfig } from "@/lib/doku";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
-import { validatePromoCode } from "@/lib/promo";
+import { validatePromoCode, resolveItemPrice } from "@/lib/promo";
+import { SITE_URL } from "@/lib/site-config";
 
 const CheckoutSchema = z.object({
   itemType: z.enum(["product", "service"]).default("product"),
@@ -52,33 +53,15 @@ export async function POST(req: Request) {
 
     const { itemType, itemId, customerName, customerEmail, customerPhone, promoCode } = parsed.data;
 
-    let itemTitle = "";
-    let amount = 0;
-
-    if (itemType === "product") {
-      const [product] = await db
-        .select()
-        .from(schema.products)
-        .where(eq(schema.products.id, itemId))
-        .limit(1);
-      if (!product) {
-        return NextResponse.json({ success: false, error: "Produk tidak ditemukan." }, { status: 404 });
-      }
-      itemTitle = product.title;
-      amount = Math.round(parseFloat(String(product.discountedPrice || product.originalPrice || "0")));
-    } else {
-      const [service] = await db
-        .select()
-        .from(schema.services)
-        .where(eq(schema.services.id, itemId))
-        .limit(1);
-      if (!service) {
-        return NextResponse.json({ success: false, error: "Layanan tidak ditemukan." }, { status: 404 });
-      }
-      itemTitle = service.title;
-      amount = Math.round(parseFloat(String(service.priceStartingAt || "0")));
+    const item = await resolveItemPrice(itemType, itemId);
+    if (!item) {
+      return NextResponse.json(
+        { success: false, error: itemType === "product" ? "Produk tidak ditemukan." : "Layanan tidak ditemukan." },
+        { status: 404 }
+      );
     }
-
+    const itemTitle = item.title;
+    let amount = item.amount;
     if (amount <= 0) {
       return NextResponse.json(
         { success: false, error: "Item gratis tidak memerlukan checkout pembayaran." },
@@ -86,24 +69,21 @@ export async function POST(req: Request) {
       );
     }
 
-    // Apply promo code discount if provided
+    // Voucher dihitung ulang di server dari database; kode tidak valid ditolak (bukan diabaikan diam-diam).
+    let voucherCode: string | null = null;
+    let discountAmount = 0;
     if (promoCode) {
-      const promoRes = validatePromoCode(promoCode, amount);
-      if (promoRes.valid && promoRes.finalAmount) {
-        amount = promoRes.finalAmount;
-        itemTitle = `${itemTitle} [Kupon ${promoRes.code}]`;
+      const promoRes = await validatePromoCode(promoCode, amount);
+      if (!promoRes.valid || !promoRes.finalAmount) {
+        return NextResponse.json({ success: false, error: promoRes.message }, { status: 400 });
       }
+      voucherCode = promoRes.code;
+      discountAmount = promoRes.discountAmount || 0;
+      amount = promoRes.finalAmount;
     }
-
-    const configuredOrigin = process.env.NEXT_PUBLIC_APP_URL?.trim();
-    const rawHost = req.headers.get("host") || "helsenvi.com";
+    const rawHost = req.headers.get("host") || "";
     const isAllowedLocal = rawHost.startsWith("localhost:") || rawHost.startsWith("127.0.0.1:");
-    const origin = isAllowedLocal
-      ? `http://${rawHost}`
-      : configuredOrigin && configuredOrigin.startsWith("http")
-        ? configuredOrigin.replace(/\/$/, "")
-        : "https://helsenvi.com";
-
+    const origin = isAllowedLocal ? `http://${rawHost}` : SITE_URL;
     const orderId = `ord-${crypto.randomUUID().slice(0, 12)}`;
     // Cryptographically random 10-hex-char suffix (40 bits entropy) to prevent invoice guessing/enumeration
     const randomSuffix = crypto.randomBytes(5).toString("hex").toUpperCase();
@@ -127,6 +107,19 @@ export async function POST(req: Request) {
       amount: amount.toFixed(2),
       status: "PENDING",
     });
+
+    if (voucherCode) {
+      try {
+        await db.insert(schema.voucherRedemptions).values({
+          id: crypto.randomUUID(),
+          voucherCode,
+          orderId,
+          discountAmount,
+        });
+      } catch (e) {
+        console.error("Failed to record voucher redemption:", e);
+      }
+    }
 
     const dokuRes = await createDokuCheckoutPayment({
       invoiceNumber,

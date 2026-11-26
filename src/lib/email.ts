@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer";
 import { formatRupiah } from "@/lib/utils";
+import { SITE_URL, CONTACT_EMAIL } from "@/lib/site-config";
 
 interface OrderEmailData {
   invoiceNumber: string;
@@ -40,7 +41,7 @@ export async function sendOrderPaidEmail(data: OrderEmailData): Promise<boolean>
     return false;
   }
 
-  const fromEmail = process.env.SMTP_FROM || process.env.SMTP_USER || "noreply@helsenvi.com";
+  const fromEmail = process.env.SMTP_FROM || process.env.SMTP_USER || CONTACT_EMAIL;
   const siteName = process.env.NEXT_PUBLIC_SITE_NAME || "Helmi Salsabila";
   const formattedAmount = formatRupiah(data.amount);
 
@@ -112,8 +113,8 @@ export async function sendOrderPaidEmail(data: OrderEmailData): Promise<boolean>
         <p style="font-size: 12px; color: #475569; margin: 0 0 8px;">
           Anda dapat mengakses seluruh produk yang dimiliki kapan saja melalui Dashboard Produk Saya:
         </p>
-        <a href="${process.env.NEXT_PUBLIC_APP_URL || "https://helsenvi.com"}/dashboard" style="color: #0284c7; font-weight: 600; font-size: 12px;">
-          Buka Dashboard Produk Saya (${process.env.NEXT_PUBLIC_APP_URL || "https://helsenvi.com"}/dashboard)
+        <a href="${SITE_URL}/dashboard" style="color: #0284c7; font-weight: 600; font-size: 12px;">
+          Buka Dashboard Produk Saya (${SITE_URL}/dashboard)
         </a>
       </div>
     </div>
@@ -144,8 +145,8 @@ export async function sendAdminNewOrderNotification(data: OrderEmailData): Promi
   const transporter = getTransporter();
   if (!transporter) return false;
 
-  const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL || process.env.SMTP_USER || "admin@helmisalsabila.com";
-  const fromEmail = process.env.SMTP_FROM || process.env.SMTP_USER || "noreply@helsenvi.com";
+  const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL || process.env.SMTP_USER || CONTACT_EMAIL;
+  const fromEmail = process.env.SMTP_FROM || process.env.SMTP_USER || CONTACT_EMAIL;
   const siteName = process.env.NEXT_PUBLIC_SITE_NAME || "Helmi Salsabila";
   const formattedAmount = formatRupiah(data.amount);
 
@@ -175,7 +176,7 @@ export async function sendAdminNewOrderNotification(data: OrderEmailData): Promi
       <tr><td>Waktu</td><td>${new Date().toLocaleString("id-ID", { timeZone: "Asia/Jakarta" })}</td></tr>
     </table>
     <p style="font-size: 12px; color: #64748b; margin-top: 20px;">
-      Buka panel admin untuk detail: <a href="${process.env.NEXT_PUBLIC_APP_URL || "https://helsenvi.com"}/admin/orders">Dashboard Orders</a>
+      Buka panel admin untuk detail: <a href="${SITE_URL}/admin/orders">Dashboard Orders</a>
     </p>
   </div>
 </body>

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { CreditCard, X, Loader2, AlertCircle, ShieldCheck, Tag, Check } from "lucide-react";
 import { formatRupiah } from "@/lib/utils";
 import { trackBeginCheckout } from "@/lib/analytics";
-import { validatePromoCode, PromoResult } from "@/lib/promo";
+import type { PromoResult } from "@/lib/promo";
 
 interface DokuCheckoutModalProps {
   itemType: "product" | "service";
@@ -30,6 +30,7 @@ export default function DokuCheckoutModal({
   const [promoInput, setPromoInput] = useState("");
   const [appliedPromo, setAppliedPromo] = useState<PromoResult | null>(null);
   const [promoError, setPromoError] = useState<string | null>(null);
+  const [isApplyingPromo, setIsApplyingPromo] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -40,16 +41,28 @@ export default function DokuCheckoutModal({
 
   const effectiveAmount = appliedPromo?.finalAmount || numericAmount;
 
-  const handleApplyPromo = () => {
+  const handleApplyPromo = async () => {
     setPromoError(null);
     if (!promoInput.trim()) return;
 
-    const res = validatePromoCode(promoInput, numericAmount);
-    if (res.valid) {
-      setAppliedPromo(res);
-    } else {
-      setPromoError(res.message);
-      setAppliedPromo(null);
+    setIsApplyingPromo(true);
+    try {
+      const r = await fetch("/api/promo/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: promoInput, itemType, itemId }),
+      });
+      const res: PromoResult = await r.json();
+      if (res.valid) {
+        setAppliedPromo(res);
+      } else {
+        setPromoError(res.message);
+        setAppliedPromo(null);
+      }
+    } catch {
+      setPromoError("Gagal memeriksa kode promo. Coba lagi.");
+    } finally {
+      setIsApplyingPromo(false);
     }
   };
 
@@ -181,15 +194,16 @@ export default function DokuCheckoutModal({
                       type="text"
                       value={promoInput}
                       onChange={(e) => setPromoInput(e.target.value.toUpperCase())}
-                      placeholder="Contoh: HELMI20 / DISKON10"
+                      placeholder="Masukkan kode promo"
                       className="flex-1 p-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 font-mono text-xs uppercase focus:outline-none focus:border-teal-600"
                     />
                     <button
                       type="button"
                       onClick={handleApplyPromo}
-                      className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold cursor-pointer transition-colors"
+                      disabled={isApplyingPromo}
+                      className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold cursor-pointer transition-colors disabled:opacity-50"
                     >
-                      Terapkan
+                      {isApplyingPromo ? "Memeriksa..." : "Terapkan"}
                     </button>
                   </div>
                 )}

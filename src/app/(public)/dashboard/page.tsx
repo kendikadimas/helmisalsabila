@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getCustomerDashboardData } from "@/actions/customer";
 import { getSiteSettings } from "@/actions/settings";
 import CustomerDashboardClient from "@/components/CustomerDashboardClient";
+import { FALLBACK_PHONE } from "@/lib/site-config";
 
 export const dynamic = "force-dynamic";
 
@@ -16,7 +17,7 @@ export default async function CustomerDashboardPage() {
     getSiteSettings(),
   ]);
 
-  const contactPhone = settings?.contactPhone || "+6269233221";
+  const contactPhone = settings?.contactPhone || FALLBACK_PHONE;
 
   return (
     <CustomerDashboardClient

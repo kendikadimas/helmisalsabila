@@ -2,9 +2,10 @@ import type { MetadataRoute } from "next";
 import { getArticles } from "@/actions/articles";
 import { getServices } from "@/actions/services";
 import { getProducts } from "@/actions/products";
+import { SITE_URL } from "@/lib/site-config";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://helsenvi.com";
+  const baseUrl = SITE_URL;
 
   // Static routes
   const staticRoutes: MetadataRoute.Sitemap = [

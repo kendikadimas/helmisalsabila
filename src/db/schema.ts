@@ -338,3 +338,29 @@ export const articleTagsRelations = relations(articleTags, ({ one }) => ({
     references: [tags.id],
   }),
 }));
+
+// 13. Vouchers (Kode Promo yang dikelola dari admin)
+export const vouchers = mysqlTable("vouchers", {
+  id: varchar("id", { length: 36 }).primaryKey(),
+  code: varchar("code", { length: 50 }).notNull().unique(),
+  description: varchar("description", { length: 255 }),
+  type: mysqlEnum("type", ["percent", "fixed"]).default("percent").notNull(),
+  value: int("value").notNull(),
+  minPurchase: int("min_purchase").default(0).notNull(),
+  maxDiscount: int("max_discount"),
+  quota: int("quota"),
+  startsAt: timestamp("starts_at"),
+  expiresAt: timestamp("expires_at"),
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+// 14. Voucher Redemptions (catatan pemakaian voucher per pesanan)
+export const voucherRedemptions = mysqlTable("voucher_redemptions", {
+  id: varchar("id", { length: 36 }).primaryKey(),
+  voucherCode: varchar("voucher_code", { length: 50 }).notNull(),
+  orderId: varchar("order_id", { length: 36 }).notNull(),
+  discountAmount: int("discount_amount").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});

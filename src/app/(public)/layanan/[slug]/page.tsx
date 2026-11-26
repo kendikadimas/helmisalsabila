@@ -9,6 +9,7 @@ import SectionHeader from "@/components/SectionHeader";
 import ShareButton from "@/components/ShareButton";
 import DokuCheckoutModal from "@/components/DokuCheckoutModal";
 import { WhatsAppIcon } from "@/components/WhatsAppIcon";
+import { FALLBACK_PHONE } from "@/lib/site-config";
 
 export async function generateMetadata({
   params,
@@ -66,7 +67,7 @@ export default async function DetailLayananPage({
     notFound();
   }
 
-  const contactPhone = settings?.contactPhone || "+6269233221";
+  const contactPhone = settings?.contactPhone || FALLBACK_PHONE;
   const relatedServices = relatedServicesAll.filter((s) => s.slug !== slug).slice(0, 3);
   const features = parseJsonArray(service.features);
   const toolsUsed = parseJsonArray(service.toolsUsed);

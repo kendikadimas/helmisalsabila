@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Save, Lock, ShieldCheck, CheckCircle2, AlertCircle } from "lucide-react";
 import { updateSiteSettings } from "@/actions/settings";
 import { changePasswordAction } from "@/actions/auth";
+import { FALLBACK_PHONE } from "@/lib/site-config";
 
 export default function SettingsClientManager({ settings }: { settings: any }) {
   const [siteSuccess, setSiteSuccess] = useState<string | null>(null);
@@ -128,7 +129,7 @@ export default function SettingsClientManager({ settings }: { settings: any }) {
               <input
                 type="text"
                 name="contactPhone"
-                defaultValue={settings?.contactPhone || "+6269233221"}
+                defaultValue={settings?.contactPhone || FALLBACK_PHONE}
                 className="w-full p-3 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-teal-600 transition-colors font-mono"
               />
             </div>

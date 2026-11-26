@@ -26,7 +26,10 @@ Catatan temuan: halaman/URL, langkah mengulang, hasil diharapkan vs terjadi, dev
 | A14 | Kategori, Langkah Kerja, Keunggulan, Testimoni: tambah/edit/hapus | Semua berfungsi | | |
 | A15 | Transaksi DOKU | Daftar, status, nominal sesuai | | |
 | A16 | Site Settings: ubah & simpan | Perubahan terlihat di publik | | |
-| A17 | Mobile (375px): menu hamburger, tabel, form | Tidak terpotong | | |
+| A17 | Sidebar dikelompokkan: Ringkasan, Penjualan, Konten Website, Blog, Sistem | Semua menu tampil & aktif sesuai halaman | | |
+| A18 | Voucher: tambah (persen & nominal), edit, nonaktifkan lewat klik status, hapus | Tersimpan, status & kolom Terpakai benar | | |
+| A19 | Voucher: kode duplikat / nilai > 100% / tanggal berakhir < mulai | Ditolak dengan pesan jelas | | |
+| A20 | Mobile (375px): menu hamburger, tabel, form | Tidak terpotong | | |
 
 ## B. Website Publik
 
@@ -44,8 +47,11 @@ Catatan temuan: halaman/URL, langkah mengulang, hasil diharapkan vs terjadi, dev
 | C2 | Selesaikan pembayaran | Status pesanan jadi PAID (via webhook) | | |
 | C3 | Cek email konfirmasi & akses produk (termasuk spam) | Email masuk | | |
 | C4 | Batalkan / biarkan expired | Tidak PAID, produk tidak bisa diakses | | |
-| C5 | Kode promo valid | Total benar | | |
-| C6 | Kode promo tidak valid / expired | Ditolak dengan pesan jelas | | |
+| C5 | Voucher valid (buat dulu di admin) | Total benar, invoice menampilkan baris Diskon | | |
+| C6 | Voucher tidak ada / nonaktif / expired / belum mulai | Ditolak dengan pesan jelas | | |
+| C7 | Voucher dengan minimal belanja di bawah syarat | Ditolak, pesan menyebut minimal belanja | | |
+| C8 | Voucher berkuota 1: pakai di 1 pesanan, coba di pesanan kedua | Pesanan kedua ditolak "Kuota habis" | | |
+| C9 | Voucher "Maks. Potongan" diisi | Potongan tidak melebihi batas | | |
 
 ## D. Cek Pesanan & Member Area
 
